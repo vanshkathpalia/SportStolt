@@ -21,7 +21,7 @@ model User {
   photos    Photo[]
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
-  blogs    Blog[]
+  post      Post[]
 }
 
 model Video {
@@ -77,7 +77,7 @@ model Photo {
   updatedAt DateTime @updatedAt
 }
 
-model Blog {
+model Post {
   id  Int    @id @default(autoincrement())
   authorId   String
   content    String
