@@ -4,7 +4,7 @@ import { PostSkeleton } from "../components/PostSkeleton";
 import { usePosts } from "../hooks";
 
 export const Posts = () => {
-    const { loading, Posts } = usePosts();
+    const { loading, posts } = usePosts();
 
     if (loading) {
         return <div>
@@ -21,19 +21,27 @@ export const Posts = () => {
         </div>
     }
 
-    return <div>
-        <Appbar />
-        <div  className="flex justify-center">
-            <div>
-                {Posts.map(Post => <PostCard
-                    id={Post.id}
-                    authorName={Post.author.name || "Anonymous"}
-                    title={Post.title}
-                    content={Post.content}
-                    publishedDate={"2nd Feb 2024"}
-                />)}
+    else {
+        return <div>
+            <Appbar />
+            <div  className="flex justify-center">
+                <div>
+                    {posts.map(post => <PostCard
+                        id={post.id}
+                        authorName={post.author.name || "Anonymous"}
+                        title={post.title}
+                        content={post.content}
+                        publishedDate={"date"}/>)}
+                </div>
             </div>
         </div>
-    </div>
+    }
 }
+
+// .map(Post => <PostCard
+//     id={Post.id}
+//     authorName={Post.author.name || "Anonymous"}
+//     title={Post.title}
+//     content={Post.content}
+//     publishedDate={"2nd Feb 2024"}
 
