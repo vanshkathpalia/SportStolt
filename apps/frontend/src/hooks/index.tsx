@@ -14,44 +14,44 @@ export interface Post {
 
 export const usePost = ({ id }: { id: string }) => {
     const [loading, setLoading] = useState(true);
-    const [Post, setPost] = useState<Post>();
+    const [post, setPost] = useState<Post>();
 
     useEffect(() => {
-        axios.get(`${BACKEND_URL}/api/v1/Post/${id}`, {
+        axios.get(`${BACKEND_URL}/api/v1/post/${id}`, {
             headers: {
                 Authorization: localStorage.getItem("token")
             }
         })
             .then(response => {
-                setPost(response.data.Post);
+                setPost(response.data.post);
                 setLoading(false);
             })
     }, [id])
 
     return {
         loading,
-        Post
+        post
     }
 
 }
 export const usePosts = () => {
     const [loading, setLoading] = useState(true);
-    const [Posts, setPosts] = useState<Post[]>([]);
+    const [posts, setPosts] = useState<Post[]>([]); //returning the array post[]
 
     useEffect(() => {
-        axios.get(`${BACKEND_URL}/api/v1/Post/bulk`, {
+        axios.get(`${BACKEND_URL}/api/v1/post/bulk`, {
             headers: {
                 Authorization: localStorage.getItem("token")
             }
         })
             .then(response => {
-                setPosts(response.data.Posts);
+                setPosts(response.data.posts);
                 setLoading(false);
             })
     }, [])
 
     return {
         loading,
-        Posts
+        posts
     }
 }
