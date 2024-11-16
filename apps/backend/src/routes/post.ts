@@ -142,9 +142,9 @@ postRouter.get('/bulk', async (c) => {
     const authorId = c.get("userId")
 
     const posts = await prisma.post.findMany({
-        // where: {
-        //     authorId: String(authorId)
-        // }
+        where: {
+            authorId: String(authorId)
+        }
     });
 
     return c.json({
@@ -164,7 +164,7 @@ postRouter.get('/:id', async (c) => {
         const post = await prisma.post.findFirst({
             where: {
                 id: Number(id),
-                // authorId: String(authorId)
+                authorId: String(authorId)
             }
         })
         return c.json({
