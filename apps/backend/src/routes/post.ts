@@ -22,6 +22,10 @@ export const postRouter = new Hono<{
 
 //for authentication, hitting as a middleware... code comming here before any of the other route is hitted
 postRouter.use('/*', async (c, next) => {
+    c.res.headers.append('Access-Control-Allow-Origin', '*');
+    c.res.headers.append('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    c.res.headers.append('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
     const authHeader = c.req.header("authorization") || "";
     const user = await verify(authHeader, c.env.JWT_SECRET)
     if (user && typeof user.id === "string") {
@@ -41,8 +45,8 @@ postRouter.post('/', async (c) => {
     // console.log('Incoming request:', c.req.method, c.req.url);
     try {
         const body = await c.req.json();
-        console.log('Request body:', body);
-        console.log('createPostInput:', createPostsInput);
+        // console.log('Request body:', body);
+        // console.log('createPostInput:', createPostsInput);
 
         const { success } = createPostsInput.safeParse(body); //deprop (success) which we do in library 
             if(!success) {
@@ -79,9 +83,9 @@ postRouter.post('/', async (c) => {
                 db: { url: c.env.DATABASE_URL },
             },
         });
-        // prisma.$connect()
-        // .then(() => console.log('Prisma connected'))
-        // .catch((error) => console.error('Prisma connection error:', error));
+        prisma.$connect()
+        .then(() => console.log('Prisma connected'))
+        .catch((error) => console.error('Prisma connection error:', error));
 
 
         const post = await prisma.post.create({
@@ -91,6 +95,9 @@ postRouter.post('/', async (c) => {
                 authorId: String(authorId),
             }
         })
+        if (post) {
+            console.log("checking");
+        }
 
         return c.json({
             id: post.id
@@ -135,6 +142,7 @@ postRouter.put('/', async (c) => {
   
 
 //add pagination at this 
+//showing all the posts by all the user 
 postRouter.get('/bulk', async (c) => {
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
@@ -142,8 +150,15 @@ postRouter.get('/bulk', async (c) => {
     const authorId = c.get("userId")
 
     const posts = await prisma.post.findMany({
-        where: {
-            authorId: String(authorId)
+        select: {
+            content: true,
+            title: true,
+            id: true,
+            author: {
+                select: {
+                    name: true
+                }
+            }
         }
     });
 
@@ -152,7 +167,7 @@ postRouter.get('/bulk', async (c) => {
     })
 })
 
-  
+//to get into the depth of a particular post
 postRouter.get('/:id', async (c) => {
     const id = await c.req.param("id");
     const prisma = new PrismaClient({
@@ -164,7 +179,15 @@ postRouter.get('/:id', async (c) => {
         const post = await prisma.post.findFirst({
             where: {
                 id: Number(id),
-                authorId: String(authorId)
+            },
+            select: {
+                content: true,
+                title: true,
+                author: {
+                    select: {
+                        name: true
+                    }
+                }
             }
         })
         return c.json({
