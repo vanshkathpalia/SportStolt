@@ -24,14 +24,14 @@ export const Posts = () => {
     else {
         return <div>
             <Appbar />
-            <div  className="flex justify-center">
+            <div className="flex justify-center">
                 <div>
                     {posts.map(post => <PostCard
                         id={post.id}
                         authorName={post.author.name || "Anonymous"}
                         title={post.title}
                         content={post.content}
-                        publishedDate={"date"}/>)}
+                        publishedDate={"date"} />)}
                 </div>
             </div>
         </div>
@@ -45,3 +45,19 @@ export const Posts = () => {
 //     content={Post.content}
 //     publishedDate={"2nd Feb 2024"}
 
+// {/* <div className="flex justify-center">
+//                 <div>
+//                     <Avatar name="vansh" />
+//                     <div className="font-extralight pl-2 text-sm flex justify-center flex-col">vansh</div>
+//                     <div className="flex justify-center flex-col pl-2">
+//                         <Circle />
+//                     </div>
+//                     <div className="pl-2 font-thin text-slate-500 text-sm flex justify-center flex-col">
+//                         10 nov
+//                     </div>
+//                 </div>
+//                 <div className="text-xl font-semibold pt-2">
+//                     this is the ittle 
+//                 </div>
+//                 </div>
+//             </div> */}

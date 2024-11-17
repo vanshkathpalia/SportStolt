@@ -39,16 +39,23 @@ export const usePosts = () => {
     const [posts, setPosts] = useState<Post[]>([]); //returning the array post[]
 
     useEffect(() => {
-        axios.get(`${BACKEND_URL}/api/v1/post/bulk`, {
-            headers: {
-                Authorization: localStorage.getItem("token")
-            }
-        })
-            .then(response => {
-                setPosts(response.data.posts);
-                setLoading(false);
+        console.log("Starting to fetch posts...");
+        axios
+            .get(`${BACKEND_URL}/api/v1/post/bulk`, {
+                headers: {
+                    Authorization: localStorage.getItem("token"),
+                },
             })
-    }, [])
+            .then((response) => {
+                console.log("Response received:", response.data);
+                setLoading(false);
+                setPosts(response.data.posts || []);
+            })
+            .catch((error) => {
+                console.error("Error fetching posts:", error);
+                setLoading(false);
+            });
+    }, []);
 
     return {
         loading,
