@@ -22,11 +22,40 @@ export const postRouter = new Hono<{
 
 //for authentication, hitting as a middleware... code comming here before any of the other route is hitted
 postRouter.use('/*', async (c, next) => {
-    c.res.headers.append('Access-Control-Allow-Origin', '*');
-    c.res.headers.append('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    c.res.headers.append('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    // c.res.headers.append('Access-Control-Allow-Origin', '*');
+    // c.res.headers.append('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    // c.res.headers.append('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+
+    if (c.req.method === 'OPTIONS') {
+        console.log('Preflight OPTIONS request received');
+        c.status(204); // Preflight requests must return 204
+        return c.text('');
+    }
 
     const authHeader = c.req.header("authorization") || "";
+    // console.log("Authorization Header:", authHeader);
+
+    // try {
+    //     const user = await verify(authHeader, c.env.JWT_SECRET);
+    //     if (user && typeof user.id === "string") {
+    //         c.set("userId", user.id);
+    //         await next();
+    //     } else {
+    //         throw new Error("Invalid token or user ID");
+    //     }
+    // } catch (err: unknown) {
+    //     // Type guard to ensure 'err' is an instance of Error
+    //     if (err instanceof Error) {
+    //         console.error("JWT Verification Failed:", err.message);
+    //         c.status(403);
+    //         c.json({ message: "Invalid or expired token" });
+    //     } else {
+    //         // Handle unexpected error types
+    //         console.error("Unexpected error during JWT verification:", err);
+    //         c.status(500);
+    //         c.json({ message: "An unexpected error occurred" });
+    //     }
+    // }
     const user = await verify(authHeader, c.env.JWT_SECRET)
     if (user && typeof user.id === "string") {
         c.set("userId", user.id);
@@ -162,6 +191,7 @@ postRouter.get('/bulk', async (c) => {
         }
     });
 
+    console.log(posts)
     return c.json({
         posts,
     })
@@ -190,6 +220,7 @@ postRouter.get('/:id', async (c) => {
                 }
             }
         })
+        console.log(post);
         return c.json({
             post
         })
