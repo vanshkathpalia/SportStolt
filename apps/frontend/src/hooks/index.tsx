@@ -22,11 +22,31 @@ export const usePost = ({ id }: { id: string }) => {
                 Authorization: localStorage.getItem("token")
             }
         })
-            .then(response => {
+        .then(response => {
                 setPost(response.data.post);
                 setLoading(false);
             })
     }, [id])
+
+    // useEffect(() => {
+        
+    //     axios
+    //         .get(`${BACKEND_URL}/api/v1/post/${id}`, {
+    //             headers: {
+    //                 Authorization: localStorage.getItem("token"),
+    //             },
+    //         })
+    //         .then((response) => {
+    //             console.log("Response received:", response.data);
+    //             console.log("Starting to fetch posts...");
+    //             setLoading(false);
+    //             setPost(response.data.post || []);
+    //         })
+    //         .catch((error) => {
+    //             console.error("Error fetching posts:", error);
+    //             setLoading(false);
+    //         });
+    // }, [id]);
 
     return {
         loading,
@@ -38,8 +58,14 @@ export const usePosts = () => {
     const [loading, setLoading] = useState(true);
     const [posts, setPosts] = useState<Post[]>([]); //returning the array post[]
 
+    const token = localStorage.getItem("token");
+    console.log("Authorization Token:", token);
+
     useEffect(() => {
-        console.log("Starting to fetch posts...");
+        // const token = localStorage.getItem("token");
+        // console.log("Authorization Token:", token);
+        // console.log("Authorization Token:", token);
+        // console.log("Authorization Token:", token);
         axios
             .get(`${BACKEND_URL}/api/v1/post/bulk`, {
                 headers: {
@@ -47,14 +73,9 @@ export const usePosts = () => {
                 },
             })
             .then((response) => {
-                console.log("Response received:", response.data);
+                setPosts(response.data.posts);
                 setLoading(false);
-                setPosts(response.data.posts || []);
             })
-            .catch((error) => {
-                console.error("Error fetching posts:", error);
-                setLoading(false);
-            });
     }, []);
 
     return {
