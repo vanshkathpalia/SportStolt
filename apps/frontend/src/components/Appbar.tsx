@@ -1,6 +1,6 @@
 import { Avatar } from "./PostCard"
 import { Link } from "react-router-dom"
-import { Story } from "./story"
+import { Story } from "./Story"
 
 export const Appbar = () => {
     return <div className="border-b flex justify-between px-10 py-4">
