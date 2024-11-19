@@ -20,7 +20,7 @@ export const Post = () => {
                 <div className="flex justify-center">
                     <Spinner />
                 </div>
-            </div>
+            </div>x
         </div>
     }
     return <div>
