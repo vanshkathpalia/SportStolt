@@ -6,7 +6,17 @@ import { BACKEND_URL } from "../config";
 export interface Post {
     "content": string;
     "title": string;
-    "id": number
+    "id": number;
+    "author": {
+        "name": string
+    }
+}
+
+interface Story {
+    "location": string;
+    "image": string;
+    "isViewed"?: boolean;
+    "id": number;
     "author": {
         "name": string
     }
@@ -56,6 +66,7 @@ export const usePost = ({ id }: { id: string }) => {
 }
 export const usePosts = () => {
     const [loading, setLoading] = useState(true);
+    const [story, setstory] = useState<Story[]>([]);
     const [posts, setPosts] = useState<Post[]>([]); //returning the array post[]
 
     const token = localStorage.getItem("token");
@@ -76,10 +87,21 @@ export const usePosts = () => {
                 setPosts(response.data.posts);
                 setLoading(false);
             })
+
+            axios
+            .get(`${BACKEND_URL}/api/v1/story/bulk`, {
+                headers: {
+                    Authorization: localStorage.getItem("token")
+                }
+            })
+            .then(response => {
+                    setstory(response.data.stories);
+            })
     }, []);
 
     return {
         loading,
-        posts
+        posts, 
+        story
     }
 }
