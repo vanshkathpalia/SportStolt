@@ -114,7 +114,6 @@ storyRouter.post('/', async (c) => {
 })
 
 storyRouter.get('/bulk', async (c) => {
-    console.log("here");
     
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
@@ -136,7 +135,6 @@ storyRouter.get('/bulk', async (c) => {
         }
     });
 
-    console.log(stories)
     return c.json({
         stories,
     })
