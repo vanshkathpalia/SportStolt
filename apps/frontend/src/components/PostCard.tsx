@@ -15,8 +15,7 @@ export const PostCard = ({
     publishedDate
 }: PostCardProps) => {
     return <Link to={`/post/${id}`}>
-        <div className="p-4 border-b border-slate-200 pb-4 w-screen max-w-screen-md cursor-pointer">
-            now this
+        <div className="p-8 border-b border-slate-200 pb-4 hover:bg-gray-50 w-screen max-w-screen-md cursor-pointer">
             <div className="flex">
                 <Avatar name={authorName} />
                 <div className="font-extralight pl-2 text-sm flex justify-center flex-col">{authorName}</div>

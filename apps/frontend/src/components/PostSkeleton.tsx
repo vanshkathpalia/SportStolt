@@ -2,7 +2,7 @@ import { Circle } from "./PostCard"
 
 export const PostSkeleton = () => {
     return <div role="status" className="animate-pulse">
-        <div className="p-4 border-b border-slate-200 pb-4 w-screen max-w-screen-md cursor-pointer">
+        <div className="p-8 border-b border-slate-200 pb-4 w-screen max-w-screen-md cursor-pointer">
             <div className="flex">
                 <div className="h-4 w-8 bg-gray-200 rounded-full mb-4"></div>
                 <div className="h-2 bg-gray-200 rounded-full mb-2.5"></div>

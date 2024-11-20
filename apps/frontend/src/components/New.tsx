@@ -1,7 +1,7 @@
 // //design for the story, using story card
 
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight } from 'lucide-react'
+// import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { usePosts } from "../hooks";
 import { Spinner } from "./Spinner";
 import { StoryCard } from "./StoryCard";

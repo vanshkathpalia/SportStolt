@@ -9,8 +9,11 @@ export const Publish = () => {
     const [description, setDescription] = useState("");
     const navigate = useNavigate();
 
-    return <div>
-        <Appbar />
+    return <div className="flex flex-row">
+        <div>
+            <Appbar />
+        </div>
+
         <div className="flex justify-center w-full pt-8"> 
             <div className="max-w-screen-lg w-full">
                 <input onChange={(e) => {

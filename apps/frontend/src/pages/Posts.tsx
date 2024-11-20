@@ -1,37 +1,54 @@
 import { Appbar } from "../components/Appbar"
 import { PostCard } from "../components/PostCard"
 import { PostSkeleton } from "../components/PostSkeleton";
+import { Story } from "../components/Story";
+import { StorySkeleton } from "../components/StorySkeleton";
 import { usePosts } from "../hooks";
 
 export const Posts = () => {
     const { loading, posts } = usePosts();
 
     if (loading) {
-        return <div>
-            <Appbar /> 
-            <div  className="flex justify-center">
+        return <div className="flex flex-row">
+            <div className = "max-w-3xl pt-6 px-4" >
+                <Appbar />
+            </div>
+            <div className="flex justify-center">
                 <div>
-                    <PostSkeleton />
-                    <PostSkeleton />
-                    <PostSkeleton />
-                    <PostSkeleton />
-                    <PostSkeleton />
+                    <div className = "pt-6 px-4">
+                        <StorySkeleton />
+                    </div>
+                    <div>
+                        <PostSkeleton />
+                        <PostSkeleton />
+                        <PostSkeleton />
+                        <PostSkeleton />
+                        <PostSkeleton />
+                    </div>       
                 </div>
             </div>
         </div>
     }
 
     else {
-        return <div>
-            <Appbar />
+        return <div className = "flex flex-row">
+            <div className = "pt-6 px-4 basic-1/2" >
+                <Appbar />
+            </div>
+            
             <div className="flex justify-center">
                 <div>
-                    {posts.map(post => <PostCard
-                        id={post.id}
-                        authorName={post.author.name || "Anonymous"}
-                        title={post.title}
-                        content={post.content}
-                        publishedDate={"date"} />)}
+                    <div className="max-w-7xl pt-6 px-4">
+                        <Story />
+                    </div>
+                    <div>
+                        {posts.map(post => <PostCard
+                            id={post.id}
+                            authorName={post.author.name || "Anonymous"}
+                            title={post.title}
+                            content={post.content}
+                            publishedDate={"date"} />)}
+                    </div>
                 </div>
             </div>
         </div>

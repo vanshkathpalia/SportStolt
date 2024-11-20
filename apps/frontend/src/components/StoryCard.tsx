@@ -15,13 +15,13 @@ export function StoryCard({
     isViewed
   }: Story) {
     return (
-      <div className="flex flex-col items-center justify-center gap-1">
+      <div className="flex flex-col items-center hover:bg-gray-100 justify-center gap-1">
         <div className={`p-[2px] rounded-full ${isViewed ? 'bg-gray-300' : 'bg-gradient-to-tr from-yellow-400 to-pink-600'}`}>
           <div className="bg-white p-[2px] rounded-full">
             <img
               src={image}
               alt={location}
-              className="w-10 h-10 rounded-full object-cover"
+              className="w-14 h-14 rounded-full object-cover"
             />
           </div>
         </div>
