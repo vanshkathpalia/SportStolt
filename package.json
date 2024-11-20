@@ -20,5 +20,8 @@
     "apps/*",
     "packages/*"
   ],
-  "version": "0.0.2"
+  "version": "0.0.2",
+  "dependencies": {
+    "lucide-react": "^0.460.0"
+  }
 }
