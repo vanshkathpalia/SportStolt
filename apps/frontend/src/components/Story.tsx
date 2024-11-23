@@ -18,14 +18,14 @@ export const Story = () => {
     else {
         return <div>
             <div className="bg-white gap-4 rounded-lg shadow-sm p-2 mb-4">
-                <div className="p-2 scroll-pr-24 flex gap-4 overflow-x-auto w-screen pb-2 max-w-3xl " >
-                {reversedStories.map(story => <StoryCard
-                    id={story.id}
-                    authorName={story.author.name || "Anonymous"}
-                    isViewed={story.isViewed}
-                    image={story.image}
-                    location={story.location}
-                    createdAt={"date"} />)}
+                <div className="p-2 scroll-pr-24 flex gap-4 overflow-x-auto w-screen pb-2 max-w-3xl" >
+                    {reversedStories.map(story => <StoryCard
+                        id={story.id}
+                        authorName={story.author.name || "Anonymous"}
+                        isViewed={story.isViewed}
+                        image={story.image}
+                        location={story.location}
+                        createdAt={"date"} />)}
                 </div>
             </div>
         </div>
