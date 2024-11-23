@@ -198,8 +198,40 @@ postRouter.get('/bulk', async (c) => {
 //to get into the depth of a particular post
 //this will handle the stories data too
 
+postRouter.get('/:id', async (c) => {
+    const id = await c.req.param("id");
+    const prisma = new PrismaClient({
+      datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate())
+    const authorId = c.get("userId") 
 
-
-  
-  
+    try {
+        const post = await prisma.post.findFirst({
+            select: {
+                content: true,
+                title: true,
+                id: true,
+                author: {
+                    select: {
+                        name: true
+                    }
+                }
+            },
+            where: {
+                id: Number(id),
+                authorId: String(authorId)
+            }
+        })
+        return c.json({
+            post
+        })
+    }
+    catch (e) {
+        console.log(e);
+        c.status(411) 
+        return c.json({
+            message: "error while fetching the posts"
+        })
+    }
+})
 

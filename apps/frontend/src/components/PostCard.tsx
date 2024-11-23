@@ -1,4 +1,6 @@
 import { Link } from "react-router-dom";
+import { Heart, MessageCircle, Bookmark, Share2, MoreHorizontal } from 'lucide-react';
+
 interface PostCardProps {
     authorName: string;
     title: string;
@@ -15,7 +17,55 @@ export const PostCard = ({
     publishedDate
 }: PostCardProps) => {
     return <Link to={`/post/${id}`}>
-        <div className="p-8 border-b border-slate-200 pb-4 hover:bg-gray-50 w-screen max-w-screen-md cursor-pointer">
+        <div className="flex flex-col">
+                <div className="flex justify-center">
+                    <div className="bg-white border border-gray-100 rounded-lg mb-4">
+                        <div className="p-4 flex items-center justify-between space-x-96">
+                            <div className="flex items-center justify-center space-x-3">
+                                <div><Avatar name={authorName} size="big"/></div>
+                                <div className="w-36">{authorName}</div>
+                            </div>
+                            <button className="text-gray-600 hover:text-gray-900">
+                                <MoreHorizontal className="w-6 h-6" />
+                            </button>
+                        </div>
+                            <div className="justify-items-center">
+                                <img
+                                    src={content}
+                                    alt={title}
+                                    className="w-full max-w-2xl h-fit max-h-2xl aspect-square px-1"
+                                />
+                            </div>
+                            <div className="p-4 space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <div className="flex space-x-4">
+                                        <button className="text-gray-600 hover:text-red-500 transition-colors">
+                                            <Heart className="w-6 h-6" />
+                                        </button>
+                                        <button className="text-gray-600 hover:text-gray-900 transition-colors">
+                                            <MessageCircle className="w-6 h-6" />
+                                        </button>
+                                        <button className="text-gray-600 hover:text-gray-900 transition-colors">
+                                            <Share2 className="w-6 h-6" />
+                                        </button>
+                                    </div>
+                                    <button className="text-gray-600 hover:text-gray-900 transition-colors">
+                                        <Bookmark className="w-6 h-6" />
+                                    </button>
+                                </div>
+                            <div className="">like count</div>
+                            <div className="space-y-2">
+                                <div className="flex flex-row">
+                                    <div className=""> {authorName} -  </div> 
+                                    <div className=""> {title}</div>
+                                </div>
+                                <div className="">{publishedDate}/comment adding/input</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {/* <div className="p-8 border-b border-slate-200 pb-4 hover:bg-gray-50 w-screen max-w-screen-md cursor-pointer">
             <div className="flex">
                 <Avatar name={authorName} />
                 <div className="font-extralight pl-2 text-sm flex justify-center flex-col">{authorName}</div>
@@ -35,7 +85,7 @@ export const PostCard = ({
             <div className="text-slate-500 text-sm font-thin pt-4">
                 {`${Math.ceil(content.length / 100)} minute(s) read`}
             </div>
-        </div>
+        </div> */}
     </Link>
 }
 
