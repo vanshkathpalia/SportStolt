@@ -78,6 +78,16 @@ export const usePosts = () => {
         // console.log("Authorization Token:", token);
         // console.log("Authorization Token:", token);
         axios
+            .get(`${BACKEND_URL}/api/v1/story/bulk`, {
+                headers: {
+                    Authorization: localStorage.getItem("token")
+                }
+            })
+            .then(response => {
+                    setstory(response.data.stories);
+            })
+            
+        axios
             .get(`${BACKEND_URL}/api/v1/post/bulk`, {
                 headers: {
                     Authorization: localStorage.getItem("token"),
@@ -88,15 +98,7 @@ export const usePosts = () => {
                 setLoading(false);
             })
 
-            axios
-            .get(`${BACKEND_URL}/api/v1/story/bulk`, {
-                headers: {
-                    Authorization: localStorage.getItem("token")
-                }
-            })
-            .then(response => {
-                    setstory(response.data.stories);
-            })
+            
     }, []);
 
     return {
