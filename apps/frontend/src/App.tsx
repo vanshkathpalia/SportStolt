@@ -3,8 +3,10 @@ import { Signup } from './pages/Signup'
 import { Signin } from './pages/Signin'
 import { Post } from './pages/Post'
 import { Posts } from './pages/Posts'
-import { Publish } from './pages/Publish'
 import { Home } from './pages/Home'
+import { AddPost } from './pages/AddPost'
+import { AddStory } from './pages/AddStory'
+import { Profile } from './pages/Profile'
 
 function App() {
 
@@ -17,7 +19,9 @@ function App() {
           <Route path="/signin" element={<Signin />} />
           <Route path="/post" element={<Posts/>} />
           <Route path="/post/:id" element={<Post />} />
-          <Route path="/publish" element={<Publish/>} />
+          <Route path="/addstory" element={<AddStory />} />
+          <Route path="/addpost" element={<AddPost />} />
+          <Route path="/profile" element={<Profile />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { Heart, MessageCircle, Bookmark, Share2, MoreHorizontal } from 'lucide-react';
+import { CaptionLimit } from "./WordLimit";
 
 interface PostCardProps {
     authorName: string;
@@ -20,7 +21,7 @@ export const PostCard = ({
         <div className="flex flex-col">
                 <div className="flex justify-center">
                     <div className="bg-white border border-gray-100 rounded-lg mb-4">
-                        <div className="p-4 flex items-center justify-between space-x-96">
+                        <div className="p-4 flex items-center justify-between space-x-[420px]">
                             <div className="flex items-center justify-center space-x-3">
                                 <div><Avatar name={authorName} size="big"/></div>
                                 <div className="w-36">{authorName}</div>
@@ -57,7 +58,7 @@ export const PostCard = ({
                             <div className="space-y-2">
                                 <div className="flex flex-row">
                                     <div className=""> {authorName} -  </div> 
-                                    <div className=""> {title}</div>
+                                    <CaptionLimit caption={"title"}/>
                                 </div>
                                 <div className="">{publishedDate}/comment adding/input</div>
                             </div>

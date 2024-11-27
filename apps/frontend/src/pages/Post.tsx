@@ -13,15 +13,15 @@ export const Post = () => {
     });
 
     if (loading || !post) {
-        return <div>
-            <div className = "max-w-96 pt-6 px-4" >
+        return <div className = "flex flex-row">
+            <div className = "pt-6 px-4 min-w-60" >
                 <Appbar />
             </div>
         
 
-                <div>
-                    <PostSkeleton />
-                </div>
+            <div className = "flex justify-center">
+                <PostSkeleton />
+            </div>
 
         </div>
     }
