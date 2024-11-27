@@ -14,7 +14,7 @@ const app = new Hono<{
 app.use('/*', cors())
 app.route("/api/v1/user", userRouter);
 app.route("/api/v1/post", postRouter);
-app.route("api/v1/story/", storyRouter);
+app.route("api/v1/story", storyRouter);
 
 
 export default app
