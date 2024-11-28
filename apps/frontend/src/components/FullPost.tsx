@@ -62,7 +62,7 @@ export const FullPost = ({ post }: {post: Post}) => {
                             <div><Avatar name={post.author.name} size="big"/></div>
                             <div className="font-bold">{post.author.name || "Anonymous"} </div> 
                             <div className="p-2 text-slate-500">
-                                <CaptionLimit caption={post.title} />
+                                <CaptionLimit caption={"porem ipsum dolor sit amet consectetur adipisicing elit. Animi ratione ullam quisquam rem provident fuga cumque fugit quidem voluptatum minus, ducimus expedita obcaecati deleniti perspiciatis reprehenderit nisi veniam, eveniet soluta"} />
                             </div>
                         </div>
                     </div>

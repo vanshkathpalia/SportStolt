@@ -18,7 +18,8 @@ export const CommentCard = ({post}: {post: Post} ) => {
                 <div><Avatar name={"aAnonymous"} size="big"/></div>
                 <div className="font-bold px-2">{"Anonymous"} 
                     <div className=" text-slate-500">
-                        <CommentLimit comment={post.title} />
+                        <CommentLimit comment={"orem ipsum dolor sit amet consectetur adipisicing elit. Animi ratione ullam quisquam rem provident fuga cumque fugit quidem voluptatum minus, ducimus expedita obcaecati deleniti perspiciatis reprehenderit nisi veniam, eveniet soluta."}
+                        />
                     </div>
                 </div> 
             </div>
@@ -27,7 +28,7 @@ export const CommentCard = ({post}: {post: Post} ) => {
                 <div><Avatar name={"aAnonymous"} size="big"/></div>
                 <div className="font-bold px-2">{"Anonymous"} 
                     <div className=" text-slate-500">
-                        Lorem ipsum 
+                        <CommentLimit comment={post.title} />
                     </div>
                 </div> 
             </div>

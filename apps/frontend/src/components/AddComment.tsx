@@ -7,12 +7,12 @@ const CommentBox = () => {
   const [isPosting, setIsPosting] = useState(false); // To show loading state
 
   // Handle change in the input box
-  const handleCommentChange = (e) => {
+  const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setComment(e.target.value);
   };
 
   // Function to handle the form submission on Enter key press
-  const handleKeyPress = async (e) => {
+  const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     // If the user presses the Enter key (keyCode 13)
     if (e.key === 'Enter' && comment.trim() !== '') {
       e.preventDefault(); // Prevent default form submission behavior
