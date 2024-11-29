@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Heart, MessageCircle, Bookmark, Share2, MoreHorizontal } from 'lucide-react';
-import { CaptionLimit } from "./WordLimit";
+import { CaptionLimit } from "../WordLimit";
 
 interface PostCardProps {
     authorName: string;
@@ -20,8 +20,8 @@ export const PostCard = ({
     return <Link to={`/post/${id}`}>
         <div className="flex flex-col">
                 <div className="flex justify-center">
-                    <div className="bg-white border border-gray-100 rounded-lg mb-4">
-                        <div className="p-4 flex items-center justify-between space-x-[420px]">
+                    <div className="bg-white border border-gray-100 rounded-lg mb-4 flex flex-col justify-center">
+                        <div className="p-4 flex items-center justify-between space-x-[300px]">
                             <div className="flex items-center justify-center space-x-3">
                                 <div><Avatar name={authorName} size="big"/></div>
                                 <div className="w-36">{authorName}</div>
@@ -30,12 +30,14 @@ export const PostCard = ({
                                 <MoreHorizontal className="w-6 h-6" />
                             </button>
                         </div>
-                            <div className="justify-items-center">
-                                <img
-                                    src={content}
-                                    alt={title}
-                                    className="w-full max-w-2xl h-fit max-h-2xl aspect-square px-1"
-                                />
+                            <div className="">
+                                <div className="flex justify-center">
+                                    <img
+                                        src={content}
+                                        alt={title}
+                                        className="w-auto max-w-[550px] max-h-2xl h-fit max-h-2xl aspect-square px-1"
+                                    />
+                                </div>
                             </div>
                             <div className="p-4 space-y-3">
                                 <div className="flex justify-between items-center">

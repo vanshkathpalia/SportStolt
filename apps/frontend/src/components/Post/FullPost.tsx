@@ -1,17 +1,17 @@
-import { Post } from "../hooks"
-import { Appbar } from "./Appbar"
-import { CaptionLimit } from "./WordLimit";
-import { CommentCard } from "./CommentCard";
+import { Post } from "../../hooks"
+import { Appbar } from "../Appbar"
+import { CaptionLimit } from "../WordLimit";
+import { CommentCard } from "../Comment/CommentCard";
 import { Avatar } from "./PostCard"
 import { Heart, MessageCircle, Bookmark, Share2, MoreHorizontal } from 'lucide-react';
 
 export const FullPost = ({ post }: {post: Post}) => {
     return <div className = "flex flex-row">
-        <div className = "pt-6 px-4 min-w-60" >
+        <div className = "pt-6 px-4 min-w-72" >
             <Appbar />
         </div>
 
-        <div className="flex flex-col py-8 max-w-2xl">
+        <div className="flex flex-col py-10 max-w-2xl">
             <div className="flex justify-center">
                 <div className="bg-white border border-gray-200 rounded-lg">
                     <div className="p-4 flex items-center justify-between space-x-96">

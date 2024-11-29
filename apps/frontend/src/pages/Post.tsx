@@ -1,9 +1,9 @@
 import { Appbar } from "../components/Appbar";
-import { FullPost } from "../components/FullPost";
+import { FullPost } from "../components/Post/FullPost";
 // import { PostSkeleton } from "../components/PostSkeleton";
 import { usePost } from "../hooks";
 import {useParams} from "react-router-dom";
-import { PostSkeleton } from "../components/PostSkeleton";
+import { PostSkeleton } from "../components/Post/PostSkeleton";
 
 // atomFamilies/selectorFamilies
 export const Post = () => {
@@ -14,7 +14,7 @@ export const Post = () => {
 
     if (loading || !post) {
         return <div className = "flex flex-row">
-            <div className = "pt-6 px-4 min-w-60" >
+            <div className = "pt-6 px-4 min-w-72" >
                 <Appbar />
             </div>
         

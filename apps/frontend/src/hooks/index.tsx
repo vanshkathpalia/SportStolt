@@ -94,6 +94,7 @@ export const usePosts = () => {
                 },
             })
             .then((response) => {
+                
                 setPosts(response.data.posts);
                 setLoading(false);
             })
@@ -103,7 +104,46 @@ export const usePosts = () => {
 
     return {
         loading,
-        posts, 
+        posts,
         story
     }
 }
+
+// export const useImages = () => {
+//     const [loading, setLoading] = useState(true);
+//     const [images, setImages] = useState<string[]>([]);
+//     const [error, setError] = useState<string | null>(null);
+
+//     useEffect(() => {
+//         const fetchImages = async () => {
+//             setLoading(true);
+//             setError(null);
+
+//             try {
+//                 const imagePromises = Array.from({ length: 12 }, () =>
+//                     axios.get('https://api.api-ninjas.com/v1/randomimage?category=nature', {
+//                         headers: { 'X-Api-Key': 'YOUR_API_KEY' }, // Replace with your API key
+//                         responseType: 'arraybuffer', // Fetching binary data as an image
+//                     })
+//                 );
+
+//                 const responses = await Promise.all(imagePromises);
+
+//                 const fetchedImages = responses.map((response) =>
+//                     URL.createObjectURL(new Blob([response.data], { type: 'image/jpeg' })) // Convert binary data to object URL
+//                 );
+
+//                 setImages(fetchedImages);
+//             } catch (err) {
+//                 setError(err instanceof Error ? err.message : "An error occurred");
+//             } finally {
+//                 setLoading(false);
+//             }
+//         };
+
+//         fetchImages();
+//     }, []);
+
+//     return { loading, images, error };
+// };
+

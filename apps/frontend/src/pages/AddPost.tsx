@@ -10,7 +10,7 @@ export const AddPost = () => {
     const navigate = useNavigate();
 
     return <div className="flex flex-row">
-       <div className = "pt-6 px-4 min-w-96" >
+       <div className = "pt-6 px-4 min-w-72" >
             <Appbar />
         </div>
 
