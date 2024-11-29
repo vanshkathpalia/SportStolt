@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Heart, MessageCircle, Bookmark, Share2, MoreHorizontal } from 'lucide-react';
 import { CaptionLimit } from "../WordLimit";
+import { useState } from "react";
 
 interface PostCardProps {
     authorName: string;
@@ -32,11 +33,11 @@ export const PostCard = ({
                         </div>
                             <div className="">
                                 <div className="flex justify-center">
-                                    <img
-                                        src={content}
-                                        alt={title}
-                                        className="w-auto max-w-[550px] max-h-2xl h-fit max-h-2xl aspect-square px-1"
-                                    />
+                                <ImageWithFallback
+                                    content={content}// The main image URL
+                                    title={title}
+                                    fallback="https://www.tributemedia.com/hs-fs/hub/481308/file-2535713272-jpg/CUsersNikkiDocumentsTributeMedia404Errors2.jpg?width=2560&name=CUsersNikkiDocumentsTributeMedia404Errors2.jpg" // Default image URL
+                                />
                                 </div>
                             </div>
                             <div className="p-4 space-y-3">
@@ -104,4 +105,21 @@ export function Avatar({ name, size = "small" }: { name: string, size?: "small" 
         {name[0]}
     </span>
 </div>
+}
+
+const ImageWithFallback = ({
+    title,
+    content,
+    fallback
+}: { title: string; content: string; fallback: string }) => {
+    const [currentSrc, setCurrentSrc] = useState(content);
+
+    return (
+        <img
+            src={currentSrc}
+            alt={title}
+            className="w-auto max-w-[550px] max-h-2xl h-fit max-h-2xl aspect-square px-1"
+            onError={() => setCurrentSrc(fallback)} 
+        />
+    );
 }

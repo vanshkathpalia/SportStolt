@@ -8,6 +8,7 @@ import { AddPost } from './pages/AddPost'
 import { AddStory } from './pages/AddStory'
 import { Profile } from './pages/Profile'
 import { Explore } from './pages/Explore'
+import { ApiPost } from './pages/ApiPost'
 
 function App() {
 
@@ -20,6 +21,7 @@ function App() {
           <Route path="/signin" element={<Signin />} />
           <Route path="/post" element={<Posts/>} />
           <Route path="/post/:id" element={<Post />} />
+          <Route path="/apipost/:id" element={<ApiPost />} />
           <Route path="/addstory" element={<AddStory />} />
           <Route path="/addpost" element={<AddPost />} />
           <Route path="/profile" element={<Profile />} />
