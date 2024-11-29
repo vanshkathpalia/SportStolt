@@ -1,7 +1,7 @@
 
-import { Avatar } from "./PostCard"
-import { CommentLimit } from "./WordLimit";
-import { Post } from "../hooks"
+import { Avatar } from "../Post/PostCard"
+import { CommentLimit } from "../WordLimit";
+import { Post } from "../../hooks"
 import CommentBox from "./AddComment";
 
 export const CommentCard = ({post}: {post: Post} ) => {

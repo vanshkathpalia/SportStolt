@@ -190,6 +190,11 @@ postRouter.get('/bulk', async (c) => {
             }
         }
     });
+    //for manipulating the size of the post image 
+    // const posts = receivedposts.map(post => ({
+    //     ...post,
+    //     content: `${post.content}?w=600&h=600&fit=crop`,
+    // }));
     return c.json({
         posts,
     })
@@ -219,7 +224,7 @@ postRouter.get('/:id', async (c) => {
             },
             where: {
                 id: Number(id),
-                authorId: String(authorId)
+                // authorId: String(authorId)
             }
         })
         return c.json({

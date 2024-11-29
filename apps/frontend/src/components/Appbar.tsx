@@ -1,8 +1,8 @@
-import { Avatar } from "./PostCard"
+import { Avatar } from "./Post/PostCard"
 import { Link } from "react-router-dom"
 
 export const Appbar = () => {
-    return <div className = "max-w-2xl mx-auto flex flex-col justify-center pl-12">
+    return <div className = "max-w-96 flex flex-col justify-center pl-12">
         <div className="flex flex-col cursor-pointer pt-10 pl-4"> 
             <Link to={'/post'}>
                     SportStolt
@@ -23,15 +23,20 @@ export const Appbar = () => {
                 <button type="button" className="mr-4 text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 ">New Story</button>
             </Link>
         </div>
-        
-        <div className = "flex flex-row pt-12"> 
-            {/* <Link to={`/profile`}>      */}
+        <div className = "pt-2">
+            <Link to={`/explore`} className = "pt-8">
+                <button type="button" className="mr-4 text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-4 focus:ring-green-300 font-medium rounded-full text-sm px-5 py-2.5 text-center me-2 mb-2 ">Explore</button>
+            </Link>
+        </div>
+        <Link to={`/profile`}>   
+        <div className = "flex flex-row pt-12">     
                 <Avatar size={"big"} name="Vansh" />
                 <div className = "flex flex-col justify-center pl-2">
                     Profile
                 </div>
-            {/* </Link> */}
         </div>
+        </Link>
+
     </div>
 }
 

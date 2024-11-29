@@ -8,7 +8,11 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+src/components/profile
+src/components/explore
 dist
+src/pages/profile.tsx
+src/pages/explore.tsx
 dist-ssr
 *.local
 

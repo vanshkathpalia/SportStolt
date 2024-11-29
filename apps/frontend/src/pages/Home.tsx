@@ -1,5 +1,5 @@
-import { Intro } from "../components/Intro"
-import { FeatureCard } from '../components/FeatureCard';
+import { Intro } from "../components/Home/Intro"
+import { FeatureCard } from '../components/Home/FeatureCard';
 import { 
   Calendar, 
   Camera, 
@@ -8,7 +8,7 @@ import {
   MapPin, 
   Share2 
 } from 'lucide-react';
-import { Footer } from "../components/Footer";
+import { Footer } from "../components/Home/Footer";
 
 const features = [
     {

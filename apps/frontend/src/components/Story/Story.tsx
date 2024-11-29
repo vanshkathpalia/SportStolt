@@ -1,7 +1,7 @@
 // design for the story, using story card
 //add a logic, where if any story is on the other side, > will appear 
 
-import { usePosts } from "../hooks";
+import { usePosts } from "../../hooks";
 import { StoryCard } from "./StoryCard";
 import { StorySkeleton } from "./StorySkeleton";
 

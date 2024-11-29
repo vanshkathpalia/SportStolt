@@ -7,6 +7,7 @@ import { Home } from './pages/Home'
 import { AddPost } from './pages/AddPost'
 import { AddStory } from './pages/AddStory'
 import { Profile } from './pages/Profile'
+import { Explore } from './pages/Explore'
 
 function App() {
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/addstory" element={<AddStory />} />
           <Route path="/addpost" element={<AddPost />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/explore" element={<Explore />} />
         </Routes>
       </BrowserRouter>
     </>

@@ -1,8 +1,8 @@
 import { Appbar } from "../components/Appbar"
-import { PostCard } from "../components/PostCard"
-import { PostSkeleton } from "../components/PostSkeleton";
-import { Story } from "../components/Story";
-import { StorySkeleton } from "../components/StorySkeleton";
+import { PostCard } from "../components/Post/PostCard"
+import { PostSkeleton } from "../components/Post/PostSkeleton";
+import { Story } from "../components/Story/Story";
+import { StorySkeleton } from "../components/Story/StorySkeleton";
 import { usePosts } from "../hooks";
 
 export const Posts = () => {
