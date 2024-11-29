@@ -12,7 +12,7 @@ export const Profile: React.FC = () => {
     // Simulate loading delay
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 150000);
+    }, 1500);
 
     return () => clearTimeout(timer);
   }, []);
