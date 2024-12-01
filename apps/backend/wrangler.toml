@@ -1,5 +1,5 @@
 name = "backend-me"
-main = "src/index.ts"
+main = "src/routes/index.ts"
 compatibility_date = "2024-10-19"
 compatibility_flags = [ "nodejs_compat" ]
 

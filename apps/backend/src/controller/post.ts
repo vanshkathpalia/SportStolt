@@ -16,7 +16,7 @@ export const postRouter = new Hono<{
         JWT_SECRET: string;
       } 
     Variables: {
-        userId: string;
+        userId: number;
     }
 }>();
 
@@ -57,7 +57,7 @@ postRouter.use('/*', async (c, next) => {
     //     }
     // }
     const user = await verify(authHeader, c.env.JWT_SECRET)
-    if (user && typeof user.id === "string") {
+    if (user && typeof user.id === "number") {
         c.set("userId", user.id);
         await next();
     }
@@ -121,7 +121,7 @@ postRouter.post('/', async (c) => {
             data: {
                 title: body.title,
                 content: body.content,
-                authorId: String(authorId),
+                authorId: Number(authorId),
             }
         })
         if (post) {

@@ -3,7 +3,7 @@ import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from '@prisma/extension-accelerate'
 import { verify } from 'hono/jwt'
 // import { createstoryInput, updatestoryInput } from '@vanshkathpalia/sportstolt-common'
-import { date, z } from "zod"
+import { date, string, z } from "zod"
 
 export const storyRouter = new Hono<{
     Bindings: {
@@ -11,7 +11,7 @@ export const storyRouter = new Hono<{
         JWT_SECRET: string;
       } 
     Variables: {
-        userId: string;
+        userId: number;
     }
 }>();
 
@@ -37,7 +37,7 @@ storyRouter.use('/*', async (c, next) => {
 
     const authHeader = c.req.header("authorization") || "";
     const user = await verify(authHeader, c.env.JWT_SECRET)
-    if (user && typeof user.id === "string") {
+    if (user && typeof user.id === "number") {
         c.set("userId", user.id);
         await next();
     }
@@ -52,7 +52,7 @@ storyRouter.use('/*', async (c, next) => {
 //story  location is like author id in story 
 storyRouter.post('/', async (c) => {
     const body = await c.req.json();
-    console.log(body);
+    // console.log(body);
     try {
         const body = await c.req.json();
         console.log(body);
@@ -96,7 +96,7 @@ storyRouter.post('/', async (c) => {
                 isViewed: body.isViewed,
                 location: body.location,
                 image: body.image,
-                authorId: String(authorId),
+                authorId: Number(authorId),
             }
         })
         if (story) {
@@ -112,6 +112,7 @@ storyRouter.post('/', async (c) => {
         c.json({ message: "Internal server error" });
     }
 })
+
 
 storyRouter.get('/bulk', async (c) => {
     
@@ -134,9 +135,89 @@ storyRouter.get('/bulk', async (c) => {
             }
         }
     });
-
+    
     return c.json({
         stories,
     })
 })
+
+
+/* user posting stories is authentic or not */
+// Check Image Authenticity (pseudo code for object identification)
+// async function checkImageAuthenticity(imageUrl: string): Promise<boolean> {
+//     // Integrate with an object detection API or use your own model
+//     const isAuthentic = await objectDetectionAPI(imageUrl);
+//     return isAuthentic;
+//   }
+  
+//   // Review Story and Update Rating
+//   async function reviewStory(storyId: string, userId: string, rating: number, content: string) {
+//     // Store review
+//     const review = await prisma.review.create({
+//       data: {
+//         content: content,
+//         rating: rating,
+//         reviewer: userId,
+//         storyId: storyId,
+//       },
+//     });
+  
+//     // Update Story Rating (calculate average)
+//     const story = await prisma.story.findUnique({
+//       where: { id: storyId },
+//       include: { reviews: true },
+//     });
+  
+//     const avgRating = story.reviews.reduce((sum, review) => sum + review.rating, 0) / story.reviews.length;
+  
+//     await prisma.story.update({
+//       where: { id: storyId },
+//       data: {
+//         rating: avgRating,
+//       },
+//     });
+//   }
+  
+//   // Authenticity and Reward Points
+//   async function authenticateAndReward(storyId: string, userId: string) {
+//     // Check all images in the story for authenticity
+//     const story = await prisma.story.findUnique({
+//       where: { id: storyId },
+//       include: { images: true },
+//     });
+  
+//     const authenticityPromises = story.images.map(async (imageUrl) => checkImageAuthenticity(imageUrl));
+//     const results = await Promise.all(authenticityPromises);
+  
+//     const isAuthentic = results.every(result => result); // If all images are authentic
+  
+//     if (isAuthentic) {
+//       // Award points to user
+//       await prisma.user.update({
+//         where: { id: userId },
+//         data: { points: { increment: 10 } }, // Add points (e.g., 10 points)
+//       });
+  
+//       // Award badge to the user
+//       await prisma.badge.create({
+//         data: {
+//           name: "Verified Creator",
+//           userId: userId,
+//         },
+//       });
+  
+//       // Update story authenticity status
+//       await prisma.story.update({
+//         where: { id: storyId },
+//         data: { authenticityStatus: "verified" },
+//       });
+//     } else {
+//       // Mark as not verified
+//       await prisma.story.update({
+//         where: { id: storyId },
+//         data: { authenticityStatus: "not_verified" },
+//       });
+//     }
+//   }
+  
 
