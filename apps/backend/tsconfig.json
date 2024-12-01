@@ -1,19 +1,26 @@
 {
-  "compilerOptions": {
-    "target": "ESNext",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "strict": true,
-    "jsx": "react-jsx",
-    "skipLibCheck": true,
-    "lib": [
-      "ESNext"
+    "compilerOptions": {
+      "target": "ES2020",
+      "module": "ESNext",
+      "moduleResolution": "Node",
+      "lib": ["ES2020", "WebWorker"],
+      "strict": true,
+      "esModuleInterop": true,
+      "skipLibCheck": true,
+      "resolveJsonModule": true,
+      "jsx": "react",
+      "outDir": "./dist",
+      "baseUrl": ".",
+      "paths": {
+        "~/*": ["./src/*"]
+      }
+    },
+    "include": [
+      "src/**/*.ts",
+      "src/**/*.tsx"
     ],
-    "types": [
-      "@cloudflare/workers-types/2023-07-01"
-    ],
-    "jsxImportSource": "hono/jsx"
-  },
-  "include": ["src"],
-  "exclude": ["node_modules"]
-}
+    "exclude": [
+      "node_modules"
+    ]
+  }
+  

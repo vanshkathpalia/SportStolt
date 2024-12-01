@@ -85,3 +85,21 @@ userRouter.post('/signin', async (c) => {
       return c.text("invalid details")
     }
   })
+
+
+userRouter.get('/users', async (c) => {
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
+
+  try {
+    const users = await prisma.user.findMany();  // Fetch all users
+
+    // Return users list as JSON
+    return c.json(users);
+  } catch (e) {
+    c.status(500);
+    console.log(e);
+    return c.text("Error fetching users");
+  }
+});
