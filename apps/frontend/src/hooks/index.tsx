@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import axios from "axios";
 import { BACKEND_URL } from "../config";
+// import { response } from "express";
 
 
 export interface Post {
@@ -12,7 +13,7 @@ export interface Post {
     }
 }
 
-interface Story {
+export interface Story {
     "location": string;
     "image": string;
     "isViewed"?: boolean;
@@ -20,6 +21,18 @@ interface Story {
     "author": {
         "name": string
     }
+}
+
+export interface EventInterface {
+    "id": number; // Assuming Prisma is autoincrementing the id
+    "image": string;
+    "city": string;
+    "authorId": number;
+    "stadium": string;
+    "startDate": Date;
+    "endDate": Date;
+    "startTime": Date;
+    "organisedBy": string;
 }
 
 export const usePost = ({ id }: { id: string }) => {
@@ -62,21 +75,14 @@ export const usePost = ({ id }: { id: string }) => {
         loading,
         post
     }
-
 }
+
 export const usePosts = () => {
     const [loading, setLoading] = useState(true);
-    const [story, setstory] = useState<Story[]>([]);
+    const [story, setStory] = useState<Story[]>([]);
     const [posts, setPosts] = useState<Post[]>([]); //returning the array post[]
 
-    const token = localStorage.getItem("token");
-    console.log("Authorization Token:", token);
-
     useEffect(() => {
-        // const token = localStorage.getItem("token");
-        // console.log("Authorization Token:", token);
-        // console.log("Authorization Token:", token);
-        // console.log("Authorization Token:", token);
         axios
             .get(`${BACKEND_URL}/api/v1/story/bulk`, {
                 headers: {
@@ -84,7 +90,7 @@ export const usePosts = () => {
                 }
             })
             .then(response => {
-                    setstory(response.data.stories);
+                    setStory(response.data.stories);
             })
             
         axios
@@ -108,6 +114,64 @@ export const usePosts = () => {
         story
     }
 }
+
+export const useEvents = () => {
+    const [loading, setLoading] = useState(true);
+    const [events, setEvents] = useState<EventInterface[]>([]);
+    
+    
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+              const token = localStorage.getItem("token");
+              if (!token) {
+                console.error("No token found in local storage");
+                setLoading(false);
+                return;
+              }
+      
+              const response = await axios.get(`${BACKEND_URL}/api/v1/event/bulk`, {
+                headers: {
+                  Authorization: token, // Use "Bearer" prefix if required by your API
+                },
+              });
+      
+              if (response.data) {
+                console.log(response.data.events);
+                
+                console.log("lfo")
+                setEvents(response.data); // Set the fetched events
+              } else {
+                console.error("Unexpected response structure:", response.data);
+              }
+            } catch (error) {
+              console.error("Error fetching events:", error);
+            } finally {
+              setLoading(false); // Ensure loading is set to false after request completes
+            }
+          };
+          fetchEvents();
+        }, []);
+
+        // axios
+        //     .get(`${BACKEND_URL}/api/v1/event/bulk`, {
+        //         headers: {
+        //             Authorization: localStorage.getItem("token")
+        //         }
+        //     })
+        //     .then(response => {
+        //             setEvents(response.data?.events);
+        //             setLoading(false);
+        //             console.log(response.data.events)
+                    
+        //     })
+        // }, []);
+
+        return {
+            loading,
+            events
+        }
+    }
 
 // export const useImages = () => {
 //     const [loading, setLoading] = useState(true);

@@ -1,4 +1,4 @@
-import { Appbar } from "../components/Appbar"
+import { Appbar } from "../components/StickyBars/Appbar"
 import { PostCard } from "../components/Post/PostCard"
 import { PostSkeleton } from "../components/Post/PostSkeleton";
 import { Story } from "../components/Story/Story";
@@ -32,12 +32,12 @@ export const Posts = () => {
 
     else {
         return <div className = "flex flex-row">
-            <div className = "pt-6 px-4 min-w-96" >
-                <Appbar />
+            <div className = "pt-6 px-4" >
+                <Sidebar />
             </div>
             
-            <div className="flex justify-center">
-                <div>
+            <div className=" mr-40 ml-40">̀
+                <div className="grid grid-cols-1">
                     <div className="pt-6 px-4">
                         <Story />
                     </div>
@@ -91,6 +91,7 @@ export const Posts = () => {
 
 // import React from 'react';
 import { Heart, MessageCircle, Bookmark, Share2, MoreHorizontal } from 'lucide-react';
+import { Sidebar } from "../components/StickyBars/Sidebar";
 
 interface PostProps {
   username: string;

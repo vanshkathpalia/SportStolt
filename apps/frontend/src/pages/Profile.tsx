@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ProfileHeader } from '../components/Profile/ProfileHeader';
 import { ProfileTabs } from '../components/Profile/ProfileTabs';
 import { ProfileGrid } from '../components/Profile/ProfileGrid';
-import { Appbar } from '../components/Appbar';
+import { Appbar } from '../components/StickyBars/Appbar';
 
 export const Profile: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
