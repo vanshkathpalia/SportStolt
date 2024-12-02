@@ -9,6 +9,7 @@ import { AddStory } from './pages/AddStory'
 import { Profile } from './pages/Profile'
 import { Explore } from './pages/Explore'
 import { ApiPost } from './pages/ApiPost'
+import { Events } from './pages/Events'
 
 function App() {
 
@@ -26,6 +27,7 @@ function App() {
           <Route path="/addpost" element={<AddPost />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/explore" element={<Explore />} />
+          <Route path="/events" element={<Events />} />
         </Routes>
       </BrowserRouter>
     </>

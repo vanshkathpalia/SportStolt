@@ -1,20 +1,22 @@
 import { Post } from "../../hooks"
-import { Appbar } from "../Appbar"
+import { Sidebar } from "../StickyBars/Sidebar"
 import { CaptionLimit } from "../WordLimit";
 import { CommentCard } from "../Comment/CommentCard";
 import { Avatar } from "./PostCard"
 import { Heart, MessageCircle, Bookmark, Share2, MoreHorizontal } from 'lucide-react';
 
 export const FullPost = ({ post }: {post: Post}) => {
-    return <div className = "flex flex-row">
-        <div className = "pt-6 px-4 min-w-72" >
-            <Appbar />
+    return <div  className="grid grid-cols-8 lg:grid-cols-10">
+        <div className="col-span-1">
+            <Sidebar />
         </div>
 
-        <div className="flex flex-col py-10 max-w-2xl">
-            <div className="flex justify-center">
-                <div className="bg-white border border-gray-200 rounded-lg">
-                    <div className="p-4 flex items-center justify-between space-x-96">
+        {/* if comment click on, sm:hidden for this */}
+        <div className="md:col-span-6 lg:col-span-5 sm:col-span-6">
+            <div className="">
+            <div className="justify-center pt-4 col-span-6 col-start-2 pl-10">
+                <div className="bg-white border border-gray-200 rounded-lg col-span-4">
+                    <div className="p-4 flex items-center justify-between">
                         <div className="flex items-center justify-center space-x-3">
                             <div><Avatar name={post.author.name} size="big"/></div>
                             <div>{post.author.name}</div>
@@ -23,11 +25,11 @@ export const FullPost = ({ post }: {post: Post}) => {
                             <MoreHorizontal className="w-6 h-6" />
                         </button>
                     </div>
-                        <div className="min-2xl justify-items-center">
+                        <div className="flex justify-center">
                             <img
                                 src={post.content}
                                 alt={post.title}
-                                className="w-full max-w-2xl aspect-square"
+                                className="w-full max-w-2xl lg:h-1/2 aspect-square"
                             />
                         </div>
                         <div className="p-4 space-y-3">
@@ -52,12 +54,13 @@ export const FullPost = ({ post }: {post: Post}) => {
                     </div>
                 </div>
             </div>
+            </div>
         </div>
-        {/* comment start here */}
-        <div className = "w-1/2">
+        {/* comment start here, if comment click on then sm show in anther tab */}
+        <div className = "grid sm:col-span-6 md:col-span-6 md:col-start-2 sm:col-start-2 lg:col-span-4"> 
             <div className="p-10">
-                <div className="divide-y-2 divide-solid items-center">
-                    <div className="flex min-w-full w-fit pb-3 items-center justify-center">
+                <div className="divide-y-2 divide-solid items-center grid grid-cols-1">
+                    <div className="flex min-w-full w-fit pb-3">
                         <div className="flex flex-col items-center justify-center">
                             <div><Avatar name={post.author.name} size="big"/></div>
                             <div className="font-bold">{post.author.name || "Anonymous"} </div> 

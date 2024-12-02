@@ -33,13 +33,13 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ isLoading }) => {
   return (
     <div className="flex flex-col md:flex-row items-center gap-8 p-8">
       <img
-        src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&h=150&fit=crop"
+        src="https://img.freepik.com/free-photo/positive-male-youngster-with-curly-hair_176532-8174.jpg?t=st=1733119110~exp=1733122710~hmac=87e8b61f003f99824d8bcc61eacb5ed744bb9833ac46390e3894c3af6c76b11d&w=2000"
         alt="Profile"
         className="w-32 h-32 rounded-full object-cover border-2 border-gray-200"
       />
       <div className="flex-1">
         <div className="flex items-center gap-4 mb-4">
-          <h1 className="text-xl font-semibold">john_doe</h1>
+          <h1 className="text-xl font-semibold">vansh_</h1>
           <button className="px-4 py-1.5 bg-gray-100 rounded-md text-sm font-medium">
             Edit Profile
           </button>
@@ -48,23 +48,22 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ isLoading }) => {
         
         <div className="flex gap-8 mb-4 justify-center md:justify-start">
           <div className="text-center">
-            <span className="font-semibold">542</span>
-            <span className="text-gray-500 text-sm block">posts</span>
+            <span className="font-semibold">6</span>
+            <span className="text-gray-500 text-sm block">Posts</span>
           </div>
           <div className="text-center">
-            <span className="font-semibold">22.5k</span>
-            <span className="text-gray-500 text-sm block">followers</span>
+            <span className="font-semibold">22</span>
+            <span className="text-gray-500 text-sm block">Stories</span>
           </div>
           <div className="text-center">
-            <span className="font-semibold">128</span>
-            <span className="text-gray-500 text-sm block">following</span>
+            <span className="font-semibold">97%</span>
+            <span className="text-gray-500 text-sm block">Reputation</span>
           </div>
         </div>
         
         <div className="text-sm">
-          <p className="font-semibold">John Doe</p>
-          <p className="text-gray-600">Digital creator | Photography enthusiast </p>
-          <p className="text-gray-600">Capturing moments one click at a time </p>
+          <p className="font-semibold">Vansh Kumar</p>
+          <p className="text-gray-600">Location | University </p>
         </div>
       </div>
     </div>

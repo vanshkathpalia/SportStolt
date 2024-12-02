@@ -10,11 +10,10 @@ datasource db {
 
 
 model User {
-  id        String    @id @default(cuid())
+  id         Int      @id @default(autoincrement())
   username  String    @unique
   password  String
   name      String?
-  videos    Video[]
   comments  Comment[]
   likes     Like[]
   tweets    Tweet[]
@@ -23,46 +22,48 @@ model User {
   updatedAt DateTime  @updatedAt
   post      Post[]
   story     Story[]
+  event     Event[]
+  badges      Badge[]    // Badges earned by the user
+  points      Int        @default(0) // Total points of the user
 }
 
-model Video {
-  id        String    @id @default(cuid())
-  title     String
-  url       String
-  userId    String
-  user      User      @relation(fields: [userId], references: [id])
-  comments  Comment[]
-  likes     Like[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+model Badge {
+  id        String   @id @default(uuid())
+  name      String   // Badge name, e.g., 'Verified Creator'
+  userId    Int   // user who earned the badge
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id]) // Opposite relation to User
 }
+
 
 model Comment {
-  id        String   @id @default(cuid())
-  content   String
-  userId    String
-  videoId   String
-  user      User     @relation(fields: [userId], references: [id])
-  video     Video    @relation(fields: [videoId], references: [id])
+  id        String   @id @default(uuid())
+  content   String   // Text content of the comment
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
+  post      Post?    @relation(fields: [postId], references: [id])
+  postId    Int?
+  event     Event?   @relation(fields: [eventId], references: [id])
+  eventId   Int?
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Like {
-  id        String   @id @default(cuid())
-  userId    String
-  videoId   String
+  id        String   @id @default(uuid())
   user      User     @relation(fields: [userId], references: [id])
-  video     Video    @relation(fields: [videoId], references: [id])
+  userId    Int
+  post      Post?    @relation(fields: [postId], references: [id])
+  postId    Int?
+  event     Event?   @relation(fields: [eventId], references: [id])
+  eventId   Int?
   createdAt DateTime @default(now())
-
-  @@unique([userId, videoId])
 }
 
 model Tweet {
   id        String   @id @default(cuid())
   content   String
-  userId    String
+  userId    Int
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -72,29 +73,73 @@ model Photo {
   id        String   @id @default(cuid())
   url       String
   caption   String?
-  userId    String
+  userId    Int
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+model PostPhoto {
+  id       String  @id @default(uuid())
+  url      String  // URL of the photo
+  post     Post    @relation(fields: [postId], references: [id])
+  postId   Int
+}
+
 model Post {
-  id  Int    @id @default(autoincrement())
-  authorId   String
-  content    String
+  id         Int      @id @default(autoincrement())
+  authorId   Int
+  photos     PostPhoto[]    // One-to-many relation with Photo
   title      String
-  published Boolean  @default(false)
-  author    User   @relation(fields: [authorId], references: [id])
+  comment    Comment[]
+  content    String
+  likes      Like[]
+  likeCount  Int      @default(0)
+  published  Boolean  @default(false)
+  author     User   @relation(fields: [authorId], references: [id])
 }
 
 
 model Story {
-  id        Int   @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
+  images    Storyimages[]
   image     String
   location  String
+  stadium   String   @default("")
+  sport     String   @default("")
   isViewed  Boolean  @default(false)
-  authorId  String
+  authorId  Int
+  endTime   DateTime @default(now())
   createdAt DateTime @default(now())
-
+  duration  Int      @default(0)
   author    User     @relation(fields: [authorId], references: [id])
+  authenticityStatus String? // 'pending', 'verified', 'not_verified'
+  rating      Float?   // Average rating
+}
+
+model Storyimages {
+  id        String   @id @default(uuid())
+  url       String   
+  story     Story    @relation(fields: [storyId], references: [id])
+  storyId   Int   
+  createdAt DateTime @default(now())
+  authenticityChecked Boolean @default(false)
+}
+
+model Event {
+  id         Int      @id @default(autoincrement())
+  image     String
+  like      Like[]
+  likeCount Int      @default(0)
+  country   String   @default("")
+  state     String  @default("")
+  city      String   @default("")
+  author     User     @relation(fields: [authorId], references: [id])
+  authorId   Int
+  stadium   String  @default("")
+  comment   Comment[]
+  StartDate DateTime  
+  EndDate   DateTime  
+  StartTime DateTime 
+  OrganisedBy String
 }

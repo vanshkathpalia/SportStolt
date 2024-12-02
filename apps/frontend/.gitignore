@@ -9,10 +9,6 @@ lerna-debug.log*
 
 node_modules
 dist
-# src/components/profile
-src/components/explore
-# src/pages/profile.tsx
-src/pages/explore.tsx
 dist-ssr
 *.local
 
