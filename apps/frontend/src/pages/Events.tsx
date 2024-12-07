@@ -3,11 +3,12 @@ import { EventCard } from '../components/Event/EventCard';
 
 import { Search, Plus } from 'lucide-react';
 import { useEvents } from '../hooks';
-import { Appbar } from '../components/StickyBars/Appbar';
+// import { Appbar } from '../components/StickyBars/Appbar';
+import { Sidebar } from '../components/StickyBars/Sidebar';
 
 
 
-export function Events() {
+export const Events = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const {loading, events} = useEvents();
   
@@ -28,8 +29,8 @@ export function Events() {
   else {
     return (
     <div className="flex-row grid grid-cols-5">
-      <div className = "pt-6 px-4 min-w-72" >
-          <Appbar />
+      <div className = "pt-6 px-4" >
+          <Sidebar />
       </div>
       <div className="col-span-2 sm:col-span-4 md:col-span-4 lg:col-span-3">
         <div className="space-y-8 p-14">
