@@ -7,7 +7,7 @@ export const PostSkeleton = () => {
         <div className="flex flex-col">
                 <div className="flex justify-center">
                     <div className="bg-white border border-gray-200 rounded-lg mb-4 animate-pulse">
-                        <div className="p-4 flex items-center justify-between space-x-96">
+                        <div className="p-4 flex items-center justify-between space-x-[300px]">
                             <div className="flex items-center space-x-3">
                                 <div className="w-10 h-10 bg-gray-200 rounded-full" />
                                 <div className="h-4 w-36 bg-gray-200 rounded m-x-20" />

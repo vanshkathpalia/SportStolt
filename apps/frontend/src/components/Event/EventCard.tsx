@@ -9,12 +9,12 @@ interface EventCardProps {
   onRegister?: () => void;
 }
 
-export function EventCard({ event, onRegister }: EventCardProps) {
+export const EventCard: React.FC<EventCardProps> = ({ event, onRegister }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="bg-white rounded-lg shadow-md overflow-hidden mb-10">
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-semibold">here is a ver ery askfjuj fkjdfjsadfkjas sdfljkasdknj  klasjdl askjfdlk sajsdlfkj las </h3>
+          <h3 className="text-xl font-semibold">los angles </h3>
           <span className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full">
             {/* {format(event.startTime, 'MMM d, yyyy')} */} 7-02-2024
           </span>

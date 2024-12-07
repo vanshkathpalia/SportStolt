@@ -15,10 +15,13 @@ export const Story = () => {
         </div>
     }
 
-    else {
-        return <div>
-            <div className="bg-white gap-4 rounded-lg shadow-sm p-2 mb-4">
-                <div className="p-2 scroll-pr-24 flex gap-4 overflow-x-auto w-screen pb-2 max-w-3xl" >
+    // else {
+        // <div className="flex flex-col p-4">
+        //         <div className="flex justify-center">
+        //             <div className="bg-white border border-gray-100 rounded-lg mb-4 flex flex-col justify-center"></div>
+        return <div className="flex flex-col p-4">
+            <div className="bg-white gap-4 rounded-lg shadow-md p-2 flex justify-center">
+                <div className="p-2 scroll-pr-24 gap-4 overflow-x-auto w-screen pb-2 max-24 flex flex-row" >
                     {reversedStories.map(story => <StoryCard
                         id={story.id}
                         authorName={story.author.name || "Anonymous"}
@@ -29,7 +32,7 @@ export const Story = () => {
                 </div>
             </div>
         </div>
-    }
+    // }
 }
 
 
