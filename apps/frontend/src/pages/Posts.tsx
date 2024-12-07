@@ -1,24 +1,27 @@
-import { Appbar } from "../components/StickyBars/Appbar"
 import { PostCard } from "../components/Post/PostCard"
 import { PostSkeleton } from "../components/Post/PostSkeleton";
 import { Story } from "../components/Story/Story";
+import { EventCard } from '../components/Event/EventCard';
 import { StorySkeleton } from "../components/Story/StorySkeleton";
-import { usePosts } from "../hooks";
+import { useEvents, usePosts } from "../hooks";
+import { Sidebar } from "../components/StickyBars/Sidebar";
+import { Calendar} from "lucide-react";
 
 export const Posts = () => {
     const { loading, posts } = usePosts();
+    const {events} = useEvents();
 
     if (loading) {
         return <div className="flex flex-row">
-            <div className = "pt-6 px-4 min-w-96" >
-                <Appbar />
+            <div className = "pt-6 px-4" >
+                <Sidebar />
             </div>
-            <div className="flex justify-center">
-                <div>
-                    <div className = "pt-6 px-4">
+            <div>
+              <div className="grid grid-cols-9 p-2">
+                  <div className="col-start-3 sm:col-span-9 sm:col-start-1 md:col-span-7 md:col-start-2 lg:col-span-5 lg:col-start-3 xl:col-span-5 xl:col-start-2 xl:mr-16 xl:ml-16">
                         <StorySkeleton />
                     </div>
-                    <div>
+                  <div className="col-start-2 sm:col-span-5 sm:col-start-3 xl:col-start-2">
                         <PostSkeleton />
                         <PostSkeleton />
                         <PostSkeleton />
@@ -36,19 +39,37 @@ export const Posts = () => {
                 <Sidebar />
             </div>
             
-            <div className=" mr-40 ml-40">̀
-                <div className="grid grid-cols-1">
-                    <div className="pt-6 px-4">
-                        <Story />
+            <div>
+                <div className="grid grid-cols-9 p-2">
+
+                  <div className="col-start-3 sm:col-span-9 sm:col-start-1 md:col-span-7 md:col-start-2 lg:col-span-5 lg:col-start-3 xl:col-span-5 xl:col-start-2 xl:mr-16 xl:ml-16">
+                    <Story />
+                  </div>
+                    
+                  <div className="col-start-2 sm:col-span-5 sm:col-start-3 p-4 xl:col-start-2">
+                      {posts.map(post => <PostCard
+                          id={post.id}
+                          authorName={post.author.name || "Anonymous"}
+                          title={post.title}
+                          content={post.content}
+                          publishedDate={"date"} />)}
+                  </div>
+
+                  <div className="col-start-7 col-span-3 hidden xl:block p-10">
+                    
+                    <Calendar className="h-8 w-6 mb-10" />
+                      
+
+                    <div className="scroll-pt-24 overflow-auto pb-2 h-[600px]">
+                      {events.map(event => (
+                        <EventCard
+                          event={event}
+                          onRegister={() => alert('Registration functionality coming soon!')}
+                        />
+                      ))}
                     </div>
-                    <div className="p-8">
-                        {posts.map(post => <PostCard
-                            id={post.id}
-                            authorName={post.author.name || "Anonymous"}
-                            title={post.title}
-                            content={post.content}
-                            publishedDate={"date"} />)}
-                    </div>
+                       
+                  </div>
                 </div>
             </div>
         </div>
@@ -89,109 +110,110 @@ export const Posts = () => {
     <span class="sr-only">Loading...</span>
 </div> */
 
-// import React from 'react';
-import { Heart, MessageCircle, Bookmark, Share2, MoreHorizontal } from 'lucide-react';
-import { Sidebar } from "../components/StickyBars/Sidebar";
+// // import React from 'react';
+// import { Heart, MessageCircle, Bookmark, Share2, MoreHorizontal } from 'lucide-react';
+// import { Sidebar } from "../components/StickyBars/Sidebar";
+// import { EventCard } from "../components/Event/EventCard";
 
-interface PostProps {
-  username: string;
-  userAvatar: string;
-  imageUrl: string;
-  caption: string;
-  likes: number;
-  timestamp: string;
-  loading?: boolean;
-}
+// interface PostProps {
+//   username: string;
+//   userAvatar: string;
+//   imageUrl: string;
+//   caption: string;
+//   likes: number;
+//   timestamp: string;
+//   loading?: boolean;
+// }
 
-export function Post({ 
-  username, 
-  userAvatar, 
-  imageUrl, 
-  caption, 
-  likes, 
-  timestamp, 
-  loading = false 
-}: PostProps) {
-  if (loading) {
-    return (
-      <div className="bg-white border border-gray-200 rounded-lg mb-4 animate-pulse">
-        <div className="p-4 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gray-200 rounded-full" />
-            <div className="h-4 w-24 bg-gray-200 rounded" />
-          </div>
-          <div className="w-6 h-6 bg-gray-200 rounded" />
-        </div>
-        <div className="aspect-square bg-gray-200" />
-        <div className="p-4 space-y-3">
-          <div className="flex justify-between items-center">
-            <div className="flex space-x-4">
-              <div className="w-6 h-6 bg-gray-200 rounded" />
-              <div className="w-6 h-6 bg-gray-200 rounded" />
-              <div className="w-6 h-6 bg-gray-200 rounded" />
-            </div>
-            <div className="w-6 h-6 bg-gray-200 rounded" />
-          </div>
-          <div className="h-4 w-20 bg-gray-200 rounded" />
-          <div className="space-y-2">
-            <div className="h-4 w-3/4 bg-gray-200 rounded" />
-            <div className="h-4 w-1/2 bg-gray-200 rounded" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+// export function Post({ 
+//   username, 
+//   userAvatar, 
+//   imageUrl, 
+//   caption, 
+//   likes, 
+//   timestamp, 
+//   loading = false 
+// }: PostProps) {
+//   if (loading) {
+//     return (
+//       <div className="bg-white border border-gray-200 rounded-lg mb-4 animate-pulse">
+//         <div className="p-4 flex items-center justify-between">
+//           <div className="flex items-center space-x-3">
+//             <div className="w-10 h-10 bg-gray-200 rounded-full" />
+//             <div className="h-4 w-24 bg-gray-200 rounded" />
+//           </div>
+//           <div className="w-6 h-6 bg-gray-200 rounded" />
+//         </div>
+//         <div className="aspect-square bg-gray-200" />
+//         <div className="p-4 space-y-3">
+//           <div className="flex justify-between items-center">
+//             <div className="flex space-x-4">
+//               <div className="w-6 h-6 bg-gray-200 rounded" />
+//               <div className="w-6 h-6 bg-gray-200 rounded" />
+//               <div className="w-6 h-6 bg-gray-200 rounded" />
+//             </div>
+//             <div className="w-6 h-6 bg-gray-200 rounded" />
+//           </div>
+//           <div className="h-4 w-20 bg-gray-200 rounded" />
+//           <div className="space-y-2">
+//             <div className="h-4 w-3/4 bg-gray-200 rounded" />
+//             <div className="h-4 w-1/2 bg-gray-200 rounded" />
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
 
-  return (
-    <div className="bg-white border border-gray-200 rounded-lg mb-4">
-      <div className="p-4 flex items-center justify-between">
-        <div className="flex items-center space-x-3">
-          <img 
-            src={userAvatar} 
-            alt={username} 
-            className="w-10 h-10 rounded-full object-cover"
-          />
-          <span className="font-medium">{username}</span>
-        </div>
-        <button className="text-gray-600 hover:text-gray-900">
-          <MoreHorizontal className="w-6 h-6" />
-        </button>
-      </div>
+//   return (
+//     <div className="bg-white border border-gray-200 rounded-lg mb-4">
+//       <div className="p-4 flex items-center justify-between">
+//         <div className="flex items-center space-x-3">
+//           <img 
+//             src={userAvatar} 
+//             alt={username} 
+//             className="w-10 h-10 rounded-full object-cover"
+//           />
+//           <span className="font-medium">{username}</span>
+//         </div>
+//         <button className="text-gray-600 hover:text-gray-900">
+//           <MoreHorizontal className="w-6 h-6" />
+//         </button>
+//       </div>
       
-      <img 
-        src={imageUrl} 
-        alt="Post content" 
-        className="w-full aspect-square object-cover"
-      />
+//       <img 
+//         src={imageUrl} 
+//         alt="Post content" 
+//         className="w-full aspect-square object-cover"
+//       />
       
-      <div className="p-4 space-y-3">
-        <div className="flex justify-between items-center">
-          <div className="flex space-x-4">
-            <button className="text-gray-600 hover:text-red-500 transition-colors">
-              <Heart className="w-6 h-6" />
-            </button>
-            <button className="text-gray-600 hover:text-gray-900 transition-colors">
-              <MessageCircle className="w-6 h-6" />
-            </button>
-            <button className="text-gray-600 hover:text-gray-900 transition-colors">
-              <Share2 className="w-6 h-6" />
-            </button>
-          </div>
-          <button className="text-gray-600 hover:text-gray-900 transition-colors">
-            <Bookmark className="w-6 h-6" />
-          </button>
-        </div>
+//       <div className="p-4 space-y-3">
+//         <div className="flex justify-between items-center">
+//           <div className="flex space-x-4">
+//             <button className="text-gray-600 hover:text-red-500 transition-colors">
+//               <Heart className="w-6 h-6" />
+//             </button>
+//             <button className="text-gray-600 hover:text-gray-900 transition-colors">
+//               <MessageCircle className="w-6 h-6" />
+//             </button>
+//             <button className="text-gray-600 hover:text-gray-900 transition-colors">
+//               <Share2 className="w-6 h-6" />
+//             </button>
+//           </div>
+//           <button className="text-gray-600 hover:text-gray-900 transition-colors">
+//             <Bookmark className="w-6 h-6" />
+//           </button>
+//         </div>
         
-        <div className="font-medium">{likes.toLocaleString()} likes</div>
+//         <div className="font-medium">{likes.toLocaleString()} likes</div>
         
-        <div className="space-y-2">
-          <p>
-            <span className="font-medium mr-2">{username}</span>
-            {caption}
-          </p>
-          <p className="text-gray-500 text-sm">{timestamp}</p>
-        </div>
-      </div>
-    </div>
-  );
-}
+//         <div className="space-y-2">
+//           <p>
+//             <span className="font-medium mr-2">{username}</span>
+//             {caption}
+//           </p>
+//           <p className="text-gray-500 text-sm">{timestamp}</p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }

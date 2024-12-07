@@ -19,7 +19,7 @@ export const PostCard = ({
     publishedDate
 }: PostCardProps) => {
     return <Link to={`/post/${id}`}>
-        <div className="flex flex-col">
+        <div className="flex flex-col p-4">
                 <div className="flex justify-center">
                     <div className="bg-white border border-gray-100 rounded-lg mb-4 flex flex-col justify-center">
                         <div className="p-4 flex items-center justify-between space-x-[300px]">
