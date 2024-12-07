@@ -1,8 +1,9 @@
-import { Appbar } from "../components/StickyBars/Appbar"
+// import { Appbar } from "../components/StickyBars/Appbar"
 import axios from "axios";
 import { BACKEND_URL } from "../config";
 import { useNavigate } from "react-router-dom";
 import { ChangeEvent, useState } from "react";
+import { Sidebar } from "../components/StickyBars/Sidebar";
 // import { a } from "framer-motion/m";
 
 
@@ -22,7 +23,7 @@ export const AddStory = () => {
 
     return <div className="flex flex-row">
         <div className = "pt-6 px-4 min-w-72" >
-            <Appbar />
+            <Sidebar />
         </div>
 
         <div className="flex justify-center w-full pt-8"> 
