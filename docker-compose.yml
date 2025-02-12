@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: apps/frontend/Dockerfile
+    container_name: sportstolt_frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - turbo
+
+  turbo:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sportstolt_turborepo
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      DATABASE_URL: ${DATABASE_URL} # Load from .env file
+    command: ["turbo", "dev"]
+
+volumes:
+  node_modules:
