@@ -2,8 +2,7 @@ import { Hono } from 'hono'
 import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from '@prisma/extension-accelerate'
 import { verify } from 'hono/jwt'
-// import { createstoryInput, updatestoryInput } from '@vanshkathpalia/sportstolt-common'
-import { date, string, z } from "zod"
+import { number, string, z } from "zod"
 
 export const storyRouter = new Hono<{
     Bindings: {
@@ -16,17 +15,52 @@ export const storyRouter = new Hono<{
 }>();
 
 const createStoryInput = z.object({
-    image: z.string().min(1, 'https://www.gettyimages.in/detail/photo/hisar-kapiya-old-plovdiv-by-omgwrks-com-royalty-free-image/987624358?adppopup=true'),
-    // image: z
-    // .any()
-    // .refine((file) => file?.size <= MAX_FILE_SIZE, `Max image size is 5MB.`)
-    // .refine(
-    //   (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
-    //   "Only .jpg, .jpeg, .png and .webp formats are supported."
+    locationImage: z.string().min(1, 'Image URL is required'),
+    images: z.array(z.number()).optional(),
     isViewed: z.boolean().optional(),
-    location: z.string().min(1, 'hisar'),
-    // createdAt: z.date(),
+    location: z.string().min(1, 'Location is required'),
+    description: z.string().optional(),
+    eventLink: z.string().url().optional(),
+    sport: z.string().min(1, 'Sport type is required'),
+    stadium: z.string().optional(),
+    swipeUpEnabled: z.boolean().optional()
 });
+
+const verifyStoryInput = z.object({
+    storyId: z.number(),
+    imageId: z.string(),
+    verified: z.boolean()
+});
+
+/**
+ * Fetches an image URL for a given location from the Pexels API.
+ * 
+ * @param {string} location - The name of the location to search for.
+ * @returns {Promise<string | null>} - A promise that resolves to the URL of the location's image or null if no image is found.
+ * 
+ * This function uses the Pexels API to search for images related to the provided location.
+ * It returns the URL of the first image in the search results, if available.
+ * In case of an error or if no images are found, the function returns null.
+ */
+import axios from 'axios';
+
+async function fetchLocationImage(location: string): Promise<string | null> {
+    const API_KEY = 'HumkAY45IhFQNjKoq50xxWo1b619Te5RmwhC9Ti0O8Bx09tdBS2hPxOp'; // Replace with your actual Pexels API key
+    const pexelsUrl = `https://api.pexels.com/v1/search?query=${encodeURIComponent(location)}&per_page=1`;
+
+    try {
+        const response = await axios.get(pexelsUrl, {
+            headers: { Authorization: API_KEY },
+        });
+
+        // Ensure the response has photos and extract the first image URL
+        return response.data?.photos?.[0]?.src?.large || null;
+    } catch (error) {
+        console.error("Error fetching location image:", error);
+        return null;
+    }
+}
+
 
 storyRouter.use('/*', async (c, next) => {
     if (c.req.method === 'OPTIONS') {
@@ -49,175 +83,168 @@ storyRouter.use('/*', async (c, next) => {
     }
 });
 
-//story  location is like author id in story 
+// Create story with enhanced details
 storyRouter.post('/', async (c) => {
     const body = await c.req.json();
-    // console.log(body);
-    try {
-        const body = await c.req.json();
-        console.log(body);
-
-        const { success } = createStoryInput.safeParse(body); 
-            if(!success) {
-            c.status(411);
-            return c.json({
-                message: "invalid"
-            })
-        }
-        
-
-        const authorId = c.get("userId");
-        if (!authorId) {
-            c.status(403);
-            c.json({ message: "User not authenticated" });
-            return;
-        }
-
-        if (!c.env.DATABASE_URL) {
-            c.status(500);
-            c.json({ message: "DATABASE_URL is not set" });
-            return;
-        }
-        // const prisma = new PrismaClient({
-        //     datasourceUrl: c.env.DATABASE_URL,
-        // }).$extends(withAccelerate());
-        const prisma = new PrismaClient({
-            datasources: {
-                db: { url: c.env.DATABASE_URL },
-            },
+    console.log("Received body:", JSON.stringify(body, null, 2));
+    
+    const parseResult = createStoryInput.safeParse(body);
+    if (!parseResult.success) {
+        console.error("Validation Errors:", parseResult.error.errors);
+        c.status(400);
+        return c.json({ 
+            message: "Invalid input", 
+            errors: parseResult.error.errors.map(err => ({
+                path: err.path.join('.'),
+                message: err.message
+            }))
         });
-        // prisma.$connect()
-        // .then(() => console.log('Prisma connected'))
-        // .catch((error) => console.error('Prisma connection error:', error));
+    }
 
+    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
 
-        const story = await prisma.story.create({
-            data: {
-                isViewed: body.isViewed,
-                location: body.location,
-                image: body.image,
-                authorId: Number(authorId),
-            }
-        })
-        if (story) {
-            console.log("checking");
+    try {
+        const userId = c.get('userId');
+        const endTime = new Date();
+        endTime.setHours(endTime.getHours() + 1); // Story expires in 1 hour
+
+        // Check if a story already exists for this location & sport
+        let existingStory = await prisma.story.findFirst({
+            where: { location: body.location, sport: body.sport }
+        });
+
+        if (!existingStory) {
+            // Fetch location image only for a new story
+            const locationImage = await fetchLocationImage(body.location);
+
+            existingStory = await prisma.story.create({
+                data: {
+                    location: body.location,
+                    sport: body.sport,
+                    stadium: body.stadium || "",
+                    description: body.description,
+                    authorId: userId,
+                    authenticityStatus: "pending",
+                    duration: 60,
+                    endTime,
+                    swipeUpEnabled: true,
+                    eventLink: body.eventLink || null,
+                    rating: 0, // Initialize rating as 0
+                    verificationCount: 0,
+                    rewardStatus: "pending",
+                    rewardAmount: null,
+                    isViewed: false,
+                    locationImage, // Store the location image URL
+                }
+            });
         }
+
+        // Add the user's uploaded image to Storyimages
+        const storyImage = await prisma.storyimages.create({
+            data: {
+                url: body.image,
+                storyId: existingStory.id,
+                UserID: userId,
+                authenticityChecked: false
+            }
+        });
 
         return c.json({
-            id: story.id
+            message: "Story created successfully",
+            story: existingStory,
+            storyImage
         });
-    } catch(error) {
-        console.error("Unhandled error:", error);
+    } catch (e) {
+        console.error(e);
         c.status(500);
-        c.json({ message: "Internal server error" });
+        return c.json({ message: "Error while creating story" });
     }
-})
+});
 
 
-storyRouter.get('/bulk', async (c) => {
-    
+
+// Verify story content
+storyRouter.post('/verify', async (c) => {
+    const body = await c.req.json();
+    const { success } = verifyStoryInput.safeParse(body);
+    if (!success) {
+        c.status(411);
+        return c.json({
+            message: "Invalid input"
+        });
+    }
+
     const prisma = new PrismaClient({
         datasourceUrl: c.env.DATABASE_URL,
-      }).$extends(withAccelerate())
-    const authorId = c.get("userId")
+    }).$extends(withAccelerate());
 
-    const stories = await prisma.story.findMany({
-        select: {
-            location: true,
-            image: true,
-            isViewed: true,
-            createdAt: true,
-            id: true,
-            author: {
-                select: {
-                    name: true
+    try {
+        const userId = c.get('userId');
+        const { storyId, imageId, verified } = body;
+
+        // Update the story image verification
+        const storyImage = await prisma.storyimages.update({
+            where: { id: imageId },
+            data: {
+                authenticityChecked: true,
+                verifiedBy: {
+                    push: userId
                 }
             }
-        }
-    });
-    
-    return c.json({
-        stories,
-    })
-})
+        });
 
+        // Update story verification count and status
+        const story = await prisma.story.update({
+            where: { id: storyId },
+            data: {
+                verificationCount: {
+                    increment: verified ? 1 : 0
+                },
+                authenticityStatus: verified ? "verified" : "not_verified",
+                rewardStatus: verified ? "eligible" : "pending"
+            }
+        });
 
-/* user posting stories is authentic or not */
-// Check Image Authenticity (pseudo code for object identification)
-// async function checkImageAuthenticity(imageUrl: string): Promise<boolean> {
-//     // Integrate with an object detection API or use your own model
-//     const isAuthentic = await objectDetectionAPI(imageUrl);
-//     return isAuthentic;
-//   }
-  
-//   // Review Story and Update Rating
-//   async function reviewStory(storyId: string, userId: string, rating: number, content: string) {
-//     // Store review
-//     const review = await prisma.review.create({
-//       data: {
-//         content: content,
-//         rating: rating,
-//         reviewer: userId,
-//         storyId: storyId,
-//       },
-//     });
-  
-//     // Update Story Rating (calculate average)
-//     const story = await prisma.story.findUnique({
-//       where: { id: storyId },
-//       include: { reviews: true },
-//     });
-  
-//     const avgRating = story.reviews.reduce((sum, review) => sum + review.rating, 0) / story.reviews.length;
-  
-//     await prisma.story.update({
-//       where: { id: storyId },
-//       data: {
-//         rating: avgRating,
-//       },
-//     });
-//   }
-  
-//   // Authenticity and Reward Points
-//   async function authenticateAndReward(storyId: string, userId: string) {
-//     // Check all images in the story for authenticity
-//     const story = await prisma.story.findUnique({
-//       where: { id: storyId },
-//       include: { images: true },
-//     });
-  
-//     const authenticityPromises = story.images.map(async (imageUrl) => checkImageAuthenticity(imageUrl));
-//     const results = await Promise.all(authenticityPromises);
-  
-//     const isAuthentic = results.every(result => result); // If all images are authentic
-  
-//     if (isAuthentic) {
-//       // Award points to user
-//       await prisma.user.update({
-//         where: { id: userId },
-//         data: { points: { increment: 10 } }, // Add points (e.g., 10 points)
-//       });
-  
-//       // Award badge to the user
-//       await prisma.badge.create({
-//         data: {
-//           name: "Verified Creator",
-//           userId: userId,
-//         },
-//       });
-  
-//       // Update story authenticity status
-//       await prisma.story.update({
-//         where: { id: storyId },
-//         data: { authenticityStatus: "verified" },
-//       });
-//     } else {
-//       // Mark as not verified
-//       await prisma.story.update({
-//         where: { id: storyId },
-//         data: { authenticityStatus: "not_verified" },
-//       });
-//     }
-//   }
-  
+        return c.json({
+            message: "Story verification updated",
+            story,
+            storyImage
+        });
+    } catch (e) {
+        console.error(e);
+        c.status(411);
+        return c.json({
+            message: "Error while verifying story"
+        });
+    }
+});
 
+storyRouter.get('/bulk', async (c) => {
+    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+    try {
+        const stories = await prisma.story.findMany({
+            where: { endTime: { gte: new Date() } }, // Fetch only non-expired stories
+            select: {
+                id: true,
+                location: true,
+                sport: true,
+                locationImage: true, // Include location image in response
+                createdAt: true,
+                endTime: true,
+                description: true,
+                stadium: true,
+                swipeUpEnabled: true,
+                Storyimages: { select: { url: true, UserID: true } } as any,
+                author: { select: { name: true, image: true } }
+            },
+            orderBy: [{ sport: 'asc' }, { location: 'asc' }] // Group by sport & location
+        });
+
+        return c.json({ stories });
+    } catch (e) {
+        console.error(e);
+        c.status(500);
+        return c.json({ message: "Error fetching stories" });
+    }
+});

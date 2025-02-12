@@ -45,6 +45,14 @@ eventRouter.use('/*', async (c, next) => {
     }
 });
 
+function formatDateToDDMMYYYY(dateString: string): string {
+  const date = new Date(dateString);
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
 eventRouter.post('/', async (c) => {
     try {
         // Parse the incoming request body
@@ -82,17 +90,21 @@ eventRouter.post('/', async (c) => {
 
         // Create the event in the database
         const event = await prisma.event.create({
-            data: {
-              image: body.image,
-              city: body.city,
-              authorId: Number(userId), // Authenticated user's ID
-              stadium: body.stadium,
-              StartDate: new Date(body.StartDate),
-              EndDate: new Date(body.EndDate),
-              StartTime: new Date(body.StartTime),
-              OrganisedBy: body.OrganisedBy
-            },
-          });
+          data: {
+              image: body.image,                      // Image URL
+              city: body.city,                        // City 
+              name: body.name,                        
+              authorId: Number(userId),               // Authenticated user's ID
+              stadium: body.stadium,                  // Stadium name
+              StartDate: new Date(body.StartDate),    // Start date
+              EndDate: new Date(body.EndDate),        // End date
+              StartTime: new Date(body.StartTime),    // Start time
+              OrganisedBy: body.OrganisedBy,          // Organizer name
+              likeCount: 0,                           // Default value
+              country: body.country || "",             // Country, default to empty string if not provided
+              state: body.state || "",                 // State, default to empty string if not provided
+          },
+      });
       
 
         // Return the created event ID in the response

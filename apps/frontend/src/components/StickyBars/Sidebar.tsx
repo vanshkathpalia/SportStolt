@@ -9,7 +9,7 @@ export const Sidebar = () => {
     { icon: Compass, label: 'Explore', href: '/explore' },
     { icon: PlusSquare, label: 'New Post', href: '/addpost' },
     { icon: Film, label: 'New Story', href: '/addstory' },
-    { icon: Calendar, label: 'New Event', href: '/addevent' },
+    { icon: Calendar, label: 'Event', href: '/events' },
     { icon: User, label: 'Profile', href: '/profile' },
   ];
 
@@ -41,7 +41,12 @@ export const Sidebar = () => {
         <div className="flex justify-around items-center">
           
           {navItems.map((item) => (
-            <item.icon key={item.label} className="h-6 w-6" />
+            <NavItem
+            key={item.label}
+            icon={item.icon}
+            label={item.label}
+            href={item.href} 
+            />
           ))}
         </div>
       </div>
