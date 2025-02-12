@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ChevronUp, X, ChevronLeft, ChevronRight } from 'lucide-react';
-import { StoryType, ImageType } from './types';
+import { StoryType } from './types';
 // import { BACKEND_URL } from '../../config';
 // import axios from 'axios';
 
@@ -66,11 +66,11 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
 
         {/* Progress Bars */}
         <div className="absolute top-0 left-0 right-0 flex gap-1 p-2">
-          {images.map((image: ImageType, _index: number) => (
+          {images.map((_, index: number) => (
             <div
-              key={_index}
+              key={index}
               className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                _index === currentImageIndex ? 'bg-white' : 'bg-white/30'
+                index === currentImageIndex ? 'bg-white' : 'bg-white/30'
               }`}
             />
           ))}

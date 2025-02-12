@@ -173,6 +173,9 @@ export const AddPost = () => {
                                 </div>
                             )}
 
+                            {/* Image Preview */}
+                            {imagePreview && <img src={imagePreview} alt="Preview" className="w-full h-48 object-cover rounded-lg mb-4" />}
+
                             {/* Upload Area */}
                             <div
                                 className={`relative h-48 rounded-lg border-2 border-dashed transition-colors ${

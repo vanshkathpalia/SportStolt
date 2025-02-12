@@ -29,7 +29,9 @@ interface StoryCardProps {
     onClose: () => void;
 }
 
-const StoryCard: React.FC<StoryCardProps> = ({ story, onClose }) => {
+
+const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
+    
     const [isViewingStory, setIsViewingStory] = useState(false);
 
     return (

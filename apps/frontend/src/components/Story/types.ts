@@ -22,9 +22,3 @@ export interface StoryType {
     stadium?: string;
     isViewed?: boolean;
 }
-
-export type ImageType = {
-    url: string;
-    altText?: string; // Optional field for image description
-    UserID: string;
-};
