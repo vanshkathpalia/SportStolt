@@ -14,18 +14,38 @@ export interface Post {
 }
 
 export interface Story {
-    "location": string;
-    "image": string;
-    "isViewed"?: boolean;
-    "id": number;
-    "author": {
-        "name": string
-    }
+    id: number;
+    locationImage: string;
+    location: string;
+    isViewed?: boolean;
+    description?: string;
+    eventLink?: string;
+    createdAt: string;
+    sport?: string;
+    endTime: any;
+    stadium?: string;
+    swipeUpEnabled?: boolean;
+    authenticityStatus?: string;
+    verificationCount?: number;
+    rewardStatus?: string;
+    author: {
+        name: string;
+        image?: string;
+        UserID: string;
+    };
+    Storyimages?: {
+        UserID: number;
+        url: string;
+        // authenticityChecked: boolean;
+    }[];
 }
 
 export interface EventInterface {
     "id": number; // Assuming Prisma is autoincrementing the id
     "image": string;
+    "name": string;
+    "country": string;
+    "state": string;
     "city": string;
     "authorId": number;
     "stadium": string;
@@ -107,13 +127,69 @@ export const usePosts = () => {
 
             
     }, []);
-
+    console.log(posts);
     return {
         loading,
         posts,
         story
     }
 }
+
+export const useStory = (id: number) => {
+    const [loading, setLoading] = useState(true);
+    const [story, setStory] = useState<Story>();
+    const [error, setError] = useState<string>();
+
+    useEffect(() => {
+        const fetchStory = async () => {
+            try {
+                const response = await axios.get(`${BACKEND_URL}/api/v1/story/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                setStory(response.data.story);
+                console.log(story);
+            } catch (e) {
+                setError('Failed to fetch story');
+                console.error(e);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStory();
+    }, [id]);
+
+    return { loading, story, error };
+};
+
+export const useStories = () => {
+    const [loading, setLoading] = useState(true);
+    const [stories, setStories] = useState<Story[]>([]);
+    const [error, setError] = useState<string>();
+
+    useEffect(() => {
+        const fetchStories = async () => {
+            try {
+                const response = await axios.get(`${BACKEND_URL}/api/v1/story/bulk`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                setStories(response.data.stories);
+            } catch (e) {
+                setError('Failed to fetch stories');
+                console.error(e);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStories();
+    }, []);
+    return { loading, stories, error };
+};
 
 export const useEvents = () => {
     const [loading, setLoading] = useState(true);
@@ -137,9 +213,6 @@ export const useEvents = () => {
               });
       
               if (response.data) {
-                console.log(response.data.events);
-                
-                console.log("lfo")
                 setEvents(response.data); // Set the fetched events
               } else {
                 console.error("Unexpected response structure:", response.data);
@@ -210,4 +283,3 @@ export const useEvents = () => {
 
 //     return { loading, images, error };
 // };
-

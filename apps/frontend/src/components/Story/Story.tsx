@@ -1,8 +1,5 @@
-// design for the story, using story card
-//add a logic, where if any story is on the other side, > will appear 
-
 import { usePosts } from "../../hooks";
-import { StoryCard } from "./StoryCard";
+import StoryCard from "./StoryCard";
 import { StorySkeleton } from "./StorySkeleton";
 
 export const Story = () => {
@@ -15,25 +12,95 @@ export const Story = () => {
         </div>
     }
 
+    return <div className="flex flex-col p-4">
+            <div className="bg-white gap-4 rounded-lg shadow-md p-2 flex justify-center">
+                <div className="p-2 scroll-pr-24 gap-4 overflow-x-auto w-screen pb-2 max-24 flex flex-row" >
+
+    {/* <div className="flex flex-col p-4">
+         <div className="bg-white gap-4 rounded-lg shadow-md p-2 flex justify-center">
+            <div className="p-2 scroll-pr-24 gap-4 overflow-x-auto w-screen pb-2 max-24 flex flex-row" > */}
+                {reversedStories && reversedStories.map(story => {
+                    const onClose = () => {
+                        // Implement the logic for closing the story view
+                        console.log('Story closed');
+                    };
+
+                    return (
+                        <StoryCard
+                            key={story.id}
+                            story={{
+                                id: story.id,
+                                locationImage: story.locationImage,
+                                location: story.location,
+                                description: story.description,
+                                eventLink: story.eventLink,
+                                createdAt: story.createdAt,
+                                sport: story.sport,
+                                endTime: story.endTime,
+                                author: story.author,
+                                Storyimages: story.Storyimages,
+                                isViewed: story.isViewed,
+                                swipeUpEnabled: story.swipeUpEnabled,
+                                authenticityStatus: story.authenticityStatus,
+                                // authorName?: story.author?.name || "Anonymous",
+                                // UserID: story.author?.UserID?.toString() ?? ""
+                            }}
+                            onClose={onClose}
+                        />
+                    );
+                })}
+            </div>
+         </div>
+    </div>
+}
+
+
+
+// design for the story, using story card
+//add a logic, where if any story is on the other side, > will appear 
+
+// import { usePosts } from "../../hooks";
+// import { StoryCard } from "./StoryCard";
+// import { StorySkeleton } from "./StorySkeleton";
+
+// export const Story = () => {
+//     const { loading, story } = usePosts();
+//     const reversedStories = [...story].reverse();
+
+//     if (loading) {
+//         return <div >
+//             <StorySkeleton />
+//         </div>
+//     }
+
     // else {
         // <div className="flex flex-col p-4">
         //         <div className="flex justify-center">
         //             <div className="bg-white border border-gray-100 rounded-lg mb-4 flex flex-col justify-center"></div>
-        return <div className="flex flex-col p-4">
-            <div className="bg-white gap-4 rounded-lg shadow-md p-2 flex justify-center">
-                <div className="p-2 scroll-pr-24 gap-4 overflow-x-auto w-screen pb-2 max-24 flex flex-row" >
-                    {reversedStories.map(story => <StoryCard
-                        id={story.id}
-                        authorName={story.author.name || "Anonymous"}
-                        isViewed={story.isViewed}
-                        image={story.image}
-                        location={story.location}
-                        createdAt={"date"} />)}
-                </div>
-            </div>
-        </div>
+        // return <div className="flex flex-col p-4">
+        //     <div className="bg-white gap-4 rounded-lg shadow-md p-2 flex justify-center">
+        //         <div className="p-2 scroll-pr-24 gap-4 overflow-x-auto w-screen pb-2 max-24 flex flex-row" >
+        //             {reversedStories.map(story => <StoryCard
+        //                 story={story}
+        //                 author={{ name: story.author.name || "Anonymous" }}
+        //                 // , image: story.author.image
+        //                 // description={story.description}
+        //                 // eventLink={story.eventLink}
+        //                 // sport={story.sport}
+        //                 // stadium={story.stadium}
+        //                 // swipeUpEnabled={story.swipeUpEnabled}
+        //                 // authenticityStatus={story.authenticityStatus}
+        //                 authorName={story.author.name || "Anonymous"}
+        //                 // isViewed={story.isViewed}
+        //                 locationImage={story.locationImage}
+        //                 location={story.location}
+        //                 // createdAt={story.createdAt} 
+        //                 />)}
+        //         </div>
+        //     </div>
+        // </div>
     // }
-}
+// }
 
 
 // flex flex-row-reverse gap-1 overflow-x-auto pb-2 scrollbar-hide cursor-pointer
@@ -60,7 +127,7 @@ export const Story = () => {
 // //             <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-4 mb-4">
 // //                 <div className="flex flex-row-reverse gap-4 overflow-x-auto pb-2 scrollbar-hidecursor-pointer" >
 // //                 {story.map(story => <StoryCard
-// //                     id={story.id}
+// //                     story={story}
 // //                     authorName={story.author.name || "Anonymous"}
 // //                     isViewed={story.isViewed}
 // //                     image={story.image}
@@ -158,15 +225,38 @@ export const Story = () => {
 //                 viewed={story.viewed}
 //             />
 //             ))} */}
-//             {story.map(story => <StoryCard
-//                         id={story.id}
-//                         authorName={story.author.name || "Anonymous"}
-//                         isViewed={story.isViewed}
-//                         image={story.image}
-//                         location={story.location}
-//                         createdAt={"date"} />)}
+//             {story && story.map(story => <StoryCard
+//                         story={{
+//                             id: story.id,
+//                             locationImage: story.locationImage,
+//                             location: story.location,
+//                             description: story.description,
+//                             eventLink: story.eventLink,
+//                             createdAt: story.createdAt,
+//                             sport: story.sport,
+//                             endTime: story.endTime,
+//                             author: story.author,
+//                             Storyimages: story.Storyimages,
+//                             isViewed: story.isViewed,
+//                             swipeUpEnabled: story.swipeUpEnabled,
+//                             authenticityStatus: story.authenticityStatus,
+//                             authorName: story.author?.name || "Anonymous",
+//                             UserID: story.UserID?.toString() ?? ""
+//                         }}
+//                         onClose={() => {
+//                             // Implement the logic for closing the story view
+//                             console.log('Story closed');
+//                         }}
+//                     />
+//                 )}
 //         </div>
 //     </div>
 //     )}
 // }
 
+
+{/* <div className="bg-white gap-4 rounded-lg shadow-md p-2 flex justify-center">
+                 <div className="p-2 scroll-pr-24 gap-4 overflow-x-auto w-screen pb-2 max-24 flex flex-row" >
+                     <Mock/>
+                 </div>
+            </div> */}

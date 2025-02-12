@@ -1,7 +1,7 @@
 import { PostCard } from "../components/Post/PostCard"
 import { PostSkeleton } from "../components/Post/PostSkeleton";
 import { Story } from "../components/Story/Story";
-import { EventCard } from '../components/Event/EventCard';
+import { EventCardHome } from '../components/Event/EventCardHome';
 import { StorySkeleton } from "../components/Story/StorySkeleton";
 import { useEvents, usePosts } from "../hooks";
 import { Sidebar } from "../components/StickyBars/Sidebar";
@@ -21,7 +21,7 @@ export const Posts = () => {
                   <div className="col-start-3 sm:col-span-9 sm:col-start-1 md:col-span-7 md:col-start-2 lg:col-span-5 lg:col-start-3 xl:col-span-5 xl:col-start-2 xl:mr-16 xl:ml-16">
                         <StorySkeleton />
                     </div>
-                  <div className="col-start-2 sm:col-span-5 sm:col-start-3 xl:col-start-2">
+                    <div className="col-start-2 sm:col-span-5 sm:col-start-3 p-4 xl:col-start-2">
                         <PostSkeleton />
                         <PostSkeleton />
                         <PostSkeleton />
@@ -46,7 +46,7 @@ export const Posts = () => {
                     <Story />
                   </div>
                     
-                  <div className="col-start-2 sm:col-span-5 sm:col-start-3 p-4 xl:col-start-2">
+                  <div className="sm:col-span-5 sm:col-start-3 p-4 xl:col-start-2">
                       {posts.map(post => <PostCard
                           id={post.id}
                           authorName={post.author.name || "Anonymous"}
@@ -62,7 +62,7 @@ export const Posts = () => {
 
                     <div className="scroll-pt-24 overflow-auto pb-2 h-[600px]">
                       {events.map(event => (
-                        <EventCard
+                        <EventCardHome
                           event={event}
                           onRegister={() => alert('Registration functionality coming soon!')}
                         />

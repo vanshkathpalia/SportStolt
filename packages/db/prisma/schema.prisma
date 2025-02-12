@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,113 +7,108 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-model User {
-  id         Int      @id @default(autoincrement())
-  username  String    @unique
-  password  String
-  name      String?
-  comments  Comment[]
-  likes     Like[]
-  tweets    Tweet[]
-  photos    Photo[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  post      Post[]
-  story     Story[]
-  event     Event[]
-  badges      Badge[]    // Badges earned by the user
-  points      Int        @default(0) // Total points of the user
-}
-
 model Badge {
-  id        String   @id @default(uuid())
-  name      String   // Badge name, e.g., 'Verified Creator'
-  userId    Int   // user who earned the badge
+  id        String   @id
+  name      String
+  userId    Int
   createdAt DateTime @default(now())
-
-  user      User     @relation(fields: [userId], references: [id]) // Opposite relation to User
+  User      User     @relation(fields: [userId], references: [id])
 }
-
 
 model Comment {
-  id        String   @id @default(uuid())
-  content   String   // Text content of the comment
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
-  post      Post?    @relation(fields: [postId], references: [id])
-  postId    Int?
-  event     Event?   @relation(fields: [eventId], references: [id])
-  eventId   Int?
+  id        String   @id
+  content   String
   createdAt DateTime @default(now())
+  authorId  Int
+  eventId   Int?
+  postId    Int?
+  author      User     @relation(fields: [authorId], references: [id])
+  Event     Event?   @relation(fields: [eventId], references: [id])
+  Post      Post?    @relation(fields: [postId], references: [id])
+}
+
+model Event {
+  id          Int       @id @default(autoincrement())
+  name        String
+  image       String
+  likeCount   Int       @default(0)
+  country     String    @default("")
+  state       String    @default("")
+  city        String    @default("")
+  authorId    Int
+  stadium     String    @default("")
+  StartDate   DateTime
+  EndDate     DateTime
+  StartTime   DateTime
+  OrganisedBy String
+  Comment     Comment[]
+  author      User      @relation(fields: [authorId], references: [id])
+  Like        Like[]
 }
 
 model Like {
-  id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    Int
-  post      Post?    @relation(fields: [postId], references: [id])
-  postId    Int?
-  event     Event?   @relation(fields: [eventId], references: [id])
+  id        String   @id
+  createdAt DateTime @default(now())
   eventId   Int?
-  createdAt DateTime @default(now())
-}
-
-model Tweet {
-  id        String   @id @default(cuid())
-  content   String
+  postId    Int?
   userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  Event     Event?   @relation(fields: [eventId], references: [id])
+  Post      Post?    @relation(fields: [postId], references: [id])
+  User      User     @relation(fields: [userId], references: [id])
 }
 
 model Photo {
-  id        String   @id @default(cuid())
+  id        String   @id
   url       String
   caption   String?
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model PostPhoto {
-  id       String  @id @default(uuid())
-  url      String  // URL of the photo
-  post     Post    @relation(fields: [postId], references: [id])
-  postId   Int
+  updatedAt DateTime
+  userId    Int
+  User    User     @relation(fields: [userId], references: [id])
 }
 
 model Post {
-  id         Int      @id @default(autoincrement())
-  authorId   Int
-  photos     PostPhoto[]    // One-to-many relation with Photo
-  title      String
-  comment    Comment[]
-  content    String
-  likes      Like[]
-  likeCount  Int      @default(0)
-  published  Boolean  @default(false)
-  author     User   @relation(fields: [authorId], references: [id])
+  id        Int         @id @default(autoincrement())
+  content   String
+  title     String
+  published Boolean     @default(false)
+  likeCount Int         @default(0)
+  authorId  Int
+  Comment   Comment[]
+  Like      Like[]
+  author    User        @relation(fields: [authorId], references: [id])
+  PostPhoto PostPhoto[]
+}
+
+model PostPhoto {
+  id     String @id
+  url    String
+  postId Int
+  Post   Post   @relation(fields: [postId], references: [id])
 }
 
 
 model Story {
   id         Int      @id @default(autoincrement())
-  images    Storyimages[]
-  image     String
-  location  String
-  stadium   String   @default("")
-  sport     String   @default("")
-  isViewed  Boolean  @default(false)
-  authorId  Int
-  endTime   DateTime @default(now())
-  createdAt DateTime @default(now())
-  duration  Int      @default(0)
-  author    User     @relation(fields: [authorId], references: [id])
+  Storyimages     Storyimages[]
+  location   String
+  locationImage String?  // New field for storing location image
+  sport      String   @default("")
+  stadium    String   @default("")
+  isViewed   Boolean  @default(false)
+  authorId   Int
+  endTime    DateTime @default(now())
+  createdAt  DateTime @default(now())
+  duration   Int      @default(0)
+  author     User     @relation(fields: [authorId], references: [id])
   authenticityStatus String? // 'pending', 'verified', 'not_verified'
-  rating      Float?   // Average rating
+  rating     Float?   // Average rating
+  description String?  // Detailed description of the story
+  eventLink  String?  // Link to related event or external content
+  verificationCount Int @default(0) // Number of verifications received
+  rewardStatus String @default("pending") // pending, eligible, rewarded
+  rewardAmount Float?  // Amount of reward tokens
+  swipeUpEnabled Boolean @default(false) // Whether story has swipe-up content
 }
 
 model Storyimages {
@@ -124,22 +118,36 @@ model Storyimages {
   storyId   Int   
   createdAt DateTime @default(now())
   authenticityChecked Boolean @default(false)
+  UserID    Int // The user who posted this image
+  verifiedBy Int[]   // Array of user IDs who verified this image
+  User      User    @relation(fields: [UserID], references: [id])
 }
 
-model Event {
-  id         Int      @id @default(autoincrement())
-  image     String
-  like      Like[]
-  likeCount Int      @default(0)
-  country   String   @default("")
-  state     String  @default("")
-  city      String   @default("")
-  author     User     @relation(fields: [authorId], references: [id])
-  authorId   Int
-  stadium   String  @default("")
-  comment   Comment[]
-  StartDate DateTime  
-  EndDate   DateTime  
-  StartTime DateTime 
-  OrganisedBy String
+model Tweet {
+  id        String   @id
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  userId    Int
+  author    User     @relation(fields: [userId], references: [id])
+}
+
+model User {
+  username  String    @unique
+  name      String?
+  image     String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  password  String
+  points    Int       @default(0)
+  id        Int       @id @default(autoincrement())
+  Badge     Badge[]
+  Comment   Comment[]
+  Event     Event[]
+  Like      Like[]
+  Photo     Photo[]
+  Post      Post[]
+  Story     Story[]
+  Tweet     Tweet[]
+  Storyimages Storyimages[]
 }

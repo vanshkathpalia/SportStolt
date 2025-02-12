@@ -121,12 +121,9 @@ postRouter.post('/', async (c) => {
             data: {
                 title: body.title,
                 content: body.content,
-                authorId: Number(authorId),
+                authorId: Number(authorId)
             }
-        })
-        if (post) {
-            console.log("checking");
-        }
+        });
 
         return c.json({
             id: post.id
@@ -141,33 +138,42 @@ postRouter.post('/', async (c) => {
   
 postRouter.put('/', async (c) => {
     const body = await c.req.json();
+    console.log("Received body:", body);
 
     const { success } = updatePostInput.safeParse(body);
-    if(!success) {
-      c.status(411);
-      return c.json({
-        message: "invalid"
-      })
+    if (!success) {
+        c.status(411);
+        return c.json({ message: "Invalid input" });
+    }
+    if (!body.id || !body.title || !body.content) {
+        return c.json({ message: "Invalid request body" }, 400);
     }
 
     const prisma = new PrismaClient({
-      datasourceUrl: c.env.DATABASE_URL,
-    }).$extends(withAccelerate())
+        datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate());
 
-    const post = await prisma.post.update({
-        where: {
-            id: body.id
-        },
-        data: {
-            title: body.title,
+    // Check if post exists
+    const existingPost = await prisma.post.findUnique({
+        where: { id: body.id },
+    });
+
+    if (!existingPost) {
+        c.status(404);
+        return c.json({ message: "Post not found" });
+    }
+
+    // Update the post
+    const updatedPost = await prisma.post.update({
+        where: { id: body.id },
+        data: { 
+            title: body.title, 
             content: body.content
-        }
-    })
+        },
+    });
 
-    return c.json({
-        id: post.id
-    })
-})
+    return c.json({ id: updatedPost.id });
+});
   
 
 //add pagination at this 
@@ -224,7 +230,7 @@ postRouter.get('/:id', async (c) => {
             },
             where: {
                 id: Number(id),
-                // authorId: String(authorId)
+                // AuthorId: String(authorId)
             }
         })
         return c.json({
@@ -239,4 +245,3 @@ postRouter.get('/:id', async (c) => {
         })
     }
 })
-
