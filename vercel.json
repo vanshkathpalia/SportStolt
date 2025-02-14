@@ -1,9 +1,12 @@
 {
     "version": 2,
     "build": {
-        "command": "npm run build",
-        "outputDirectory": "dist"
+      "env": {
+        "VITE_API_URL": "https://backend-me.vanshkumarkathpalia.workers.dev/api/v1/"
+      }
     },
+    "routes": [{ "handle": "filesystem" }],
+    "outputDirectory": "dist",
     "rewrites": [
       {
         "source": "/api/v1/(.*)",
