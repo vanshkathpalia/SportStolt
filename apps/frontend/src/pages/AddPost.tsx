@@ -69,7 +69,7 @@ export const AddPost = () => {
     const handleSubmit = async () => {
         try {
             setIsLoading(true);
-            await axios.post(`${BACKEND_URL}/api/v1/posts`, {
+            await axios.post(`${BACKEND_URL}/api/v1/post`, {
                 ...formData,
                 PostPhoto: photos,
             }, {
@@ -77,7 +77,7 @@ export const AddPost = () => {
                     Authorization: localStorage.getItem("token")
                 }
             });
-            navigate('/posts');
+            navigate('/post');
         } catch (error) {
             console.error('Error publishing post:', error);
         } finally {

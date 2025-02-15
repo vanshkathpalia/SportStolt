@@ -245,3 +245,30 @@ postRouter.get('/:id', async (c) => {
         })
     }
 })
+
+postRouter.delete('/:id', async (c) => {
+    try {
+        const id = parseInt(c.req.param('id'), 10);
+
+        if (isNaN(id)) {
+            return c.json({ message: "Invalid post ID" }, 400);
+        }
+
+        const prisma = new PrismaClient({
+            datasources: {
+                db: { url: c.env.DATABASE_URL },
+            },
+        });
+
+        await prisma.$connect();
+
+        const deletedPost = await prisma.post.delete({
+            where: { id },
+        });
+
+        return c.json({ message: "Post deleted successfully", deletedPost });
+    } catch (error) {
+        console.error("Error deleting post:", error);
+        return c.json({ message: "Error while deleting post" }, 500);
+    }
+});

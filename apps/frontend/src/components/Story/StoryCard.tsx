@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { StoryView } from './StoryView';
+import { useNavigate } from 'react-router-dom';
 
 interface StoryCardProps {
     story: {
@@ -7,6 +8,8 @@ interface StoryCardProps {
         locationImage: string;
         location: string;
         description?: string;
+        activityStarted: Date;
+        activityEnded: Date;
         eventLink?: string;
         createdAt: string;
         sport?: string;
@@ -33,6 +36,23 @@ interface StoryCardProps {
 const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
     
     const [isViewingStory, setIsViewingStory] = useState(false);
+    const navigate = useNavigate();
+
+    if (!story) {
+        return (
+            <div
+                className="flex flex-col items-center justify-center gap-1 cursor-pointer"
+                onClick={() => navigate("/addstory")}
+            >
+                <div className="p-[2px] rounded-full bg-gray-300 relative">
+                    <div className="bg-white p-[2px] rounded-full flex items-center justify-center w-14 h-14">
+                        <span className="text-2xl font-bold text-gray-500">+</span>
+                    </div>
+                </div>
+                <span className="text-xs truncate w-16 text-center text-gray-500">Add Story</span>
+            </div>
+        );
+    }
 
     return (
         <>
@@ -63,6 +83,8 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
                         eventLink: story.eventLink,
                         createdAt: story.createdAt,
                         sport: story.sport,
+                        activityEnded: story.activityEnded,
+                        activityStarted: story.activityStarted,
                         endTime: story.endTime,
                         authenticityStatus: story.authenticityStatus,
                         stadium: story.stadium,

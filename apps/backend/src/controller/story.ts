@@ -45,7 +45,7 @@ const verifyStoryInput = z.object({
 import axios from 'axios';
 
 async function fetchLocationImage(location: string): Promise<string | null> {
-    const API_KEY = 'HumkAY45IhFQNjKoq50xxWo1b619Te5RmwhC9Ti0O8Bx09tdBS2hPxOp'; // Replace with your actual Pexels API key
+    const API_KEY = 'HumkAY45IhFQNjKoq50xxWo1b619Te5RmwhC9Ti0O8Bx09tdBS2hPxOp'; 
     const pexelsUrl = `https://api.pexels.com/v1/search?query=${encodeURIComponent(location)}&per_page=1`;
 
     try {
@@ -105,8 +105,16 @@ storyRouter.post('/', async (c) => {
 
     try {
         const userId = c.get('userId');
+        const activityStarted = new Date(body.activityStarted);
+        const activityEnded = new Date(body.activityEnded);
+
+        if (activityEnded <= activityStarted) {
+            c.status(400);
+            return c.json({ message: "Activity Ended time must be after Activity Started time." });
+        }
+
         const endTime = new Date();
-        endTime.setHours(endTime.getHours() + 1); // Story expires in 1 hour
+        endTime.setHours(activityEnded.getHours() + 1); // Story expires in 1 hour
 
         // Check if a story already exists for this location & sport
         let existingStory = await prisma.story.findFirst({
@@ -126,6 +134,8 @@ storyRouter.post('/', async (c) => {
                     authorId: userId,
                     authenticityStatus: "pending",
                     duration: 60,
+                    activityStarted,
+                    activityEnded,
                     endTime,
                     swipeUpEnabled: true,
                     eventLink: body.eventLink || null,
@@ -134,7 +144,7 @@ storyRouter.post('/', async (c) => {
                     rewardStatus: "pending",
                     rewardAmount: null,
                     isViewed: false,
-                    locationImage, // Store the location image URL
+                    locationImage,
                 }
             });
         }
@@ -231,6 +241,8 @@ storyRouter.get('/bulk', async (c) => {
                 sport: true,
                 locationImage: true, // Include location image in response
                 createdAt: true,
+                activityStarted: true,  
+                activityEnded: true,
                 endTime: true,
                 description: true,
                 stadium: true,
@@ -246,5 +258,51 @@ storyRouter.get('/bulk', async (c) => {
         console.error(e);
         c.status(500);
         return c.json({ message: "Error fetching stories" });
+    }
+});
+
+
+storyRouter.delete('/', async (c) => {
+    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+    try {
+        const { id, location, sport } = await c.req.json();
+
+        if (!id && !location && !sport) {
+            c.status(400);
+            return c.json({ message: "Provide at least one identifier: id, location, or sport" });
+        }
+
+        // Find the story based on the provided identifier
+        const story = await prisma.story.findFirst({
+            where: {
+                OR: [
+                    id ? { id } : {},
+                    location ? { location } : {},
+                    sport ? { sport } : {}
+                ]
+            }
+        });
+
+        if (!story) {
+            c.status(404);
+            return c.json({ message: "Story not found" });
+        }
+
+        // Delete associated images first (to avoid foreign key constraint issues)
+        await prisma.storyimages.deleteMany({
+            where: { storyId: story.id }
+        });
+
+        // Now delete the story
+        await prisma.story.delete({
+            where: { id: story.id }
+        });
+
+        return c.json({ message: "Story deleted successfully" });
+    } catch (e) {
+        console.error("Error deleting story:", e);
+        c.status(500);
+        return c.json({ message: "Error while deleting story" });
     }
 });
