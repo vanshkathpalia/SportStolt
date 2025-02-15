@@ -8,10 +8,13 @@ import { Camera, MapPin, X, Upload, Trophy, Link as LinkIcon, FileText } from 'l
 export const AddStory = () => {
     const [formData, setFormData] = useState({
         location: "",
+        image: "",
         locationImage: "",
         description: "",
         eventLink: "",
         sport: "",
+        activityStarted: "",
+        activityEnded: "",
         stadium: "",
     });
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -60,6 +63,12 @@ export const AddStory = () => {
     };
 
     const handleSubmit = async () => {
+        
+        if (new Date(formData.activityEnded) <= new Date(formData.activityStarted)) {
+            alert("Activity Ended time must be after Activity Started time.");
+            return;
+        }
+
         try {
             setIsLoading(true);
             await axios.post(`${BACKEND_URL}/api/v1/story`, {
@@ -79,8 +88,8 @@ export const AddStory = () => {
         }
     };
 
-    const isFormValid = formData.location && formData.locationImage && formData.description && 
-                       formData.sport && formData.stadium;
+    const isFormValid = formData.location && formData.image && formData.description && 
+                       formData.sport && formData.stadium && formData.activityStarted && formData.activityEnded;
 
     return (
         <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
@@ -150,11 +159,27 @@ export const AddStory = () => {
                             </label>
                             <input
                                 type="text"
+                                name="image"
+                                value={formData.image}
+                                onChange={handleInputChange}
+                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Enter image URL"
+                            />
+                        </div>
+
+                        {/* Location image Input */}
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <Camera className="w-4 h-4 inline mr-1" />
+                                Location URL
+                            </label>
+                            <input
+                                type="text"
                                 name="locationImage"
                                 value={formData.locationImage}
                                 onChange={handleInputChange}
                                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Enter image URL"
+                                placeholder="Enter location URL"
                             />
                         </div>
 
@@ -173,6 +198,34 @@ export const AddStory = () => {
                                 placeholder="Enter location"
                             />
                         </div>
+
+                        {/* Activity Started Input */}
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <Camera className="w-4 h-4 inline mr-1" />
+                            Activity Started At
+                        </label>
+                        <input
+                            type="datetime-local"
+                            name="activityStarted"
+                            value={formData.activityStarted}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Activity Started"
+                        />
+
+                        {/* Activity Ended Input */}
+                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <Camera className="w-4 h-4 inline mr-1" />
+                            Activity Ended At
+                        </label>
+                        <input
+                            type="datetime-local"
+                            name="activityEnded"
+                            value={formData.activityEnded}
+                            onChange={handleInputChange}
+                            className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                            placeholder="Activity Ended"
+                        />
 
                         {/* Sport Selection */}
                         <div>

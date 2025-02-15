@@ -98,6 +98,8 @@ model Story {
   isViewed   Boolean  @default(false)
   authorId   Int
   endTime    DateTime @default(now())
+  activityStarted   DateTime  @default(now())
+  activityEnded     DateTime  @default(now())
   createdAt  DateTime @default(now())
   duration   Int      @default(0)
   author     User     @relation(fields: [authorId], references: [id])

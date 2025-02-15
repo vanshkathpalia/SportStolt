@@ -4,6 +4,8 @@ export interface StoryType {
     image: string;
     location: string;
     description?: string;
+    activityStarted: Date;
+    activityEnded: Date;
     eventLink?: string;
     createdAt: string;
     sport?: string;

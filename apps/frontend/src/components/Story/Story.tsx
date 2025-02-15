@@ -1,58 +1,75 @@
 import { usePosts } from "../../hooks";
 import StoryCard from "./StoryCard";
 import { StorySkeleton } from "./StorySkeleton";
+import { useNavigate } from "react-router-dom"; // Import for navigation
 
 export const Story = () => {
     const { loading, story } = usePosts();
+    const navigate = useNavigate();
     const reversedStories = [...story].reverse();
 
     if (loading) {
-        return <div >
-            <StorySkeleton />
-        </div>
+        return <div><StorySkeleton /></div>;
     }
 
-    return <div className="flex flex-col p-4">
+    return (
+        <div className="flex flex-col p-4">
             <div className="bg-white gap-4 rounded-lg shadow-md p-2 flex justify-center">
-                <div className="p-2 scroll-pr-24 gap-4 overflow-x-auto w-screen pb-2 max-24 flex flex-row" >
+                <div className="p-2 scroll-pr-24 gap-4 overflow-x-auto w-screen pb-2 max-24 flex flex-row">
 
-    {/* <div className="flex flex-col p-4">
-         <div className="bg-white gap-4 rounded-lg shadow-md p-2 flex justify-center">
-            <div className="p-2 scroll-pr-24 gap-4 overflow-x-auto w-screen pb-2 max-24 flex flex-row" > */}
-                {reversedStories && reversedStories.map(story => {
-                    const onClose = () => {
-                        // Implement the logic for closing the story view
-                        console.log('Story closed');
-                    };
+                    {/* ✅ Add Story Button (Visible Always) */}
+                    <div 
+                        className="flex flex-col items-center justify-center gap-1 cursor-pointer"
+                        onClick={() => navigate("/addstory")}
+                    >
+                        <div className="p-[2px] rounded-full bg-gray-300 relative">
+                            <div className="bg-white p-[2px] rounded-full flex items-center justify-center w-14 h-14">
+                                <span className="text-2xl font-bold text-gray-500">+</span>
+                            </div>
+                        </div>
+                        <span className="text-xs truncate w-16 text-center text-gray-500">Add Story</span>
+                    </div>
 
-                    return (
-                        <StoryCard
-                            key={story.id}
-                            story={{
-                                id: story.id,
-                                locationImage: story.locationImage,
-                                location: story.location,
-                                description: story.description,
-                                eventLink: story.eventLink,
-                                createdAt: story.createdAt,
-                                sport: story.sport,
-                                endTime: story.endTime,
-                                author: story.author,
-                                Storyimages: story.Storyimages,
-                                isViewed: story.isViewed,
-                                swipeUpEnabled: story.swipeUpEnabled,
-                                authenticityStatus: story.authenticityStatus,
-                                // authorName?: story.author?.name || "Anonymous",
-                                // UserID: story.author?.UserID?.toString() ?? ""
-                            }}
-                            onClose={onClose}
-                        />
-                    );
-                })}
+                    {/* ✅ Show Stories if Available */}
+                    {reversedStories.length > 0 ? (
+                        reversedStories.map((story) => {
+                            return (
+                                <StoryCard
+                                    key={story.id}
+                                    story={{
+                                        id: story.id,
+                                        locationImage: story.locationImage,
+                                        location: story.location,
+                                        description: story.description,
+                                        eventLink: story.eventLink,
+                                        createdAt: story.createdAt,
+                                        activityEnded: story.activityEnded,
+                                        activityStarted: story.activityStarted,
+                                        sport: story.sport,
+                                        endTime: story.endTime,
+                                        author: story.author,
+                                        Storyimages: story.Storyimages,
+                                        isViewed: story.isViewed,
+                                        swipeUpEnabled: story.swipeUpEnabled,
+                                        authenticityStatus: story.authenticityStatus,
+                                    }}
+                                    onClose={() => console.log('Story card closed')} // Add this line
+                                />
+                            );
+                        })
+                    ) : (
+                        <div className="flex items-center justify-center pb-4">
+                            <p>
+                                No stories available
+                            </p>
+                        </div>
+                    )}
+                </div>
             </div>
-         </div>
-    </div>
-}
+        </div>
+    );
+};
+
 
 
 

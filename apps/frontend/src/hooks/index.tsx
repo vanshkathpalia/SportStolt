@@ -23,6 +23,8 @@ export interface Story {
     createdAt: string;
     sport?: string;
     endTime: any;
+    activityStarted: Date;
+    activityEnded: Date;
     stadium?: string;
     swipeUpEnabled?: boolean;
     authenticityStatus?: string;

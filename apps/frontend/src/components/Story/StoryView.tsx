@@ -130,18 +130,16 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
         {showDetails && (
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="bg-black/70 p-6 rounded-lg max-w-lg w-full mx-4">
-              <h2 className="text-white text-2xl font-bold mb-4">
-                {story.sport} at {story.stadium}
-              </h2>
+              <h2 className="text-white text-2xl font-bold mb-4">{story.sport} at {story.stadium}</h2>
               <p className="text-white/90 mb-4">{story.description}</p>
-              <div className="flex justify-between text-white/80 text-sm">
-                <span>Location: {story.location}</span>
-                <span>Posted: {new Date(story.createdAt).toLocaleDateString()}</span>
+              <div className="text-white/80 text-sm">
+                <p><strong>Location:</strong> {story.location}</p>
+                <p><strong>Activity Started At:</strong> {new Date(story.activityStarted).toLocaleString()}</p>
+                <p><strong>Activity Will End At:</strong> {new Date(story.activityEnded).toLocaleString()}</p>
+                <p><strong>Expires At:</strong> {new Date(story.endTime).toLocaleString()}</p>
+                <p><strong>Posted:</strong> {new Date(story.createdAt).toLocaleDateString()}</p>
               </div>
-              <button
-                onClick={() => setShowDetails(false)}
-                className="mt-4 text-white/90 hover:text-white"
-              >
+              <button onClick={() => setShowDetails(false)} className="mt-4 text-white/90 hover:text-white">
                 Close Details
               </button>
             </div>
