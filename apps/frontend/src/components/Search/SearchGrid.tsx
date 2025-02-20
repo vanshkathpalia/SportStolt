@@ -3,11 +3,11 @@ import { Heart, MessageCircle } from 'lucide-react';
 import { Sidebar } from '../StickyBars/Sidebar';
 // import { Appbar } from '../StickyBars/Appbar';
 
-interface ExploreGridProps {
+interface SearchGridProps {
   isLoading?: boolean;
 }
 
-export const ExploreGrid = ({ isLoading } : ExploreGridProps) => {
+export const SearchGrid = ({ isLoading } : SearchGridProps) => {
   if (isLoading) {
     return (
       <div className="grid grid-cols-8">

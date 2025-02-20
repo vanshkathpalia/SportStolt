@@ -88,8 +88,8 @@ export const AddPost = () => {
     const isFormValid = formData.title && formData.content;
 
     return (
-        <div className="flex flex-col md:flex-row min-h-screen bg-gray-50">
-            <div className="md:pt-6 px-4 md:min-w-72 w-full md:w-auto">
+        <div className="flex flex-row  bg-gray-50">
+            <div className="pt-6 px-4 md:pt-8 md:px-8">
                 <Sidebar />
             </div>
 

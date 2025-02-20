@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ChevronUp, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { StoryType } from './types';
 // import { BACKEND_URL } from '../../config';
@@ -15,17 +15,17 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
 
   const images = story.Storyimages ? story.Storyimages : (story.Storyimages ? [story.Storyimages] : [{ url: story.locationImage, UserID: story.author.UserID || '0' }]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     if (currentImageIndex < images.length - 1) {
       setCurrentImageIndex(prev => prev + 1);
     }
-  };
+  }, [currentImageIndex, images.length]);
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     if (currentImageIndex > 0) {
       setCurrentImageIndex(prev => prev - 1);
     }
-  };
+  }, [currentImageIndex]);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -40,7 +40,7 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
 
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentImageIndex]);
+  }, [currentImageIndex, handleNext, handlePrevious, onClose]);
 
   return (
     <div className="fixed inset-0 z-50 bg-black">

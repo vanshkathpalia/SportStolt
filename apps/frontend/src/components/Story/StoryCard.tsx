@@ -13,7 +13,7 @@ interface StoryCardProps {
         eventLink?: string;
         createdAt: string;
         sport?: string;
-        endTime: any;
+        endTime: Date;
         author: {
             name: string;
             image?: string;
