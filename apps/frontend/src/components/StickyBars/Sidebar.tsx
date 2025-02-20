@@ -1,12 +1,11 @@
 
-import { Home, Compass, PlusSquare, Film, User, Calendar, Search } from 'lucide-react';
+import { Home, PlusSquare, Film, User, Calendar, Search } from 'lucide-react';
 import NavItem from './NavItem';
 
 export const Sidebar = () => {
   const navItems = [
     { icon: Home, label: 'Home', href: '/post'},
     { icon: Search, label: 'Search', href: '/search'},
-    { icon: Compass, label: 'Explore', href: '/explore' },
     { icon: PlusSquare, label: 'New Post', href: '/addpost' },
     { icon: Film, label: 'New Story', href: '/addstory' },
     { icon: Calendar, label: 'Event', href: '/events' },
@@ -37,7 +36,7 @@ export const Sidebar = () => {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 py-3">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
         <div className="flex justify-around items-center">
           
           {navItems.map((item) => (

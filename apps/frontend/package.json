@@ -7,9 +7,11 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "deploy": "gh-pages -d dist",
     "start": "serve -s dist",
     "preview": "vite preview"
   },
+  "homepage": "./",
   "dependencies": {
     "@vanshkathpalia/sportstolt-common": "^1.0.0",
     "axios": "^1.7.7",

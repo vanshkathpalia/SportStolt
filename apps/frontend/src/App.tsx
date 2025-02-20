@@ -7,7 +7,7 @@ import { Home } from './pages/Home'
 import { AddPost } from './pages/AddPost'
 import { AddStory } from './pages/AddStory'
 import { Profile } from './pages/Profile'
-import { Explore } from './pages/Explore'
+import { Search } from './pages/Search'
 // import { ApiPost } from './pages/ApiPost'
 import { Events } from './pages/Events'
 import AddEvent from './pages/AddEvent'
@@ -27,7 +27,7 @@ function App() {
           <Route path="/addstory" element={<AddStory />} />
           <Route path="/addpost" element={<AddPost />} />
           <Route path="/profile" element={<Profile />} />
-          <Route path="/explore" element={<Explore />} />
+          <Route path="/search" element={<Search />} />
           <Route path="/events" element={<Events />} />
           <Route path="/addevent" element={<AddEvent />} />
         </Routes>
