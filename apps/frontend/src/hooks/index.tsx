@@ -22,7 +22,7 @@ export interface Story {
     eventLink?: string;
     createdAt: string;
     sport?: string;
-    endTime: any;
+    endTime: Date;
     activityStarted: Date;
     activityEnded: Date;
     stadium?: string;
@@ -33,10 +33,10 @@ export interface Story {
     author: {
         name: string;
         image?: string;
-        UserID: string;
+        UserId: string;
     };
     Storyimages?: {
-        UserID: number;
+        UserId: number;
         url: string;
         // authenticityChecked: boolean;
     }[];
@@ -147,7 +147,7 @@ export const useStory = (id: number) => {
             try {
                 const response = await axios.get(`${BACKEND_URL}/api/v1/story/${id}`, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': localStorage.getItem('token')
                     }
                 });
                 setStory(response.data.story);
@@ -161,14 +161,14 @@ export const useStory = (id: number) => {
         };
 
         fetchStory();
-    }, [id]);
+    }, [id, story]);
 
     return { loading, story, error };
 };
 
 export const useStories = () => {
     const [loading, setLoading] = useState(true);
-    const [stories, setStories] = useState<Story[]>([]);
+    const [story, setStories] = useState<Story[]>([]);
     const [error, setError] = useState<string>();
 
     useEffect(() => {
@@ -176,10 +176,10 @@ export const useStories = () => {
             try {
                 const response = await axios.get(`${BACKEND_URL}/api/v1/story/bulk`, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': localStorage.getItem('token')
                     }
                 });
-                setStories(response.data.stories);
+                setStories(response.data.story);
             } catch (e) {
                 setError('Failed to fetch stories');
                 console.error(e);
@@ -190,7 +190,7 @@ export const useStories = () => {
 
         fetchStories();
     }, []);
-    return { loading, stories, error };
+    return { loading, story, error };
 };
 
 export const useEvents = () => {

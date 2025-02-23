@@ -8,7 +8,7 @@ datasource db {
 }
 
 model Badge {
-  id        String   @id
+  id        String   @id @default(uuid())
   name      String
   userId    Int
   createdAt DateTime @default(now())
@@ -16,20 +16,19 @@ model Badge {
 }
 
 model Comment {
-  id        String   @id
+  id        String   @id @default(uuid())
   content   String
   createdAt DateTime @default(now())
   authorId  Int
   eventId   Int?
   postId    Int?
-  author      User     @relation(fields: [authorId], references: [id])
+  author    User     @relation(fields: [authorId], references: [id])
   Event     Event?   @relation(fields: [eventId], references: [id])
   Post      Post?    @relation(fields: [postId], references: [id])
 }
 
 model Event {
   id          Int       @id @default(autoincrement())
-  name        String
   image       String
   likeCount   Int       @default(0)
   country     String    @default("")
@@ -41,13 +40,14 @@ model Event {
   EndDate     DateTime
   StartTime   DateTime
   OrganisedBy String
+  name        String
   Comment     Comment[]
   author      User      @relation(fields: [authorId], references: [id])
   Like        Like[]
 }
 
 model Like {
-  id        String   @id
+  id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   eventId   Int?
   postId    Int?
@@ -58,13 +58,13 @@ model Like {
 }
 
 model Photo {
-  id        String   @id
+  id        String   @id @default(uuid())
   url       String
   caption   String?
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
   userId    Int
-  User    User     @relation(fields: [userId], references: [id])
+  User      User     @relation(fields: [userId], references: [id])
 }
 
 model Post {
@@ -81,12 +81,11 @@ model Post {
 }
 
 model PostPhoto {
-  id     String @id
+  id     String @id @default(uuid())
   url    String
   postId Int
   Post   Post   @relation(fields: [postId], references: [id])
 }
-
 
 model Story {
   id         Int      @id @default(autoincrement())
@@ -114,42 +113,54 @@ model Story {
 }
 
 model Storyimages {
-  id        String   @id @default(uuid())
-  url       String   
-  story     Story    @relation(fields: [storyId], references: [id])
-  storyId   Int   
-  createdAt DateTime @default(now())
-  authenticityChecked Boolean @default(false)
-  UserID    Int // The user who posted this image
-  verifiedBy Int[]   // Array of user IDs who verified this image
-  User      User    @relation(fields: [UserID], references: [id])
+  url                 String
+  createdAt           DateTime       @default(now())
+  authenticityChecked Boolean        @default(false)
+  verifiedBy          Int[]
+  id                  String         @id @default(uuid())
+  UserId              Int
+  storyImageId        Int            
+  User                User           @relation(fields: [UserId], references: [id])
+  story               Story          @relation(fields: [storyImageId], references: [id])
+  Verification        Verification[]
 }
 
 model Tweet {
-  id        String   @id
+  id        String   @id @default(uuid())
   content   String
   createdAt DateTime @default(now())
-  updatedAt DateTime
+  updatedAt DateTime @updatedAt
   userId    Int
   author    User     @relation(fields: [userId], references: [id])
 }
 
 model User {
-  username  String    @unique
-  name      String?
-  image     String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  password  String
-  points    Int       @default(0)
-  id        Int       @id @default(autoincrement())
-  Badge     Badge[]
-  Comment   Comment[]
-  Event     Event[]
-  Like      Like[]
-  Photo     Photo[]
-  Post      Post[]
-  Story     Story[]
-  Tweet     Tweet[]
-  Storyimages Storyimages[]
+  username     String         @unique
+  name         String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  password     String
+  points       Int            @default(0)
+  id           Int            @id @default(autoincrement())
+  image        String?
+  badge        Badge[]
+  comment      Comment[]
+  event        Event[]
+  like         Like[]
+  photo        Photo[]
+  post         Post[]
+  story        Story[]
+  storyimages  Storyimages[]
+  tweet        Tweet[]
+  verification Verification[]
+}
+
+model Verification {
+  id             Int         @id @default(autoincrement())
+  verificationId String
+  userId         Int
+  verified       Boolean
+  createdAt      DateTime    @default(now())
+  user           User        @relation(fields: [userId], references: [id])
+  storyImages    Storyimages @relation(fields: [verificationId], references: [id])
 }

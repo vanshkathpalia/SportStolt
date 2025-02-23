@@ -17,10 +17,10 @@ interface StoryCardProps {
         author: {
             name: string;
             image?: string;
-            UserID: string;
+            UserId: string;
         };
         Storyimages?: {
-            UserID: number;
+            UserId: number;
             url: string;
         }[];
         swipeUpEnabled?: boolean;
@@ -34,9 +34,26 @@ interface StoryCardProps {
 
 
 const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
-    
+
     const [isViewingStory, setIsViewingStory] = useState(false);
+    const [isViewed, setIsViewed] = useState(story.isViewed || false);  // Track if the story is viewed
     const navigate = useNavigate();
+
+    const handleOpenStory = async () => {
+        setIsViewingStory(true);
+        setIsViewed(true); // Update local state
+
+        try {
+            await fetch('/api/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ storyId: story.id, isViewed: true }),
+            });
+        } catch (error) {
+            console.error('Error updating story view status:', error);
+        }
+    };
+
 
     if (!story) {
         return (
@@ -54,13 +71,22 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
         );
     }
 
+    const images = Array.isArray(story.Storyimages) ? story.Storyimages.map((image) => ({
+        url: image?.url,
+        UserId: image?.UserId?.toString()
+    })) : [];
+
+    if (images.length === 0) {
+        return <div>No images available.</div>;
+    }
+
     return (
         <>
             <div 
                 className="flex flex-col items-center hover:bg-gray-100 justify-center gap-1 cursor-pointer"
-                onClick={() => setIsViewingStory(true)}
+                onClick={handleOpenStory}  // Call handleOpenStory instead
             >
-                <div className={`p-[2px] rounded-full ${story.isViewed ? 'bg-gray-300' : 'bg-gradient-to-tr from-yellow-400 to-pink-600'}`}>
+                <div className={`p-[2px] rounded-full ${isViewed ? 'bg-gray-300' : 'bg-gradient-to-tr from-yellow-400 to-pink-600'}`}>
                     <div className="bg-white p-[2px] rounded-full">
                         <img
                             src={story.locationImage}
@@ -89,14 +115,11 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
                         authenticityStatus: story.authenticityStatus,
                         stadium: story.stadium,
                         swipeUpEnabled: story.swipeUpEnabled,
-                        Storyimages: (story.Storyimages || []).map(image => ({
-                            url: image?.url,
-                            UserID: image?.UserID?.toString(),
-                        })) || [],
+                        Storyimages: images,
                         author: {
                             name: story.author?.name || "Anonymous",
                             image: story.author?.image,
-                            UserID: story.author?.UserID || ""
+                            UserId: story.author?.UserId || ""
                         }
                     }}
                     onClose={() => setIsViewingStory(false)}

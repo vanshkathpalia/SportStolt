@@ -8,5 +8,5 @@
 -- AlterTable
 ALTER TABLE "Storyimages" DROP CONSTRAINT "Storyimages_pkey",
 DROP COLUMN "id",
-ADD COLUMN     "id" SERIAL NOT NULL,
+ADD COLUMN "id" SERIAL NOT NULL,
 ADD CONSTRAINT "Storyimages_pkey" PRIMARY KEY ("id");

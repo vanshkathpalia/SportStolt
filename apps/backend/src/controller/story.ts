@@ -28,7 +28,7 @@ const createStoryInput = z.object({
 
 const verifyStoryInput = z.object({
     storyId: z.number(),
-    imageId: z.string(),
+    imageId: z.number(),
     verified: z.boolean()
 });
 
@@ -70,18 +70,16 @@ storyRouter.use('/*', async (c, next) => {
     }
 
     const authHeader = c.req.header("authorization") || "";
-    const user = await verify(authHeader, c.env.JWT_SECRET)
+    const user = await verify(authHeader, c.env.JWT_SECRET);
     if (user && typeof user.id === "number") {
         c.set("userId", user.id);
-        await next();
-    }
-    else {
+        return next();
+    } else {
         c.status(403);
-        c.json({
-            message: "you are not logged in"
-        })
+        return c.json({ message: "Invalid token, you are not logged in" }, 403);
     }
 });
+
 
 // Create story with enhanced details
 storyRouter.post('/', async (c) => {
@@ -153,8 +151,8 @@ storyRouter.post('/', async (c) => {
         const storyImage = await prisma.storyimages.create({
             data: {
                 url: body.image,
-                storyId: existingStory.id,
-                UserID: userId,
+                storyImageId: existingStory.id,
+                UserId: userId,
                 authenticityChecked: false
             }
         });
@@ -192,6 +190,26 @@ storyRouter.post('/verify', async (c) => {
         const userId = c.get('userId');
         const { storyId, imageId, verified } = body;
 
+        const existingVerification = await prisma.verification.findFirst({
+            where: {
+                verificationId: storyId,
+                userId: userId
+            }
+        });
+
+        if (existingVerification) {
+            return c.json({ message: "You have already verified this story." });
+        }
+
+        // Create a verification record
+        await prisma.verification.create({
+            data: {
+                verificationId: storyId,
+                userId: userId,
+                verified: verified
+            }
+        });
+
         // Update the story image verification
         const storyImage = await prisma.storyimages.update({
             where: { id: imageId },
@@ -203,17 +221,52 @@ storyRouter.post('/verify', async (c) => {
             }
         });
 
-        // Update story verification count and status
+        // Fetch the updated story verification count
         const story = await prisma.story.update({
             where: { id: storyId },
             data: {
-                verificationCount: {
-                    increment: verified ? 1 : 0
-                },
-                authenticityStatus: verified ? "verified" : "not_verified",
-                rewardStatus: verified ? "eligible" : "pending"
+                verificationCount: { increment: verified ? 1 : 0 }
             }
         });
+
+        // If a certain number of verifications is reached, mark the story as verified
+        if (story.verificationCount >= 3) {
+            await prisma.story.update({
+                where: { id: storyId },
+                data: {
+                    authenticityStatus: "verified",
+                    rewardStatus: "eligible"
+                }
+            });
+
+            // Give **points** to the author of the story
+            await prisma.user.update({
+                where: { id: story.authorId },
+                data: {
+                    points: { increment: 20 } // Reward points for getting a story verified
+                }
+            });
+        }
+
+        // Give **points** to the user for verifying
+        // await prisma.user.update({
+        //     where: { id: userId },
+        //     data: {
+        //         points: { increment: 5 } // Reward points for verifying
+        //     }
+        // });
+
+        // Update story verification count and status
+        // const story = await prisma.story.update({
+        //     where: { id: storyId },
+        //     data: {
+        //         verificationCount: {
+        //             increment: verified ? 1 : 0
+        //         },
+        //         authenticityStatus: verified ? "verified" : "not_verified",
+        //         rewardStatus: verified ? "eligible" : "pending"
+        //     }
+        // });
 
         return c.json({
             message: "Story verification updated",
@@ -228,6 +281,7 @@ storyRouter.post('/verify', async (c) => {
         });
     }
 });
+
 
 storyRouter.get('/bulk', async (c) => {
     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
@@ -247,7 +301,7 @@ storyRouter.get('/bulk', async (c) => {
                 description: true,
                 stadium: true,
                 swipeUpEnabled: true,
-                Storyimages: { select: { url: true, UserID: true } } as any,
+                Storyimages: { select: { url: true, UserId: true } } as any,
                 author: { select: { name: true, image: true } }
             },
             orderBy: [{ sport: 'asc' }, { location: 'asc' }] // Group by sport & location
@@ -260,6 +314,27 @@ storyRouter.get('/bulk', async (c) => {
         return c.json({ message: "Error fetching stories" });
     }
 });
+
+
+storyRouter.get('/points', async (c) => {
+    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+    try {
+        const userId = c.get('userId');
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: { points: true }
+        });
+
+        return c.json({ points: user?.points ?? 0 });
+
+    } catch (e) {
+        console.error(e);
+        c.status(500);
+        return c.json({ message: "Error fetching points" });
+    }
+});
+
 
 
 storyRouter.delete('/', async (c) => {
@@ -291,7 +366,7 @@ storyRouter.delete('/', async (c) => {
 
         // Delete associated images first (to avoid foreign key constraint issues)
         await prisma.storyimages.deleteMany({
-            where: { storyId: story.id }
+            where: { storyImageId: story.id }
         });
 
         // Now delete the story

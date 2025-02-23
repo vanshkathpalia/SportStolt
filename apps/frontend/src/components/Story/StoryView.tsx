@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { ChevronUp, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronUp, ChevronLeft, ChevronRight, X} from 'lucide-react';
 import { StoryType } from './types';
 // import { BACKEND_URL } from '../../config';
 // import axios from 'axios';
@@ -12,8 +12,10 @@ interface StoryViewProps {
 export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showDetails, setShowDetails] = useState(false);
+  const [willAttend, setWillAttend] = useState(false);
+  // const [showVerification, setShowVerification] = useState(story.isViewed);
 
-  const images = story.Storyimages ? story.Storyimages : (story.Storyimages ? [story.Storyimages] : [{ url: story.locationImage, UserID: story.author.UserID || '0' }]);
+  const images = story.Storyimages ? story.Storyimages : (story.Storyimages ? [story.Storyimages] : [{ url: story.locationImage, UserId: story.author.UserId || '0' }]);
 
   const handleNext = useCallback(() => {
     if (currentImageIndex < images.length - 1) {
@@ -42,10 +44,45 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [currentImageIndex, handleNext, handlePrevious, onClose]);
 
+  // Handle verification (tick or cross)
+  // const handleVerification = async (isVerified: boolean) => {
+  //   try {
+  //     // Send verification to backend
+  //     await fetch('/api/v1/story/verify', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ storyId: story.id, imageId: images[currentImageIndex].UserId, verified: isVerified }),
+  //     });
+
+  //     // Hide verification UI after submission
+  //     setShowVerification(false);
+  //     setShowDetails(true); // Allow swipe up after verification
+  //   } catch (error) {
+  //     console.error('Error verifying story:', error);
+  //   }
+  // };
+
+  // Handle "Will You Go?" Response
+  const handleWillGo = async () => {
+    try {
+      await fetch('/api/v1/story/will-go', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ storyId: story.id, userId: story.author.UserId }),
+      });
+
+      setWillAttend(true);
+    } catch (error) {
+      console.error('Error saving attendance:', error);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black">
       <div className="relative h-full">
-        {/* Main Image */}
+        {/* Main Story Image */}
         {Array.isArray(images) && (
           <img
             src={images[Math.max(0, Math.min(currentImageIndex, images.length - 1))].url}
@@ -59,7 +96,7 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-white p-2 rounded-full bg-black/30 hover:bg-black/50 z-50"
+          className="absolute top-4 right-4 text-white p-4 rounded-full bg-black/30 hover:bg-black/50 z-50"
         >
           <X className="w-6 h-6" />
         </button>
@@ -77,7 +114,7 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
         </div>
 
         {/* Header */}
-        <div className="absolute top-4 left-0 right-0 px-4">
+        <div className="absolute top-4 left-0 right-0 pl-4 pt-2">
           <div className="flex items-center space-x-2">
             <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden">
               {story.author.image ? (
@@ -115,15 +152,41 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
           </button>
         )}
 
-        {/* Swipe Up Button */}
+
+        {/* what this to appear in case we got the notification, if we visited */}
+        {/* Verification UI */}
+        {/* {!showVerification && (
+          <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-black/70 p-4 rounded-md text-white flex flex-col items-center z-50">
+          <p className="mb-2 text-lg">Was this information correct?</p>
+          <div className="flex gap-4">
+            <button
+              onClick={() => handleVerification(true)}
+              className="flex items-center gap-2 bg-green-500 px-4 py-2 rounded-md text-white"
+            >
+              <CheckCircle className="w-6 h-6" /> Yes
+            </button>
+            <button
+              onClick={() => handleVerification(false)}
+              className="flex items-center gap-2 bg-red-500 px-4 py-2 rounded-md text-white"
+            >
+              <XCircle className="w-6 h-6" /> No
+            </button>
+          </div>
+        </div>
+        )} */}
+
+        {/* Swipe Up Button (Only if verification is done) */}
+        {/*  */}
         {story.swipeUpEnabled && !showDetails && (
-          <button
-            onClick={() => setShowDetails(true)}
-            className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white flex flex-col items-center animate-bounce"
-          >
-            <ChevronUp className="w-6 h-6" />
-            <span className="text-sm">Swipe up for details</span>
-          </button>
+          <div className="absolute bottom-8 w-full flex justify-center">
+            <button
+              onClick={() => setShowDetails(true)}
+              className="text-white flex flex-col items-center animate-bounce"
+            >
+              <ChevronUp className="w-6 h-6" />
+              <span className="text-sm">Swipe up for details</span>
+            </button>
+          </div>
         )}
 
         {/* Details Modal */}
@@ -139,7 +202,17 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
                 <p><strong>Expires At:</strong> {new Date(story.endTime).toLocaleString()}</p>
                 <p><strong>Posted:</strong> {new Date(story.createdAt).toLocaleDateString()}</p>
               </div>
-              <button onClick={() => setShowDetails(false)} className="mt-4 text-white/90 hover:text-white">
+
+              {/* Will You Go Button */}
+              {!willAttend ? (
+                <button onClick={handleWillGo} className="mt-6 bg-blue-500 px-4 py-2 rounded-md">
+                  Yes, I will go!
+                </button>
+              ) : (
+                <p className="mt-6 text-green-400">You have confirmed attendance!</p>
+              )}
+
+              <button onClick={() => setShowDetails(false)} className="mt-4 pl-4 text-white/90 hover:text-white">
                 Close Details
               </button>
             </div>
