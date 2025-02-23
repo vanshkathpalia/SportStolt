@@ -6,6 +6,6 @@
 
 */
 -- AlterTable
-ALTER TABLE "Story" ADD COLUMN     "activityEnded" TIMESTAMP(3) NOT NULL,
-ADD COLUMN     "activityStarted" TIMESTAMP(3) NOT NULL,
+ALTER TABLE "Story" ADD COLUMN "activityEnded" TIMESTAMP(3) NOT NULL,
+ADD COLUMN "activityStarted" TIMESTAMP(3) NOT NULL,
 ALTER COLUMN "endTime" DROP DEFAULT;

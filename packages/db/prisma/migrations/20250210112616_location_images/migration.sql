@@ -7,4 +7,4 @@
 */
 -- AlterTable
 ALTER TABLE "Story" DROP COLUMN "locationimage",
-ADD COLUMN     "locationImage" TEXT NOT NULL;
+ADD COLUMN "locationImage" TEXT NOT NULL;

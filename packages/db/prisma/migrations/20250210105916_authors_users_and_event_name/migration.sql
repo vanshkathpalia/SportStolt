@@ -8,14 +8,14 @@
 
 */
 -- AlterTable
-ALTER TABLE "Event" ADD COLUMN     "name" TEXT NOT NULL;
+ALTER TABLE "Event" ADD COLUMN "name" TEXT NOT NULL;
 
 -- AlterTable
 ALTER TABLE "Story" DROP COLUMN "image",
-ADD COLUMN     "locationimage" TEXT NOT NULL;
+ADD COLUMN "locationimage" TEXT NOT NULL;
 
 -- AlterTable
-ALTER TABLE "Storyimages" ADD COLUMN     "UserID" INTEGER NOT NULL;
+ALTER TABLE "Storyimages" ADD COLUMN "UserID" INTEGER NOT NULL;
 
 -- AddForeignKey
 ALTER TABLE "Storyimages" ADD CONSTRAINT "Storyimages_UserID_fkey" FOREIGN KEY ("UserID") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

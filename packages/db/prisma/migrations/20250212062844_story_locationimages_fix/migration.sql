@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE "Story" ADD COLUMN     "locationImage" TEXT;
+ALTER TABLE "Story" ADD COLUMN "locationImage" TEXT;
