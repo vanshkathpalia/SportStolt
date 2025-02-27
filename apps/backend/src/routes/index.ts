@@ -2,6 +2,7 @@ import { Hono } from 'hono'
 import { userRouter } from '../controller/user';
 import { postRouter } from '../controller/post';
 import { storyRouter } from '../controller/story'
+import { searchRouter } from '../controller/search'
 import { cors } from 'hono/cors'
 import { apiPostRouter } from '../controller/apiPost';
 import { eventRouter } from '../controller/event';
@@ -20,6 +21,7 @@ app.route("/api/v1/post", postRouter);
 app.route("api/v1/story", storyRouter);
 app.route("api/v1/apiPost", apiPostRouter);
 app.route("api/v1/event", eventRouter);
+app.route("api/v1/search", searchRouter);
 
 // setInterval(async () => {
 //   const prisma = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL });

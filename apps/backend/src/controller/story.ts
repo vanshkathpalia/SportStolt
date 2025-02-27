@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from '@prisma/extension-accelerate'
 import { verify } from 'hono/jwt'
 import { number, string, z } from "zod"
+import axios from 'axios';
 
 export const storyRouter = new Hono<{
     Bindings: {
@@ -32,17 +33,6 @@ const verifyStoryInput = z.object({
     verified: z.boolean()
 });
 
-/**
- * Fetches an image URL for a given location from the Pexels API.
- * 
- * @param {string} location - The name of the location to search for.
- * @returns {Promise<string | null>} - A promise that resolves to the URL of the location's image or null if no image is found.
- * 
- * This function uses the Pexels API to search for images related to the provided location.
- * It returns the URL of the first image in the search results, if available.
- * In case of an error or if no images are found, the function returns null.
- */
-import axios from 'axios';
 
 async function fetchLocationImage(location: string): Promise<string | null> {
     const API_KEY = 'HumkAY45IhFQNjKoq50xxWo1b619Te5RmwhC9Ti0O8Bx09tdBS2hPxOp'; 
