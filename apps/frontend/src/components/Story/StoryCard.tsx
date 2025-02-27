@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StoryView } from './StoryView';
 import { useNavigate } from 'react-router-dom';
+import { BACKEND_URL } from '../../config';
 
 interface StoryCardProps {
     story: {
@@ -44,7 +45,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
         setIsViewed(true); // Update local state
 
         try {
-            await fetch('/api/', {
+            await fetch(`${BACKEND_URL}/api/v1/story/view`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ storyId: story.id, isViewed: true }),
