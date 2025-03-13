@@ -1,0 +1,28 @@
+name = "backend-me"
+main = "src/routes/index.ts"
+compatibility_date = "2024-10-19"
+compatibility_flags = [ "nodejs_compat" ]
+
+[vars]
+DATABASE_URL="prisma://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiZDUwMGMzYmMtMmYyYi00ZTkwLTlmNmItYTRjOGUyMWVkZTc0IiwidGVuYW50X2lkIjoiNGM4MDk2NGVhZmJhNmEwNzFhMWE2ZDdmNDQ2M2Y1ZmQ2NTNkMzk3MTk5OGViZmZmZjEzYjA0YWFmNDVlM2JkOSIsImludGVybmFsX3NlY3JldCI6ImU1M2VlMzNiLTg2YmYtNDEyOS04YWMwLWFjOWZhMGZjZDI1MyJ9.DNkOeSk2ynTLuIP3ZEIN1TXVLGgkOOoUeSX5Mp0GX-k"
+JWT_SECRET="mymymysecret"
+
+# [[kv_namespaces]]
+# binding = "MY_KV_NAMESPACE"
+# id = "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+
+# [[r2_buckets]]
+# binding = "MY_BUCKET"
+# bucket_name = "my-bucket"
+
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "my-database"
+# database_id = ""
+
+# [ai]
+# binding = "AI"
+
+# [observability]
+# enabled = true
+# head_sampling_rate = 1

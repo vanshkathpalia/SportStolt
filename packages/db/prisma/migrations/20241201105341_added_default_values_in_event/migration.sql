@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Event" ALTER COLUMN "country" SET DEFAULT '',
+ALTER COLUMN "state" SET DEFAULT '',
+ALTER COLUMN "city" SET DEFAULT '',
+ALTER COLUMN "stadium" SET DEFAULT '';
