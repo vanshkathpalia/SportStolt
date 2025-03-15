@@ -1,9 +1,14 @@
 import { Home, Search, PlusSquare, Trophy, User, Bell, Activity } from "lucide-react";
-import { useLocation, Link } from "react-router-dom";
+import { useLocation, Link, useNavigate} from "react-router-dom";
 import { cn } from "../lib/utils";
+interface MobileNavProps {
+  openCreateModal: () => void
+}
 
-export function MobileNav() {
+export function MobileNav({ openCreateModal }: MobileNavProps) {
   const location = useLocation();
+  const navigate = useNavigate()
+  const pathname = location.pathname
 
   const navItems = [
     { icon: Home, label: "Home", href: "/post" },
@@ -19,10 +24,10 @@ export function MobileNav() {
       <div className="fixed top-0 left-0 right-0 bg-background border-b border-border z-10 px-4 h-14 flex items-center justify-between">
         <h1 className="text-xl font-bold text-green-500">SportsFeed</h1>
         <div className="flex items-center gap-4">
-          <Link to="/notifications" className="focus:outline-none">
+        <button className="focus:outline-none" onClick={() => navigate("/notifications")}>
             <Bell className="h-6 w-6" />
-          </Link>
-          <button className="focus:outline-none">
+          </button>
+          <button className="focus:outline-none" onClick={openCreateModal}>
             <PlusSquare className="h-6 w-6" />
           </button>
         </div>
@@ -34,10 +39,11 @@ export function MobileNav() {
           {navItems.map((item) => (
             <Link
               key={item.href}
+              onClick={() => navigate(item.href)}
               to={item.href}
               className={cn(
                 "flex flex-col items-center justify-center w-full h-full",
-                location.pathname === item.href ? "text-green-500" : "text-muted-foreground"
+                pathname === item.href ? "text-green-500" : "text-muted-foreground"
               )}
             >
               <item.icon className="h-6 w-6" />

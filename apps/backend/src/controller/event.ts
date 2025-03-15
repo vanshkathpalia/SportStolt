@@ -119,21 +119,55 @@ eventRouter.post('/', async (c) => {
 });
 
 
-eventRouter.get('/bulk', async (c) => {
+// eventRouter.get('/bulk', async (c) => {
+//     try {
+//       // Ensure DATABASE_URL is set
+//       if (!c.env.DATABASE_URL) {
+//         return c.json({ message: "DATABASE_URL is not set" }, 500);
+//       }
+  
+//       // Initialize PrismaClient with database URL
+//       const prisma = new PrismaClient({
+//         datasources: {
+//           db: { url: c.env.DATABASE_URL },
+//         },
+//       });
+  
+//       // Fetch all events from the database
+//       const events = await prisma.event.findMany({
+//         select: {
+//           id: true,
+//           image: true,
+//           city: true,
+//           authorId: true,
+//           stadium: true,
+//           StartDate: true,
+//           EndDate: true,
+//           StartTime: true,
+//           OrganisedBy: true,
+//         },
+//       });
+
+//       // Return the events in the response
+//       return c.json(events);
+//     } catch (error) {
+//       console.error("Unhandled error:", error);
+//       return c.json({ message: "Internal server error" }, 500);
+//     }
+//   });
+
+  eventRouter.get('/bulk', async (c) => {
     try {
-      // Ensure DATABASE_URL is set
       if (!c.env.DATABASE_URL) {
         return c.json({ message: "DATABASE_URL is not set" }, 500);
       }
   
-      // Initialize PrismaClient with database URL
       const prisma = new PrismaClient({
         datasources: {
           db: { url: c.env.DATABASE_URL },
         },
       });
   
-      // Fetch all events from the database
       const events = await prisma.event.findMany({
         select: {
           id: true,
@@ -147,12 +181,27 @@ eventRouter.get('/bulk', async (c) => {
           OrganisedBy: true,
         },
       });
-
-      // Return the events in the response
-      return c.json(events);
+  
+      const transformedEvents = events.map((event) => ({
+        id: event.id,
+        author: {
+          name: event.OrganisedBy || "Unknown Organizer",
+          avatar: "https://via.placeholder.com/50", // Placeholder avatar
+        },
+        imageUrl: event.image,
+        title: `${event.city} - ${event.stadium}`,
+        content: `Starts: ${event.StartDate} at ${event.StartTime}, Ends: ${event.EndDate}`,
+        likes: Math.floor(Math.random() * 100), // Mock likes
+        sportTags: ["Live Event", event.city],
+        comments: [],
+        publishedDate: new Date().toISOString(),
+      }));
+  
+      return c.json(transformedEvents);
     } catch (error) {
-      console.error("Unhandled error:", error);
-      return c.json({ message: "Internal server error" }, 500);
+      console.error("Error fetching events:", error);
+      return c.json({ message: "Failed to fetch events" }, 500);
     }
   });
+  
   

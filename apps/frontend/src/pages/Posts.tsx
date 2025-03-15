@@ -1,21 +1,62 @@
+"use client"
+
+import { useState } from "react"
+
+// import { StoryList } from "../components/stories/StoryList"
+import { useMediaQuery } from "../hooks/useMediaQuery"
+import { PlusCircle } from "lucide-react"
+import { Button } from "../components/ui/button"
+// import { CreateStoryModal } from "../components/modals/CreateStoryModel"
+
+// Mock data
+// import { STORIES, POSTS, EVENTS } from "../data/mockData"
+import { MobileNav } from "../components/StickyBars/MobileNav"
+import { Sidebar } from "../components/StickyBars/Sidebar"
+import { useEvents, usePosts } from "../hooks"
+// import { EventCardHome } from "../components/Event/EventCardHome"
 import { PostCard } from "../components/Post/PostCard"
-import { PostSkeleton } from "../components/Post/PostSkeleton";
-import { Story } from "../components/Story/Story";
-import { EventCardHome } from '../components/Event/EventCardHome';
-import { StorySkeleton } from "../components/Story/StorySkeleton";
-import { useEvents, usePosts } from "../hooks";
-import { Sidebar } from "../components/StickyBars/Sidebar";
-import { Calendar} from "lucide-react";
+import { StorySkeleton } from "../components/Story/StorySkeleton"
+import { PostSkeleton } from "../components/Post/PostSkeleton"
+import { Story } from "../components/Story/Story"
+import { EventSideBar } from "../components/Event/EventSideBar"
 
-export const Posts = () => {
-    const { loading, posts } = usePosts();
-    const {events} = useEvents();
+// import { EventCardHome } from "../components/Event/EventCardHome"
 
-    if (loading) {
+interface PostsPageProps {
+  openCreateModal: () => void
+}
+
+export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
+  const { loading, posts } = usePosts();
+  const { events } = useEvents();
+  const [storyDisplayType, setStoryDisplayType] = useState<"sport" | "location">("sport")
+  const [postSortType, setPostSortType] = useState<"following" | "sport">("following")
+  // const [selectedSportFilter, setSelectedSportFilter] = useState<string | null>(null)
+  // const [createStoryModalOpen, setCreateStoryModalOpen] = useState(false)
+  const isMobile = useMediaQuery("(max-width: 768px)")
+
+  // Extract all unique sport tags for filtering
+  // const allSportTags = Array.from(new Set(POSTS.flatMap((post) => post.sportTags || [])))
+
+  // Filter posts based on selected sport tag
+//   const filteredPosts = selectedSportFilter
+//     ? POSTS.filter((post) => post.sportTags?.includes(selectedSportFilter))
+//     : POSTS
+
+//   useEffect(() => {
+//     // Simulate loading data
+//     const timer = setTimeout(() => {
+//       setLoading(false)
+//     }, 1000)
+
+//     return () => clearTimeout(timer)
+//   }, [])
+
+     if (loading) {
         return <div className="flex flex-row">
             <div className = "pt-6 px-4" >
-                <Sidebar />
-            </div>
+                <Sidebar openCreateModal={openCreateModal} />
+            </div> 
             <div>
               <div className="grid grid-cols-9 p-2">
                   <div className="col-start-3 sm:col-span-9 sm:col-start-1 md:col-span-7 md:col-start-2 lg:col-span-5 lg:col-start-3 xl:col-span-5 xl:col-start-2 xl:mr-16 xl:ml-16">
@@ -32,49 +73,241 @@ export const Posts = () => {
             </div>
         </div>
     }
-
     else {
-        return <div className = "flex flex-row">
-            <div className = "pt-6 px-4" >
-                <Sidebar />
-            </div>
-            
-            <div>
-                <div className="grid grid-cols-9 p-2">
+      return <div className="min-h-screen bg-background">
+      {isMobile && <MobileNav openCreateModal={openCreateModal} />}
 
+      <div className="flex">
+        <div className="md:block w-16 lg:w-64 fixed h-screen">
+          <Sidebar openCreateModal={openCreateModal} />
+        </div>
+        {/* Main Content */}
+        <main className="flex-1 md:ml-16 lg:ml-64">
+          <div className="max-w-screen-xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+              {/* Stories and Posts Column */}
+              <div className="md:col-span-3 lg:col-span-3">
+                {/* Story Display Type Toggle */}
+                <div className="px-4 mt-2 md:mt-4 flex justify-between items-center">
+                  <div className="flex space-x-2">
+                    <button
+                      onClick={() => setStoryDisplayType("sport")}
+                      className={`px-3 py-1 text-sm rounded-full ${
+                        storyDisplayType === "sport"
+                          ? "bg-primary text-primary-foreground"
+                          : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      Sports
+                    </button>
+                    <button
+                      onClick={() => setStoryDisplayType("location")}
+                      className={`px-3 py-1 text-sm rounded-full ${
+                        storyDisplayType === "location" ? "bg-blue-500 text-white" : "bg-muted text-muted-foreground"
+                      }`}
+                    >
+                      Locations
+                    </button>
+                  </div>
+
+                  {/* Create Post Button (Desktop) */}
+                  <Button
+                    onClick={openCreateModal}
+                    size="sm"
+                    className="hidden md:flex items-center gap-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+                  >
+                    <PlusCircle className="h-4 w-4" />
+                    Create Post
+                  </Button>
+                </div>
+
+                {/* Stories Section */}
                   <div className="col-start-3 sm:col-span-9 sm:col-start-1 md:col-span-7 md:col-start-2 lg:col-span-5 lg:col-start-3 xl:col-span-5 xl:col-start-2 xl:mr-16 xl:ml-16">
                     <Story />
                   </div>
-                    
-                  <div className="sm:col-span-5 sm:col-start-3 p-4 xl:col-start-2">
-                      {posts.map(post => <PostCard
-                          id={post.id}
-                          authorName={post.author.name || "Anonymous"}
-                          title={post.title}
-                          content={post.content}
-                          publishedDate={"date"} />)}
-                  </div>
 
-                  <div className="col-start-7 col-span-3 hidden xl:block p-10">
-                    
-                    <Calendar className="h-8 w-6 mb-10" />
-                      
-
-                    <div className="scroll-pt-24 overflow-auto pb-2 h-[600px]">
-                      {events.map(event => (
-                        <EventCardHome
-                          event={event}
-                          onRegister={() => alert('Registration functionality coming soon!')}
-                        />
-                      ))}
+                {/* Post Sorting Options */}
+                <div className="px-4 mt-4 mb-2">
+                  <div className="flex justify-between items-center">
+                    <div className="flex space-x-2">
+                      <button
+                        onClick={() => {
+                          setPostSortType("following")
+                          // setSelectedSportFilter(null)
+                        }}
+                        className={`px-3 py-1 text-sm rounded-full ${
+                          postSortType === "following"
+                            ? "bg-primary text-primary-foreground"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        Following
+                      </button>
+                      <button
+                        onClick={() => setPostSortType("sport")}
+                        className={`px-3 py-1 text-sm rounded-full ${
+                          postSortType === "sport" ? "bg-blue-500 text-white" : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        Sports
+                      </button>
                     </div>
-                       
                   </div>
                 </div>
+
+                  {/* Sport Tags Filter - Only visible when "Sports" is selected */}
+                  {/* {postSortType === "sport" && (
+                    <div className="flex flex-wrap gap-2 mt-2 pb-2 overflow-x-auto">
+                      {allSportTags.map((tag) => (
+                        <button
+                          key={tag}
+                          onClick={() => setSelectedSportFilter(tag === selectedSportFilter ? null : tag)}
+                          className={`px-3 py-1 text-xs rounded-full border ${
+                            tag === selectedSportFilter
+                              ? "bg-blue-500 text-white border-blue-500"
+                              : "bg-background text-foreground border-border"
+                          }`}
+                        >
+                          {tag}
+                        </button>
+                    ))}
+                    </div>
+                  )}  */}
+                {/* </div> */}
+
+                {/* Posts Section */}
+                <div className="mt-2 space-y-4 px-0 md:px-4 pb-16 md:pb-8"> 
+                 {loading
+                    ? // Post loading skeletons
+                      Array(3)
+                        .fill(0)
+                        .map((_, index) => (
+                          <div key={index} className="bg-card rounded-md p-4 space-y-4 max-w-xl mx-auto">
+                            <div className="flex items-center space-x-2">
+                              <div className="w-10 h-10 rounded-full bg-muted animate-pulse" />
+                              <div className="h-4 bg-muted rounded w-24 animate-pulse" />
+                            </div>
+                            <div className="w-full aspect-square bg-muted rounded animate-pulse" />
+                            <div className="space-y-2">
+                              <div className="h-4 bg-muted rounded w-32 animate-pulse" />
+                              <div className="h-4 bg-muted rounded w-full animate-pulse" />
+                            </div>
+                          </div>
+                        ))
+                    : // Actual posts
+                      posts.map(post => <PostCard
+                          id={post.id}
+                          // authorName={post.author.name || "Anonymous"}
+                          title={post.title}
+                          content={post.content}
+                          // publishedDate={"date"} 
+                          expanded={false}
+                          />)}
+                </div>
+            
+              </div>
+              
+                <div className="hidden lg:block lg:col-span-2">
+                    <div className="scroll-pt-24 overflow-auto pb-2 h-[600px]">
+                        <EventSidebar
+                          event={events}
+                          // onRegister={() => alert('Registration functionality coming soon!')}
+                        />
+                    </div>
+                </div>
+
+              
+
             </div>
-        </div>
-    }
+          </div>
+        </main>
+      {/* Create Story Modal */}
+      {/* <CreateStoryModal isOpen={createStoryModalOpen} onClose={() => setCreateStoryModalOpen(false)} /> */}
+      </div>
+    </div>
+  }
 }
+
+      
+
+// import { PostCard } from "../components/Post/PostCard"
+// import { PostSkeleton } from "../components/Post/PostSkeleton";
+// import { Story } from "../components/Story/Story";
+// import { EventCardHome } from '../components/Event/EventCardHome';
+// import { StorySkeleton } from "../components/Story/StorySkeleton";
+// import { useEvents, usePosts } from "../hooks";
+// // import { Sidebar } from "../components/StickyBars/Sidebar";
+// import { Calendar} from "lucide-react";
+// import { Appbar } from "../components/StickyBars/Appbar";
+
+// export const PostsPage = () => {
+//     const { loading, posts } = usePosts();
+//     const {events} = useEvents();
+
+//     if (loading) {
+//         return <div className="flex flex-row">
+//             {/* <div className = "pt-6 px-4" >
+//                 <Sidebar />
+//             </div> */}
+//             <div>
+//               <div className="grid grid-cols-9 p-2">
+//                   <div className="col-start-3 sm:col-span-9 sm:col-start-1 md:col-span-7 md:col-start-2 lg:col-span-5 lg:col-start-3 xl:col-span-5 xl:col-start-2 xl:mr-16 xl:ml-16">
+//                         <StorySkeleton />
+//                     </div>
+//                     <div className="col-start-2 sm:col-span-5 sm:col-start-3 p-4 xl:col-start-2">
+//                         <PostSkeleton />
+//                         <PostSkeleton />
+//                         <PostSkeleton />
+//                         <PostSkeleton />
+//                         <PostSkeleton />
+//                     </div>       
+//                 </div>
+//             </div>
+//         </div>
+//     }
+
+//     else {
+//         return <div className = "flex flex-row">
+//             <div className = "pt-6 px-4" >
+//                 <Appbar />
+//             </div>
+            
+//             {/* <div>
+//                 <div className="grid grid-cols-9 p-2">
+
+//                   <div className="col-start-3 sm:col-span-9 sm:col-start-1 md:col-span-7 md:col-start-2 lg:col-span-5 lg:col-start-3 xl:col-span-5 xl:col-start-2 xl:mr-16 xl:ml-16">
+//                     <Story />
+//                   </div>
+                    
+//                   <div className="sm:col-span-5 sm:col-start-3 p-4 xl:col-start-2">
+//                       {posts.map(post => <PostCard
+//                           id={post.id}
+//                           authorName={post.author.name || "Anonymous"}
+//                           title={post.title}
+//                           content={post.content}
+//                           publishedDate={"date"} />)}
+//                   </div>
+
+//                   <div className="col-start-7 col-span-3 hidden xl:block p-10">
+                    
+//                     <Calendar className="h-8 w-6 mb-10" />
+                      
+
+//                     <div className="scroll-pt-24 overflow-auto pb-2 h-[600px]">
+//                       {events.map(event => (
+//                         <EventCardHome
+//                           event={event}
+//                           onRegister={() => alert('Registration functionality coming soon!')}
+//                         />
+//                       ))}
+//                     </div>
+                       
+//                   </div>
+//                 </div>
+//             </div> */}
+//         </div>
+//     }
+// }
 
 // .map(Post => <PostCard
 //     id={Post.id}
