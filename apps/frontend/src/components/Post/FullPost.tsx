@@ -2,13 +2,14 @@ import { Post } from "../../hooks"
 import { Sidebar } from "../StickyBars/Sidebar"
 import { CaptionLimit } from "../WordLimit";
 import { CommentCard } from "../Comment/CommentCard";
-import { Avatar } from "./PostCard"
+// import { Avatar } from "./PostCard"
 import { Heart, MessageCircle, Bookmark, Share2, MoreHorizontal } from 'lucide-react';
+// import { Appbar } from "../StickyBars/Appbar";
 
 export const FullPost = ({ post }: {post: Post}) => {
     return <div  className="grid grid-cols-8 lg:grid-cols-10">
         <div className="col-span-1">
-            <Sidebar />
+            <Sidebar openCreateModal={() => {}} />
         </div>
 
         {/* if comment click on, sm:hidden for this */}
@@ -18,7 +19,7 @@ export const FullPost = ({ post }: {post: Post}) => {
                 <div className="bg-white border border-gray-200 rounded-lg col-span-4">
                     <div className="p-4 flex items-center justify-between">
                         <div className="flex items-center justify-center space-x-3">
-                            <div><Avatar name={post.author.name} size="big"/></div>
+                            {/* <div><Avatar name={post.author.name} size="big"/></div> */}
                             <div>{post.author.name}</div>
                         </div>
                         <button className="text-gray-600 hover:text-gray-900">
@@ -62,7 +63,7 @@ export const FullPost = ({ post }: {post: Post}) => {
                 <div className="divide-y-2 divide-solid items-center grid grid-cols-1">
                     <div className="flex min-w-full w-fit pb-3">
                         <div className="flex flex-col items-center justify-center">
-                            <div><Avatar name={post.author.name} size="big"/></div>
+                            {/* <div><Avatar name={post.author.name} size="big"/></div> */}
                             <div className="font-bold">{post.author.name || "Anonymous"} </div> 
                             <div className="p-2 text-slate-500">
                                 <CaptionLimit caption={"porem ipsum dolor sit amet consectetur adipisicing elit. Animi ratione ullam quisquam rem provident fuga cumque fugit quidem voluptatum minus, ducimus expedita obcaecati deleniti perspiciatis reprehenderit nisi veniam, eveniet soluta"} />

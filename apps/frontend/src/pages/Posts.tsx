@@ -12,13 +12,14 @@ import { Button } from "../components/ui/button"
 // import { STORIES, POSTS, EVENTS } from "../data/mockData"
 import { MobileNav } from "../components/StickyBars/MobileNav"
 import { Sidebar } from "../components/StickyBars/Sidebar"
-import { useEvents, usePosts } from "../hooks"
+import { usePosts } from "../hooks"
 // import { EventCardHome } from "../components/Event/EventCardHome"
 import { PostCard } from "../components/Post/PostCard"
 import { StorySkeleton } from "../components/Story/StorySkeleton"
 import { PostSkeleton } from "../components/Post/PostSkeleton"
 import { Story } from "../components/Story/Story"
-import { EventSideBar } from "../components/Event/EventSideBar"
+// import { EventHomeSidebar } from "../components/Event/EventHomeSidebar"
+
 
 // import { EventCardHome } from "../components/Event/EventCardHome"
 
@@ -28,7 +29,7 @@ interface PostsPageProps {
 
 export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
   const { loading, posts } = usePosts();
-  const { events } = useEvents();
+  // const { events } = useEvents();
   const [storyDisplayType, setStoryDisplayType] = useState<"sport" | "location">("sport")
   const [postSortType, setPostSortType] = useState<"following" | "sport">("following")
   // const [selectedSportFilter, setSelectedSportFilter] = useState<string | null>(null)
@@ -207,14 +208,14 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
             
               </div>
               
-                <div className="hidden lg:block lg:col-span-2">
+                {/* <div className="hidden lg:block lg:col-span-2">
                     <div className="scroll-pt-24 overflow-auto pb-2 h-[600px]">
-                        <EventSidebar
+                        <EventHomeSidebar
                           event={events}
                           // onRegister={() => alert('Registration functionality coming soon!')}
                         />
                     </div>
-                </div>
+                </div> */}
 
               
 
