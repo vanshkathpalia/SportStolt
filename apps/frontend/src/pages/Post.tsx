@@ -1,38 +1,106 @@
-// import { Appbar } from "../components/StickyBars/Appbar";
-import { FullPost } from "../components/Post/FullPost";
-// import { PostSkeleton } from "../components/PostSkeleton";
+"use client"
+
+import { useNavigate, useParams } from "react-router-dom"
 import { usePost } from "../hooks";
-import {useParams} from "react-router-dom";
-import { PostSkeleton } from "../components/Post/PostSkeleton";
+import { useMediaQuery } from "../hooks/useMediaQuery";
+import { MobileNav } from "../components/StickyBars/MobileNav";
 import { Sidebar } from "../components/StickyBars/Sidebar";
+import { Button } from "../components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import { PostCard } from "../components/Post/PostCard";
 
+// // import { Sidebar } from "../components/StickyBars/Sidebar"
+// // import { MobileNav } from "../components/StickyBars/MobileNav"
+// // import { PostCard } from "../components/Post/PostCard"
+// // import { useMediaQuery } from "../hooks/useMediaQuery"
+// import { ArrowLeft } from "lucide-react"
+// import { usePosts } from "../../hooks"
+// import { useMediaQuery } from "../../hooks/useMediaQuery"
+// import { MobileNav } from "../StickyBars/MobileNav"
+// import { Sidebar } from "../StickyBars/Sidebar"
+// import { Button } from "../ui/button"
+// // import { Button } from "../components/ui/button"
+// // import { usePosts } from "../hooks"
 
+// Mock data
+// import { POSTS } from "../data/mockData"
 
-// atomFamilies/selectorFamilies
-export const Post = () => {
-    const { id } = useParams();
+interface PostPageProps {
+  openCreateModal: () => void
+}
+
+export const PostPage = ({ openCreateModal }: PostPageProps) => {
+  const { id } = useParams();
     const {loading, post} = usePost({
         id: id || ""
     });
+  const isMobile = useMediaQuery("(max-width: 768px)")
+  const navigate = useNavigate()
 
-    if (loading || !post) {
-        return <div>
-            <div className = "pt-6 px-4" >
-                <Sidebar />
-            </div>
-        
 
-            <div className = "justify-center">
-                <PostSkeleton />
-            </div>
+  const handleBack = () => {
+    navigate(-1)
+  }
 
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Mobile Header - Only visible on mobile */}
+      {isMobile && <MobileNav openCreateModal={openCreateModal} />}
+
+      <div className="flex">
+        {/* Sidebar - Hidden on mobile */}
+        <div className="hidden md:block w-16 lg:w-64 fixed h-screen">
+          <Sidebar openCreateModal={openCreateModal} />
         </div>
-    }
-    else {
-        return <div>
-            <FullPost post={post} />
-        </div>
-    }      
+
+        {/* Main Content */}
+        <main className="flex-1 md:ml-16 lg:ml-64">
+          <div className="max-w-2xl mx-auto p-4">
+            {/* Back button */}
+            <Button variant="ghost" size="sm" className="mb-4 flex items-center gap-1" onClick={handleBack}>
+              <ArrowLeft className="h-4 w-4" />
+              Back
+            </Button>
+
+            {loading ? (
+              // Loading skeleton
+              <div className="bg-card rounded-md p-4 space-y-4 max-w-xl mx-auto">
+                <div className="flex items-center space-x-2">
+                  <div className="w-10 h-10 rounded-full bg-muted animate-pulse" />
+                  <div className="h-4 bg-muted rounded w-24 animate-pulse" />
+                </div>
+                <div className="w-full aspect-square bg-muted rounded animate-pulse" />
+                <div className="space-y-2">
+                  <div className="h-4 bg-muted rounded w-32 animate-pulse" />
+                  <div className="h-4 bg-muted rounded w-full animate-pulse" />
+                </div>
+              </div>
+            ) : post ? (
+              // Post detail view
+                  <div className="sm:col-span-5 sm:col-start-3 p-4 xl:col-start-2">
+                      {post &&  <PostCard
+                          id={post.id}
+                        //   authorName={post.author.name || "Anonymous"}
+                          title={post.title}
+                          content={post.content}
+                        //   publishedDate={"date"} 
+                        expanded={true}  />}
+                  </div>
+            ) : (
+              // Post not found
+              <div className="text-center py-12">
+                <h2 className="text-xl font-semibold mb-2">Post not found</h2>
+                <p className="text-muted-foreground mb-4">
+                  The post you're looking for doesn't exist or has been removed.
+                </p>
+                <Button onClick={handleBack}>Go back</Button>
+              </div>
+            )}
+          </div>
+        </main>
+      </div>
+    </div>
+  )
 }
 
 

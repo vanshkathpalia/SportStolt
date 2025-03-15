@@ -1,6 +1,8 @@
 
-import { Home, Search, Trophy, Activity, Bell, PlusSquare, User, Menu } from "lucide-react";
+import { Home, Search, Trophy, Activity, Bell, PlusSquare, User, Menu, DollarSign, Settings, LogOut } from "lucide-react";
 import { cn } from "../lib/utils";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
 // import NavItem from "./NavItem";
 // Utility function to combine class names
 
@@ -12,7 +14,20 @@ interface SidebarItemProps {
   onClick?: () => void
 }
 
+
+
+// for handling toggle in and out, appear and disappear for more options
 const SidebarItem = ({ icon: Icon, label, href, active, onClick }: SidebarItemProps) => {
+  const navigate = useNavigate()
+
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault()
+    if (onClick) {
+      onClick()
+    } else if (href) {
+      navigate(href)
+    }
+  }
   return (
     <a
       href={href}
@@ -20,7 +35,7 @@ const SidebarItem = ({ icon: Icon, label, href, active, onClick }: SidebarItemPr
         "flex items-center gap-4 px-4 py-3 rounded-md transition-colors hover:bg-accent",
         active && "font-semibold"
       )}
-      onClick={onClick}
+      onClick={handleClick}
     >
       <Icon className={cn("h-6 w-6", active && "text-green-500")} />
       <span className="hidden lg:block">{label}</span>
@@ -28,8 +43,14 @@ const SidebarItem = ({ icon: Icon, label, href, active, onClick }: SidebarItemPr
   );
 };
 
-export function Sidebar() {
-  const currentPath = window.location.pathname;
+interface SidebarProps {
+  openCreateModal: () => void
+}
+
+export function Sidebar({ openCreateModal }: SidebarProps) {
+  const location = useLocation()
+  const pathname = location.pathname
+  const [moreOpen, setMoreOpen] = useState(false)
 
   const navItems = [
     { icon: Home, label: "Home", href: "/post" },
@@ -37,7 +58,7 @@ export function Sidebar() {
     { icon: Trophy, label: "Competitions", href: "/events" },
     { icon: Bell, label: "Notifications", href: "/notifications" },
     { icon: Activity, label: "Training", href: "/training" },
-    { icon: PlusSquare, label: "Create", href: "#" },
+    { icon: PlusSquare, label: "Create", href: "#", onClick: openCreateModal },
     { icon: User, label: "Profile", href: "/profile" },
   ];
 
@@ -59,28 +80,24 @@ export function Sidebar() {
             icon={item.icon}
             label={item.label}
             href={item.href}
-            active={currentPath === item.href}
+            active={pathname === item.href}
           />
         ))}
       </nav>
 
-      <div className="mt-auto">
+      {/* <div className="mt-auto">
         <SidebarItem icon={Menu} label="More" href="#" />
-      </div>
-        {/* Mobile Bottom Navigation
-      <div className="sm:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200">
-        <div className="flex justify-around items-center">
-          
-          {navItems.map((item) => (
-            <NavItem
-            key={item.label}
-            icon={item.icon}
-            label={item.label}
-            href={item.href} 
-            />
-          ))}
-        </div>
       </div> */}
+      <div className="mt-auto relative">
+        <SidebarItem icon={Menu} label="More" href="#" onClick={() => setMoreOpen(!moreOpen)} />
+        {moreOpen && (
+          <div className="absolute bottom-12 left-0 w-48 bg-white shadow-lg rounded-lg p-2 z-50">
+            <SidebarItem icon={Settings} label="Settings" href="/settings" />
+            <SidebarItem icon={DollarSign} label="Be an Earner" href="/earn" />
+            <SidebarItem icon={LogOut} label="Logout" href="/logout" />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
