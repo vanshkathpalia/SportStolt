@@ -85,9 +85,7 @@ export function Sidebar({ openCreateModal }: SidebarProps) {
         ))}
       </nav>
 
-      {/* <div className="mt-auto">
-        <SidebarItem icon={Menu} label="More" href="#" />
-      </div> */}
+      
       <div className="mt-auto relative">
         <SidebarItem icon={Menu} label="More" href="#" onClick={() => setMoreOpen(!moreOpen)} />
         {moreOpen && (

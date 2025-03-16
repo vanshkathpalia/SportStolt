@@ -12,12 +12,14 @@ import { Button } from "../components/ui/button"
 // import { STORIES, POSTS, EVENTS } from "../data/mockData"
 import { MobileNav } from "../components/StickyBars/MobileNav"
 import { Sidebar } from "../components/StickyBars/Sidebar"
-import { usePosts } from "../hooks"
+import { useEvents, usePosts } from "../hooks"
 // import { EventCardHome } from "../components/Event/EventCardHome"
 import { PostCard } from "../components/Post/PostCard"
-import { StorySkeleton } from "../components/Story/StorySkeleton"
-import { PostSkeleton } from "../components/Post/PostSkeleton"
+// import { StorySkeleton } from "../components/Story/StorySkeleton"
+// import { PostSkeleton } from "../components/Post/PostSkeleton"
 import { Story } from "../components/Story/Story"
+import { EventHomeSidebar } from "../components/Event/EventHomeSidebar"
+import { PostSkeleton } from "../components/Post/PostSkeleton"
 // import { EventHomeSidebar } from "../components/Event/EventHomeSidebar"
 
 
@@ -29,7 +31,7 @@ interface PostsPageProps {
 
 export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
   const { loading, posts } = usePosts();
-  // const { events } = useEvents();
+  const { events } = useEvents();
   const [storyDisplayType, setStoryDisplayType] = useState<"sport" | "location">("sport")
   const [postSortType, setPostSortType] = useState<"following" | "sport">("following")
   // const [selectedSportFilter, setSelectedSportFilter] = useState<string | null>(null)
@@ -53,33 +55,33 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
 //     return () => clearTimeout(timer)
 //   }, [])
 
-     if (loading) {
-        return <div className="flex flex-row">
-            <div className = "pt-6 px-4" >
-                <Sidebar openCreateModal={openCreateModal} />
-            </div> 
-            <div>
-              <div className="grid grid-cols-9 p-2">
-                  <div className="col-start-3 sm:col-span-9 sm:col-start-1 md:col-span-7 md:col-start-2 lg:col-span-5 lg:col-start-3 xl:col-span-5 xl:col-start-2 xl:mr-16 xl:ml-16">
-                        <StorySkeleton />
-                    </div>
-                    <div className="col-start-2 sm:col-span-5 sm:col-start-3 p-4 xl:col-start-2">
-                        <PostSkeleton />
-                        <PostSkeleton />
-                        <PostSkeleton />
-                        <PostSkeleton />
-                        <PostSkeleton />
-                    </div>       
-                </div>
-            </div>
-        </div>
-    }
-    else {
+    //  if (loading) {
+    //     return <div className="flex flex-row">
+    //         <div className = "pt-6 px-4" >
+    //             <Sidebar openCreateModal={openCreateModal} />
+    //         </div> 
+    //         <div>
+    //           <div className="grid grid-cols-9 p-2">
+    //               <div className="col-start-3 sm:col-span-9 sm:col-start-1 md:col-span-7 md:col-start-2 lg:col-span-5 lg:col-start-3 xl:col-span-5 xl:col-start-2 xl:mr-16 xl:ml-16">
+    //                     <StorySkeleton />
+    //                 </div>
+    //                 <div className="col-start-2 sm:col-span-5 sm:col-start-3 p-4 xl:col-start-2">
+    //                     <PostSkeleton />
+    //                     <PostSkeleton />
+    //                     <PostSkeleton />
+    //                     <PostSkeleton />
+    //                     <PostSkeleton />
+    //                 </div>       
+    //             </div>
+    //         </div>
+    //     </div>
+    // }
+    // else {
       return <div className="min-h-screen bg-background">
       {isMobile && <MobileNav openCreateModal={openCreateModal} />}
 
       <div className="flex">
-        <div className="md:block w-16 lg:w-64 fixed h-screen">
+        <div className="hidden md:block w-16 lg:w-56 fixed h-screen">
           <Sidebar openCreateModal={openCreateModal} />
         </div>
         {/* Main Content */}
@@ -177,23 +179,24 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                 {/* </div> */}
 
                 {/* Posts Section */}
-                <div className="mt-2 space-y-4 px-0 md:px-4 pb-16 md:pb-8"> 
+                <div className="mt-2 space-y-4 p-6 md:px-4 pb-16 md:pb-8 "> 
                  {loading
                     ? // Post loading skeletons
                       Array(3)
                         .fill(0)
-                        .map((_, index) => (
-                          <div key={index} className="bg-card rounded-md p-4 space-y-4 max-w-xl mx-auto">
-                            <div className="flex items-center space-x-2">
-                              <div className="w-10 h-10 rounded-full bg-muted animate-pulse" />
-                              <div className="h-4 bg-muted rounded w-24 animate-pulse" />
-                            </div>
-                            <div className="w-full aspect-square bg-muted rounded animate-pulse" />
-                            <div className="space-y-2">
-                              <div className="h-4 bg-muted rounded w-32 animate-pulse" />
-                              <div className="h-4 bg-muted rounded w-full animate-pulse" />
-                            </div>
-                          </div>
+                        .map((_) => (
+                          <PostSkeleton />
+                          // <div key={index} className="bg-card rounded-md p-4 space-y-4 max-w-xl mx-auto">
+                          //   <div className="flex items-center space-x-2">
+                          //     <div className="w-10 h-10 rounded-full bg-muted animate-pulse" />
+                          //     <div className="h-4 bg-muted rounded w-24 animate-pulse" />
+                          //   </div>
+                          //   <div className="w-full aspect-square bg-muted rounded animate-pulse" />
+                          //   <div className="space-y-2">
+                          //     <div className="h-4 bg-muted rounded w-32 animate-pulse" />
+                          //     <div className="h-4 bg-muted rounded w-full animate-pulse" />
+                          //   </div>
+                          // </div>
                         ))
                     : // Actual posts
                       posts.map(post => <PostCard
@@ -208,14 +211,21 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
             
               </div>
               
-                {/* <div className="hidden lg:block lg:col-span-2">
+                <div className="hidden lg:block lg:col-span-2">
+                    
                     <div className="scroll-pt-24 overflow-auto pb-2 h-[600px]">
-                        <EventHomeSidebar
-                          event={events}
-                          // onRegister={() => alert('Registration functionality coming soon!')}
-                        />
+                    
+                      
+
+                      <div className="space-y-4 max-h-[600px] overflow-auto pr-1">
+                          <EventHomeSidebar
+                            events={events}
+                            onRegister={() => alert('Registration functionality coming soon!')}
+                          />
+                      </div>
+
                     </div>
-                </div> */}
+                </div>
 
               
 
@@ -227,7 +237,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
       </div>
     </div>
   }
-}
+
 
       
 

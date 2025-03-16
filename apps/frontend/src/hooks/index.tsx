@@ -43,7 +43,7 @@ export interface Story {
 }
 
 export interface EventInterface {
-    "id": number; // Assuming Prisma is autoincrementing the id
+    id: number; // Assuming Prisma is autoincrementing the id
     "image": string;
     "name": string;
     "country": string;
