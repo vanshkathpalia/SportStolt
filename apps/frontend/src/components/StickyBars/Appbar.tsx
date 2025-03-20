@@ -1,4 +1,4 @@
-import { Avatar } from "../Post/PostCard"
+import { Avatar } from "../ui/avatar"
 import { Link } from "react-router-dom"
 
 export const Appbar = () => {
@@ -35,7 +35,7 @@ export const Appbar = () => {
         </div>
         <Link to={`/profile`}>   
         <div className = "flex flex-row pt-12">     
-                <Avatar size={"big"} name="Vansh" />
+                <Avatar /> 
                 <div className = "flex flex-col justify-center pl-2">
                     Profile
                 </div>

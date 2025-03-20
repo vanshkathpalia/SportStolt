@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { SearchGrid } from '../components/Search/SearchGrid';
 
 
-export const Search = () => {
+export const Search = ({openCreateModal}: {openCreateModal: () => void}) => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -30,7 +30,7 @@ export const Search = () => {
           </div>
       </form>
 
-      <SearchGrid isLoading={isLoading} />
+      <SearchGrid isLoading={isLoading} openCreateModal={openCreateModal}/>
     </div>
   );
 };

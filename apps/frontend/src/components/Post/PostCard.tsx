@@ -66,7 +66,7 @@ export const PostCard = ({
   return (
     <div
       className={cn(
-        "bg-background border border-border rounded-md max-w-xl mx-auto mb-6" 
+        "bg-background border border-border rounded-md max-w-xl mx-auto mb-6", 
         // !expanded && "cursor-pointer"
       )} onClick={handlePostClick}
     >
@@ -176,6 +176,38 @@ export const PostCard = ({
     </div>
   )
 }
+
+
+export function Circle() {
+    return <div className="h-1 w-1 rounded-full bg-slate-500">
+
+    </div>
+}
+
+// export function Avatar({ name, size = "small" }: { name: string, size?: "small" | "big" }) {
+//     return <div className={`relative inline-flex items-center justify-center overflow-hidden bg-gray-600 rounded-full ${size === "small" ? "w-6 h-6" : "w-10 h-10"}`}>
+//     <span className={`${size === "small" ? "text-xs" : "text-md"} font-extralight text-gray-600 dark:text-gray-300`}>
+//         {name[0]}
+//     </span>
+// </div>
+// }
+
+// const ImageWithFallback = ({
+//     title,
+//     content,
+//     fallback
+// }: { title: string; content: string; fallback: string }) => {
+//     const [currentSrc, setCurrentSrc] = useState(content);
+
+//     return (
+//         <img
+//             src={currentSrc}
+//             alt={title}
+//             className="w-auto max-w-[550px] max-h-2xl h-fit max-h-2xl aspect-square px-1"
+//             onError={() => setCurrentSrc(fallback)} 
+//         />
+//     );
+// }
 
 
 // "use client"
@@ -449,35 +481,4 @@ export const PostCard = ({
 //             </div>
 //         </div> */}
 //     </Link>
-// }
-
-// export function Circle() {
-//     return <div className="h-1 w-1 rounded-full bg-slate-500">
-
-//     </div>
-// }
-
-// export function Avatar({ name, size = "small" }: { name: string, size?: "small" | "big" }) {
-//     return <div className={`relative inline-flex items-center justify-center overflow-hidden bg-gray-600 rounded-full ${size === "small" ? "w-6 h-6" : "w-10 h-10"}`}>
-//     <span className={`${size === "small" ? "text-xs" : "text-md"} font-extralight text-gray-600 dark:text-gray-300`}>
-//         {name[0]}
-//     </span>
-// </div>
-// }
-
-// const ImageWithFallback = ({
-//     title,
-//     content,
-//     fallback
-// }: { title: string; content: string; fallback: string }) => {
-//     const [currentSrc, setCurrentSrc] = useState(content);
-
-//     return (
-//         <img
-//             src={currentSrc}
-//             alt={title}
-//             className="w-auto max-w-[550px] max-h-2xl h-fit max-h-2xl aspect-square px-1"
-//             onError={() => setCurrentSrc(fallback)} 
-//         />
-//     );
 // }

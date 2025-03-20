@@ -9,12 +9,15 @@ interface EventHomeSidebarProps {
 
 export const EventHomeSidebar = ({ events, onRegister }: EventHomeSidebarProps) => {
   return (
-    <div className="p-4 sticky top-4">
-      <div className="flex items-center mb-6 pt-6">
+    <div className="p-10 sticky top-4 ">
+      <div className="flex items-center mb-6">
         <Trophy className="h-6 w-6 mr-2 text-green-500" />
         <h2 className="text-lg font-semibold">Upcoming Top Events</h2>
       </div>
-      <div className="space-y-4 max-h-[600px] overflow-auto pr-10 shadow-sm border:1">
+      
+
+      
+      <div className="space-y-4 max-h-[455px]  overflow-auto pr-2 ">
         {events.map((event) => (
           <div key={event.id} className="border border-border rounded-lg p-4 hover:border-green-500 transition-colors">
             <h3 className="font-medium mb-2">{event.name}</h3>
@@ -43,10 +46,17 @@ export const EventHomeSidebar = ({ events, onRegister }: EventHomeSidebarProps) 
                     Join Event
               </Button>
             </div>
+            {/* <Button
+                    onClick={onRegister} size="sm"
+                    className=" bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                    Join Event
+            </Button> */}
             
           </div> 
         ))}
       </div>
+      <hr />
     </div>
   )
 }

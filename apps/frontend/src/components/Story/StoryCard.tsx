@@ -101,6 +101,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
 
             {isViewingStory && (
                 <StoryView
+                    // isViewingStory={isViewingStory}
                     story={{
                         id: story.id,
                         locationImage: story.locationImage,

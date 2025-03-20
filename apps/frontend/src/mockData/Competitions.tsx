@@ -1,0 +1,47 @@
+export const COMPETITIONS = [
+    {
+      id: 1,
+      title: "Downtown Basketball Tournament",
+      description: "3v3 basketball tournament with prizes for winners",
+      date: "May 15, 2025",
+      time: "2:00 PM",
+      location: "Central Park Courts",
+      attendees: 24,
+      sportType: "Basketball",
+      organizer: {
+        name: "City Sports Association",
+        avatar: "/placeholder.svg?height=40&width=40",
+      },
+      image: "/placeholder.svg?height=200&width=400",
+    },
+    {
+      id: 2,
+      title: "5K Charity Run",
+      description: "Annual charity run supporting local youth sports programs",
+      date: "May 18, 2025",
+      time: "7:00 AM",
+      location: "City Park",
+      attendees: 156,
+      sportType: "Running",
+      organizer: {
+        name: "RunClub",
+        avatar: "/placeholder.svg?height=40&width=40",
+      },
+      image: "/placeholder.svg?height=200&width=400",
+    },
+    {
+      id: 3,
+      title: "Tennis Open",
+      description: "Open tennis tournament for all skill levels",
+      date: "May 20, 2025",
+      time: "6:30 PM",
+      location: "Sports Complex",
+      attendees: 32,
+      sportType: "Tennis",
+      organizer: {
+        name: "Tennis Association",
+        avatar: "/placeholder.svg?height=40&width=40",
+      },
+      image: "/placeholder.svg?height=200&width=400",
+    },
+  ];

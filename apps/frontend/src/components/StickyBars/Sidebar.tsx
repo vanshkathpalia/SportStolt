@@ -38,7 +38,7 @@ const SidebarItem = ({ icon: Icon, label, href, active, onClick }: SidebarItemPr
       onClick={handleClick}
     >
       <Icon className={cn("h-6 w-6", active && "text-green-500")} />
-      <span className="hidden lg:block">{label}</span>
+      <span className="hidden xl:block">{label}</span>
     </a>
   );
 };
@@ -69,7 +69,7 @@ export function Sidebar({ openCreateModal }: SidebarProps) {
           {/* <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
             <Trophy className="h-5 w-5 text-white" />
           </div> */}
-          <h1 className="text-xl font-bold hidden lg:block px-6 text-black">SportStolt</h1>
+          <h1 className="text-xl font-bold hidden xl:block px-6 text-black">SportStolt</h1>
         </div>
       </div>
 
@@ -81,6 +81,7 @@ export function Sidebar({ openCreateModal }: SidebarProps) {
             label={item.label}
             href={item.href}
             active={pathname === item.href}
+            onClick={item.onClick}
           />
         ))}
       </nav>

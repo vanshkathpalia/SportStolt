@@ -20,6 +20,8 @@ import { PostCard } from "../components/Post/PostCard"
 import { Story } from "../components/Story/Story"
 import { EventHomeSidebar } from "../components/Event/EventHomeSidebar"
 import { PostSkeleton } from "../components/Post/PostSkeleton"
+import { CreateStoryModal } from "../components/models/CreateStoryModal"
+// import { Appbar } from "../components/StickyBars/Appbar"
 // import { EventHomeSidebar } from "../components/Event/EventHomeSidebar"
 
 
@@ -35,7 +37,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
   const [storyDisplayType, setStoryDisplayType] = useState<"sport" | "location">("sport")
   const [postSortType, setPostSortType] = useState<"following" | "sport">("following")
   // const [selectedSportFilter, setSelectedSportFilter] = useState<string | null>(null)
-  // const [createStoryModalOpen, setCreateStoryModalOpen] = useState(false)
+  const [createStoryModalOpen, setCreateStoryModalOpen] = useState(false)
   const isMobile = useMediaQuery("(max-width: 768px)")
 
   // Extract all unique sport tags for filtering
@@ -62,7 +64,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
     //         </div> 
     //         <div>
     //           <div className="grid grid-cols-9 p-2">
-    //               <div className="col-start-3 sm:col-span-9 sm:col-start-1 md:col-span-7 md:col-start-2 lg:col-span-5 lg:col-start-3 xl:col-span-5 xl:col-start-2 xl:mr-16 xl:ml-16">
+    //               <div className="px-1 md:px-4 mt-2">
     //                     <StorySkeleton />
     //                 </div>
     //                 <div className="col-start-2 sm:col-span-5 sm:col-start-3 p-4 xl:col-start-2">
@@ -81,23 +83,23 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
       {isMobile && <MobileNav openCreateModal={openCreateModal} />}
 
       <div className="flex">
-        <div className="hidden md:block w-16 lg:w-56 fixed h-screen">
+        <div className="hidden md:block w-16 xl:w-52 fixed h-screen">
           <Sidebar openCreateModal={openCreateModal} />
         </div>
         {/* Main Content */}
-        <main className="flex-1 md:ml-16 lg:ml-64">
+        <main className="flex-1 md:ml-16 xl:ml-56">
           <div className="max-w-screen-xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
               {/* Stories and Posts Column */}
-              <div className="md:col-span-3 lg:col-span-3">
+              <div className="md:col-span-3 p-2 lg:col-span-3">
                 {/* Story Display Type Toggle */}
-                <div className="px-4 mt-2 md:mt-4 flex justify-between items-center">
+                <div className="mt-2 md:mt-4 flex justify-between items-center">
                   <div className="flex space-x-2">
                     <button
                       onClick={() => setStoryDisplayType("sport")}
                       className={`px-3 py-1 text-sm rounded-full ${
                         storyDisplayType === "sport"
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-blue-400 text-white"  
                           : "bg-muted text-muted-foreground"
                       }`}
                     >
@@ -106,7 +108,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                     <button
                       onClick={() => setStoryDisplayType("location")}
                       className={`px-3 py-1 text-sm rounded-full ${
-                        storyDisplayType === "location" ? "bg-blue-500 text-white" : "bg-muted text-muted-foreground"
+                        storyDisplayType === "location" ? "bg-blue-400 text-white" : "bg-muted text-muted-foreground"
                       }`}
                     >
                       Locations
@@ -117,7 +119,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                   <Button
                     onClick={openCreateModal}
                     size="sm"
-                    className="hidden md:flex items-center gap-1 bg-primary hover:bg-primary/90 text-primary-foreground"
+                    className="hidden md:flex items-center gap-1 bg-primary hover:bg-blue-300 text-primary-foreground"
                   >
                     <PlusCircle className="h-4 w-4" />
                     Create Post
@@ -125,13 +127,14 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                 </div>
 
                 {/* Stories Section */}
-                  <div className="col-start-3 sm:col-span-9 sm:col-start-1 md:col-span-7 md:col-start-2 lg:col-span-5 lg:col-start-3 xl:col-span-5 xl:col-start-2 xl:mr-16 xl:ml-16">
+                  <div className="pt-2 ">
                     <Story />
                   </div>
+                  <hr />
 
                 {/* Post Sorting Options */}
-                <div className="px-4 mt-4 mb-2">
-                  <div className="flex justify-between items-center">
+                <div className="mt-4 mb-2">
+                  <div className="flex justify-between items-center ">
                     <div className="flex space-x-2">
                       <button
                         onClick={() => {
@@ -140,7 +143,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                         }}
                         className={`px-3 py-1 text-sm rounded-full ${
                           postSortType === "following"
-                            ? "bg-primary text-primary-foreground"
+                            ? "bg-blue-400 text-white"
                             : "bg-muted text-muted-foreground"
                         }`}
                       >
@@ -149,7 +152,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                       <button
                         onClick={() => setPostSortType("sport")}
                         className={`px-3 py-1 text-sm rounded-full ${
-                          postSortType === "sport" ? "bg-blue-500 text-white" : "bg-muted text-muted-foreground"
+                          postSortType === "sport" ? "bg-blue-400 text-white" : "bg-muted text-muted-foreground"
                         }`}
                       >
                         Sports
@@ -179,14 +182,14 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                 {/* </div> */}
 
                 {/* Posts Section */}
-                <div className="mt-2 space-y-4 p-6 md:px-4 pb-16 md:pb-8 "> 
+                <div className="mt-2 px-6 pt-6 space-y-4 md:px-4 pb-16 md:pb-8 "> 
                  {loading
                     ? // Post loading skeletons
                       Array(3)
                         .fill(0)
                         .map((_) => (
                           <PostSkeleton />
-                          // <div key={index} className="bg-card rounded-md p-4 space-y-4 max-w-xl mx-auto">
+                          // <div className="bg-card rounded-md p-4 space-y-4 max-w-xl mx-auto">
                           //   <div className="flex items-center space-x-2">
                           //     <div className="w-10 h-10 rounded-full bg-muted animate-pulse" />
                           //     <div className="h-4 bg-muted rounded w-24 animate-pulse" />
@@ -211,20 +214,13 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
             
               </div>
               
-                <div className="hidden lg:block lg:col-span-2">
-                    
-                    <div className="scroll-pt-24 overflow-auto pb-2 h-[600px]">
-                    
-                      
-
-                      <div className="space-y-4 max-h-[600px] overflow-auto pr-1">
+                <div className="hidden lg:block lg:col-span-2 ">
+                  
                           <EventHomeSidebar
                             events={events}
                             onRegister={() => alert('Registration functionality coming soon!')}
                           />
-                      </div>
-
-                    </div>
+                      
                 </div>
 
               
@@ -233,7 +229,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
           </div>
         </main>
       {/* Create Story Modal */}
-      {/* <CreateStoryModal isOpen={createStoryModalOpen} onClose={() => setCreateStoryModalOpen(false)} /> */}
+      <CreateStoryModal isOpen={createStoryModalOpen} onClose={() => setCreateStoryModalOpen(false)} />
       </div>
     </div>
   }
@@ -262,7 +258,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
 //             </div> */}
 //             <div>
 //               <div className="grid grid-cols-9 p-2">
-//                   <div className="col-start-3 sm:col-span-9 sm:col-start-1 md:col-span-7 md:col-start-2 lg:col-span-5 lg:col-start-3 xl:col-span-5 xl:col-start-2 xl:mr-16 xl:ml-16">
+//                   <div className="px-1 md:px-4 mt-2">
 //                         <StorySkeleton />
 //                     </div>
 //                     <div className="col-start-2 sm:col-span-5 sm:col-start-3 p-4 xl:col-start-2">
@@ -286,7 +282,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
 //             {/* <div>
 //                 <div className="grid grid-cols-9 p-2">
 
-//                   <div className="col-start-3 sm:col-span-9 sm:col-start-1 md:col-span-7 md:col-start-2 lg:col-span-5 lg:col-start-3 xl:col-span-5 xl:col-start-2 xl:mr-16 xl:ml-16">
+//                   <div className="px-1 md:px-4 mt-2">
 //                     <Story />
 //                   </div>
                     

@@ -3,8 +3,11 @@ import { Calendar, Clock, MapPin, Building2, Users, Upload } from 'lucide-react'
 import { Sidebar } from "../components/StickyBars/Sidebar";
 import axios from 'axios';
 import { BACKEND_URL } from "../config";
+interface AddEventPageProps {
+  openCreateModal: () => void
+}
 
-function App() {
+export const AddEvent = ({openCreateModal}: AddEventPageProps) => {
   const [formData, setFormData] = useState({
     image: '',
     name: '',
@@ -136,7 +139,7 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       <div className="grid grid-cols-8">
         <div className="pt-6 px-4 col-span-8 md:col-span-1">
-          <Sidebar />
+          <Sidebar openCreateModal = {openCreateModal} />
         </div>
         
         <div className="col-span-8 md:col-span-7 px-4 py-8 sm:px-6 lg:px-8">
@@ -383,5 +386,3 @@ function App() {
     </div>
   );
 }
-
-export default App;
