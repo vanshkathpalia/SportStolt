@@ -1,3 +1,285 @@
+"use client"
+
+import type React from "react"
+import { useState } from "react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
+import { Textarea } from "../ui/textarea"
+import { Label } from "../ui/label"
+import { MapPin, Clock, Users, Image, X } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+
+interface CreateStoryModalProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+const SPORT_CATEGORIES = [
+  "Basketball",
+  "Soccer",
+  "Tennis",
+  "Running",
+  "Swimming",
+  "Cycling",
+  "Golf",
+  "Rugby",
+  "Volleyball",
+  "Boxing",
+  "Gymnastics",
+  "Other",
+]
+
+//write handle submit function
+
+export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
+  const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
+  const [location, setLocation] = useState("")
+  const [startTime, setStartTime] = useState("")
+  const [endTime, setEndTime] = useState("")
+  const [sportType, setSportType] = useState("")
+  const [participants, setParticipants] = useState("")
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null
+    if (file) {
+      setSelectedFile(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setIsLoading(true)
+
+    try {
+      // Here you would typically send the data to your backend
+      const formData = {
+        title,
+        description,
+        location,
+        startTime,
+        endTime,
+        sportType,
+        participants: parseInt(participants),
+        file: selectedFile,
+      }
+
+      console.log('Creating story:', formData)
+      // Add your API call here
+      // await createStory(formData)
+
+      // Reset form
+      setTitle("")
+      setDescription("")
+      setLocation("")
+      setStartTime("")
+      setEndTime("")
+      setSportType("")
+      setParticipants("")
+      setSelectedFile(null)
+      setPreviewUrl(null)
+
+      onClose()
+    } catch (error) {
+      console.error('Error creating story:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-white">
+        <DialogHeader>
+          <DialogTitle>Create New Story</DialogTitle>
+        </DialogHeader>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Story Image Upload */}
+          <div className="space-y-2">
+            <Label>Story Image</Label>
+            {previewUrl ? (
+              <div className="relative w-full border-2 border-primary rounded-lg p-4">
+                <img
+                  src={previewUrl}
+                  alt="Story preview"
+                  className="max-h-64 mx-auto object-contain"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  onClick={() => {
+                    setSelectedFile(null)
+                    setPreviewUrl(null)
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center">
+                <Image className="h-10 w-10 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground mb-2">
+                  Upload story image
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => document.getElementById("story-image-upload")?.click()}
+                >
+                  Select image
+                </Button>
+                <input
+                  id="story-image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Title */}
+          <div className="space-y-2">
+            <Label htmlFor="title">Story Title</Label>
+            <div className="relative">
+              <Image className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="title"
+                placeholder="Enter story title"
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="pl-9"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description">Description</Label>
+            <Textarea
+              id="description"
+              placeholder="Describe your story..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="min-h-[100px]"
+              required
+            />
+          </div>
+
+          {/* Sport Type */}
+          <div className="space-y-2">
+            <Label htmlFor="sportType">Sport Type</Label>
+            <Select value={sportType} onValueChange={setSportType} required>
+              <SelectTrigger id="sportType" className="w-full">
+                <SelectValue placeholder="Select sport" />
+              </SelectTrigger>
+              <SelectContent>
+                {SPORT_CATEGORIES.map((sport) => (
+                  <SelectItem key={sport} value={sport}>
+                    {sport}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Location */}
+          <div className="space-y-2">
+            <Label htmlFor="location">Location</Label>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="location"
+                placeholder="Enter location"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                className="pl-9"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Time Range */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="startTime">Start Time</Label>
+              <div className="relative">
+                <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="startTime"
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  className="pl-9"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="endTime">End Time</Label>
+              <div className="relative">
+                <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="endTime"
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="pl-9"
+                  required
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Participants */}
+          <div className="space-y-2">
+            <Label htmlFor="participants">Expected Participants</Label>
+            <div className="relative">
+              <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="participants"
+                type="number"
+                placeholder="Enter number of participants"
+                value={participants}
+                onChange={(e) => setParticipants(e.target.value)}
+                className="pl-9"
+                min="1"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+            disabled={isLoading || !title || !description || !location || !startTime || !endTime || !sportType || !selectedFile}
+          >
+            {isLoading ? "Creating story..." : "Share Story"}
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+
 // import { useState, useRef } from "react";
 // import axios from "axios";
 // import { BACKEND_URL } from "../config";
@@ -6,6 +288,7 @@
 // import { Camera, MapPin, X, Upload, Trophy, Link as LinkIcon, FileText } from 'lucide-react';
 // // import { Appbar } from "../components/StickyBars/Appbar";
 // import { Sidebar } from "../components/StickyBars/Sidebar";
+
 
 
 // export const AddStory = ({openCreateModal}: {openCreateModal: () => void}) => {

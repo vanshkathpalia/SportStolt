@@ -6,21 +6,20 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 import { Signup } from './pages/Signup'
 import { Signin } from './pages/Signin'
 import { Home } from './pages/Home'
-import { AddPost } from './pages/AddPost'
-import { AddStory } from './pages/AddStory'
+// import { AddStory } from './pages/AddStory'
 import { Profile } from './pages/Profile'
 import { Search } from './pages/Search'
-// import { ApiPost } from './pages/ApiPost'
-import { Events } from './pages/Events'
-import AddEvent from './pages/AddEvent'
+import { EventsPage } from './pages/Events'
 import NotificationsPage from './pages/NotificationPage'
 import { CreatePostModal } from './components/models/CreatePostModal'
+
 
 import { AppContextProvider } from "./context/AppContext"
 // import e from "express"
 import { useState } from "react"
 import { PostsPage } from "./pages/Posts"
 import { PostPage } from "./pages/Post"
+import { AddEvent } from "./pages/AddEvent"
 
 
 const queryClient = new QueryClient()
@@ -41,13 +40,11 @@ function App() {
               <Route path="/signin" element={<Signin />} />
               <Route path="/post" element={<PostsPage openCreateModal={() => setCreatePostModalOpen(true)} />} />
               <Route path="/post/:id" element={<PostPage openCreateModal={() => setCreatePostModalOpen(true)} />} />
-              {/* <Route path="/apipost/:id" element={<ApiPost />} /> */}
-              <Route path="/addstory" element={<AddStory />} />
-              <Route path="/addpost" element={<AddPost />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/search" element={<Search />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/addevent" element={<AddEvent />} />
+              {/* <Route path="/addstory" element={<AddStory openCreateModal={() => setCreatePostModalOpen(true)} />} /> */}
+              <Route path="/profile" element={<Profile openCreateModal={() => setCreatePostModalOpen(true)}/>} />
+              <Route path="/search" element={<Search openCreateModal={() => setCreatePostModalOpen(true)} />} />
+              <Route path="/events" element={<EventsPage openCreateModal={() => setCreatePostModalOpen(true)} />} />
+              <Route path="/addevent" element={<AddEvent openCreateModal={() => setCreatePostModalOpen(true)} />} />
               <Route path="/notifications"
                 element={<NotificationsPage openCreateModal={() => setCreatePostModalOpen(true)} />}/>
             </Routes>

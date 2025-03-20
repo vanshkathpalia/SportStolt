@@ -1,26 +1,47 @@
+
 import { usePosts } from "../../hooks";
 import StoryCard from "./StoryCard";
 import { StorySkeleton } from "./StorySkeleton";
-import { useNavigate } from "react-router-dom"; // Import for navigation
+import { CreateStoryModal } from "../models/CreateStoryModal";
+import { useState } from "react";
 
 export const Story = () => {
     const { loading, story } = usePosts();
-    const navigate = useNavigate();
+
     const reversedStories = [...story].reverse();
+
+    const [isCreateStoryModalOpen, setIsCreateStoryModalOpen] = useState(false);
+
+    const openCreateStoryModal = () => {
+        setIsCreateStoryModalOpen(true);
+      };
+    
+      // Function to close the modal
+      const closeCreateStoryModal = () => {
+        setIsCreateStoryModalOpen(false);
+      };
+    // const handleStoryClick = (story: Story) => {
+    //     if (story.isYourStory) {
+    //       openCreateStoryModal()
+    //     } 
+        // else {
+        //   setSelectedStory(story)
+        //   setStoryModalOpen(true)
+        // }
 
     if (loading) {
         return <div><StorySkeleton /></div>;
     }
 
     return (
-        <div className="flex flex-col p-4">
-            <div className="bg-white gap-4 rounded-lg shadow-md p-2 flex justify-center">
-                <div className="p-2 scroll-pr-24 gap-4 overflow-x-auto w-screen pb-2 max-24 flex flex-row">
+        <div className="flex flex-col">
+            <div className="bg-white gap-4 flex justify-center">
+                <div className="pt-2 scroll-pr-24 gap-4 overflow-x-auto w-screen pb-2 max-24 flex flex-row">
 
                     {/* ✅ Add Story Button (Visible Always) */}
                     <div 
                         className="flex flex-col items-center justify-center gap-1 cursor-pointer"
-                        onClick={() => navigate("/addstory")}
+                        onClick={openCreateStoryModal}
                     >
                         <div className="p-[2px] rounded-full bg-gray-300 relative">
                             <div className="bg-white p-[2px] rounded-full flex items-center justify-center w-14 h-14">
@@ -29,6 +50,11 @@ export const Story = () => {
                         </div>
                         <span className="text-xs truncate w-16 text-center text-gray-500">Add Story</span>
                     </div>
+
+                    <CreateStoryModal
+                        isOpen={isCreateStoryModalOpen}
+                        onClose={closeCreateStoryModal}
+                    />
 
                     {/* ✅ Show Stories if Available */}
                     {reversedStories.length > 0 ? (
@@ -66,6 +92,7 @@ export const Story = () => {
                     )}
                 </div>
             </div>
+            
         </div>
     );
 };

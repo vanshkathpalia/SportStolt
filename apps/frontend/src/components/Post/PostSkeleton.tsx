@@ -3,7 +3,7 @@
 import { Heart, MessageCircle, Bookmark, Share2, MoreHorizontal } from 'lucide-react';
 
 export const PostSkeleton = () => {
-    return <div className="py-6">
+    return (
         <div className="flex flex-col">
                 <div className="flex justify-center">
                     <div className="bg-white border border-gray-200 rounded-lg mb-4 animate-pulse">
@@ -46,8 +46,9 @@ export const PostSkeleton = () => {
                     </div>
                 </div>
             </div>
-    </div>
-}
+
+)
+};
 
 // <div className="bg-white border border-gray-200 rounded-lg mb-4 animate-pulse">
 //         <div className="p-4 flex items-center justify-between">
