@@ -1,15 +1,18 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import { Button } from "../ui/button"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
-import { Image, Video, X, Search, MapPin, Tag } from "lucide-react"
+// import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
+import { MapPin, Camera } from "lucide-react"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 import { Textarea } from "../ui/textarea"
-import { fetchImagesFromPexels } from "../../utils/imageApi"
+import axios from "axios"
+import { BACKEND_URL } from "../../config"
+import { useNavigate } from "react-router-dom"
+// import { fetchImagesFromPexels } from "../../utils/imageApi"
 
 interface CreatePostModalProps {
   isOpen: boolean
@@ -17,50 +20,51 @@ interface CreatePostModalProps {
 }
 
 export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
-  const [activeTab, setActiveTab] = useState("photo")
-  const [caption, setCaption] = useState("")
-  const [location, setLocation] = useState("")
-  const [tags, setTags] = useState("")
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  // const [activeTab, setActiveTab] = useState("photo")
+  const [content, setContent] = useState("")
+  const [title, setTitle] = useState("")
+  // const [tags, setTags] = useState("")
+  // const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  // const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate();
 
   // For Pexels API
-  const [searchQuery, setSearchQuery] = useState("")
-  const [isSearching, setIsSearching] = useState(false)
-  const [searchResults, setSearchResults] = useState<string[]>([])
+  // const [searchQuery, setSearchQuery] = useState("")
+  // const [isSearching, setIsSearching] = useState(false)
+  // const [searchResults, setSearchResults] = useState<string[]>([])
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null
-    if (file) {
-      setSelectedFile(file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0] || null
+  //   if (file) {
+  //     setSelectedFile(file)
+  //     const reader = new FileReader()
+  //     reader.onloadend = () => {
+  //       setPreviewUrl(reader.result as string)
+  //     }
+  //     reader.readAsDataURL(file)
+  //   }
+  // }
 
-  const handleSearchImages = async () => {
-    if (!searchQuery.trim()) return
+  // const handleSearchImages = async () => {
+  //   if (!searchQuery.trim()) return
 
-    setIsSearching(true)
-    try {
-      const images = await fetchImagesFromPexels(searchQuery, 12)
-      setSearchResults(images)
-    } catch (error) {
-      console.error("Error searching for images:", error)
-    } finally {
-      setIsSearching(false)
-    }
-  }
+  //   setIsSearching(true)
+  //   try {
+  //     const images = await fetchImagesFromPexels(searchQuery, 12)
+  //     setSearchResults(images)
+  //   } catch (error) {
+  //     console.error("Error searching for images:", error)
+  //   } finally {
+  //     setIsSearching(false)
+  //   }
+  // }
 
-  const handleSelectImage = (imageUrl: string) => {
-    setPreviewUrl(imageUrl)
-    setSelectedFile(null)
-    setSearchResults([]) // Clear search results after selection
-  }
+  // const handleSelectImage = (imageUrl: string) => {
+  //   setPreviewUrl(imageUrl)
+  //   setSelectedFile(null)
+  //   setSearchResults([]) // Clear search results after selection
+  // }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -69,26 +73,42 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
     try {
       // Here you would typically send the data to your backend
       const formData = {
-        type: activeTab,
-        caption,
-        location,
-        tags: tags.split(',').map(tag => tag.trim()),
-        file: selectedFile,
-        imageUrl: previewUrl,
+        // type: activeTab,
+        content,
+        title,
+        // tags: tags.split(',').map(tag => tag.trim()),
+        // file: selectedFile,
+        // imageUrl: previewUrl,
       }
 
       console.log('Submitting post:', formData)
-      // Add your API call here
+      
+      try {
+          setIsLoading(true);
+          await axios.post(`${BACKEND_URL}/api/v1/post`, {
+              ...formData,
+              // PostPhoto: photos,
+          }, {
+              headers: {
+                  Authorization: localStorage.getItem("token")
+              }
+          });
+          navigate('/post');
+      } catch (error) {
+          console.error('Error publishing post:', error);
+      } finally {
+          setIsLoading(false);
+      }
       // await createPost(formData)
 
       // Reset form
-      setCaption("")
-      setLocation("")
-      setTags("")
-      setSelectedFile(null)
-      setPreviewUrl(null)
-      setSearchQuery("")
-      setSearchResults([])
+      setContent("")
+      setTitle("")
+      // setTags("")
+      // setSelectedFile(null)
+      // setPreviewUrl(null)
+      // setSearchQuery("")
+      // setSearchResults([])
 
       onClose()
     } catch (error) {
@@ -98,12 +118,12 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
     }
   }
 
-  useEffect(() => {
-    if (!isOpen) {
-      setSearchResults([])
-      setSearchQuery("")
-    }
-  }, [isOpen])
+  // useEffect(() => {
+  //   if (!isOpen) {
+  //     setSearchResults([])
+  //     setSearchQuery("")
+  //   }
+  // }, [isOpen])
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -113,7 +133,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          <Tabs defaultValue="photo" value={activeTab} onValueChange={setActiveTab}>
+          {/* <Tabs defaultValue="photo" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="photo" className="flex items-center gap-2">
                 <Image className="h-4 w-4" />
@@ -127,7 +147,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
 
             <TabsContent value="photo" className="space-y-4 mt-4">
               {/* Image Preview */}
-              {previewUrl ? (
+              {/* {previewUrl ? (
                 <div className="relative w-full border-2 border-primary rounded-lg p-4">
                   <img
                     src={previewUrl}
@@ -149,7 +169,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
                 </div>
               ) : (
                 <>
-                  {/* Upload Section */}
+                  
                   <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center">
                     <Image className="h-10 w-10 text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground mb-2">
@@ -172,7 +192,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
                     />
                   </div>
 
-                  {/* Online Image Search */}
+                  
                   <div className="space-y-2">
                     <Label>Search Online Images</Label>
                     <div className="flex gap-2">
@@ -192,10 +212,12 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
                         Search
                       </Button>
                     </div>
-                  </div>
+                  </div> */}
+
+                  
 
                   {/* Search Results */}
-                  {searchResults.length > 0 && (
+                  {/* {searchResults.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 mt-4">
                       {searchResults.map((imageUrl, index) => (
                         <div
@@ -215,7 +237,22 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
                 </>
               )}
             </TabsContent>
-          </Tabs>
+          </Tabs> */}
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Camera className="w-4 h-4 inline mr-1" />
+                Image Content URL
+            </label>
+            <input
+              type="text"
+              name="image"
+              value={content}
+              onChange={(e) => setContent(e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter image URL"
+            />
+          </div>
 
           {/* Caption */}
           <div className="space-y-2">
@@ -223,29 +260,29 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
             <Textarea
               id="caption"
               placeholder="Write a caption for your post..."
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               className="min-h-[100px]"
             />
           </div>
 
-          {/* Location */}
+          {/* Image URL */}
           <div className="space-y-2">
-            <Label htmlFor="location">Add location</Label>
+            <Label htmlFor="location">Add Image URL</Label>
             <div className="relative">
               <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                id="location"
+                id="text"
                 placeholder="Add location"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
                 className="pl-9"
               />
             </div>
           </div>
 
           {/* Tags */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label htmlFor="tags">Add sports tags</Label>
             <div className="relative">
               <Tag className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -260,13 +297,13 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
             <p className="text-sm text-muted-foreground">
               Separate tags with commas (e.g., basketball, soccer, tennis)
             </p>
-          </div>
+          </div> */}
 
           {/* Submit Button */}
           <Button
             type="submit"
             className="w-full"
-            disabled={isLoading || (!previewUrl && activeTab === "photo")}
+            disabled={ /* isLoading || (!previewUrl && activeTab === "photo") || */ !content || !title}
           >
             {isLoading ? "Creating post..." : "Share Post"}
           </Button>

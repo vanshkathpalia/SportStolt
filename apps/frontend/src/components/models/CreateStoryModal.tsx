@@ -7,54 +7,62 @@ import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 import { Label } from "../ui/label"
-import { MapPin, Clock, Users, Image, X } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+import { MapPin, Clock, Trophy, Camera, Users } from "lucide-react"
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
+import { BACKEND_URL } from "../../config"
+import axios from "axios"
+import { useNavigate } from "react-router-dom"
+// import e from "express"
 
 interface CreateStoryModalProps {
   isOpen: boolean
   onClose: () => void
 }
 
-const SPORT_CATEGORIES = [
-  "Basketball",
-  "Soccer",
-  "Tennis",
-  "Running",
-  "Swimming",
-  "Cycling",
-  "Golf",
-  "Rugby",
-  "Volleyball",
-  "Boxing",
-  "Gymnastics",
-  "Other",
-]
+// const SPORT_CATEGORIES = [
+//   "Basketball",
+//   "Soccer",
+//   "Tennis",
+//   "Running",
+//   "Swimming",
+//   "Cycling",
+//   "Golf",
+//   "Rugby",
+//   "Volleyball",
+//   "Boxing",
+//   "Gymnastics",
+//   "Other",
+// ]
 
 //write handle submit function
 
 export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
-  const [title, setTitle] = useState("")
+  // const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [location, setLocation] = useState("")
-  const [startTime, setStartTime] = useState("")
-  const [endTime, setEndTime] = useState("")
-  const [sportType, setSportType] = useState("")
-  const [participants, setParticipants] = useState("")
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [activityStarted, setActivityStarted] = useState("")
+  const [activityEnded, setActivityEnded] = useState("")
+  const [sport, setSport] = useState("")
+  const [stadium, setStadium] = useState("")
+  const [image, setImage] = useState("")
+  const [eventLink, setEventLink] = useState("")  
+  const [locationImage, setLocationImage] = useState("")  
+  // const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  // const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const navigate = useNavigate();
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null
-    if (file) {
-      setSelectedFile(file)
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
+  // const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0] || null
+  //   if (file) {
+  //     setSelectedFile(file)
+  //     const reader = new FileReader()
+  //     reader.onloadend = () => {
+  //       setPreviewUrl(reader.result as string)
+  //     }
+  //     reader.readAsDataURL(file)
+  //   }
+  // }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -63,30 +71,51 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
     try {
       // Here you would typically send the data to your backend
       const formData = {
-        title,
-        description,
         location,
-        startTime,
-        endTime,
-        sportType,
-        participants: parseInt(participants),
-        file: selectedFile,
+        image,
+        locationImage,
+        description,
+        eventLink,
+        sport,
+        activityStarted,
+        activityEnded,
+        stadium
       }
 
       console.log('Creating story:', formData)
-      // Add your API call here
+
+      try {
+          setIsLoading(true);
+          await axios.post(`${BACKEND_URL}/api/v1/story`, {
+              ...formData,
+              isViewed: false
+          }, {
+              headers: {
+                  Authorization: localStorage.getItem("token")
+              }
+          });
+          navigate(`/post`);
+      } catch (error) {
+          console.error('Error publishing story:', error);
+          // Handle error appropriately
+      } finally {
+          setIsLoading(false);
+      }
       // await createStory(formData)
 
       // Reset form
-      setTitle("")
+
+      setImage("")
       setDescription("")
       setLocation("")
-      setStartTime("")
-      setEndTime("")
-      setSportType("")
-      setParticipants("")
-      setSelectedFile(null)
-      setPreviewUrl(null)
+      setActivityStarted("")
+      setActivityEnded("")
+      setSport("")
+      setEventLink("")
+      setStadium("")
+      setLocationImage("")
+      // setSelectedFile(null)
+      // setPreviewUrl(null)
 
       onClose()
     } catch (error) {
@@ -105,7 +134,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Story Image Upload */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label>Story Image</Label>
             {previewUrl ? (
               <div className="relative w-full border-2 border-primary rounded-lg p-4">
@@ -150,10 +179,41 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                 />
               </div>
             )}
+          </div> */}
+
+          <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <Camera className="w-4 h-4 inline mr-1" />
+                    Image URL
+                </label>
+                <input
+                  type="text"
+                  name="image"
+                  value={image}
+                  onChange={(e) => setImage(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter image URL"
+              />
+          </div>
+          
+          {/* Location image Input */}
+          <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+                <Camera className="w-4 h-4 inline mr-1" />
+                Location Name
+            </label>
+              <input
+              type="text"
+              name="locationImage"
+              value={locationImage}
+                onChange={(e) => setLocationImage(e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter image URL"
+              />
           </div>
 
           {/* Title */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label htmlFor="title">Story Title</Label>
             <div className="relative">
               <Image className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -166,7 +226,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                 required
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Description */}
           <div className="space-y-2">
@@ -182,20 +242,24 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           </div>
 
           {/* Sport Type */}
-          <div className="space-y-2">
-            <Label htmlFor="sportType">Sport Type</Label>
-            <Select value={sportType} onValueChange={setSportType} required>
-              <SelectTrigger id="sportType" className="w-full">
-                <SelectValue placeholder="Select sport" />
-              </SelectTrigger>
-              <SelectContent>
-                {SPORT_CATEGORIES.map((sport) => (
-                  <SelectItem key={sport} value={sport}>
-                    {sport}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <Trophy className="w-4 h-4 inline mr-1" />
+                  Sport
+              </label>
+              <select
+                  name="sport"
+                  value={sport}
+                  onChange={(e) => setSport(e.target.value)}
+                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              >
+                  <option value="">Select a sport</option>
+                  <option value="Cricket">Cricket</option>
+                  <option value="Football">Football</option>
+                  <option value="Basketball">Basketball</option>
+                  <option value="Baseball">Baseball</option>
+                  <option value="Tennis">Tennis</option>
+              </select>
           </div>
 
           {/* Location */}
@@ -205,13 +269,28 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
               <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="location"
-                placeholder="Enter location"
+                placeholder="Enter location "
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 className="pl-9"
                 required
               />
             </div>
+          </div>
+
+          <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <MapPin className="w-4 h-4 inline mr-1" />
+                  Stadium
+              </label>
+              <input
+                type="text"
+                name="stadium"
+                value={stadium}
+                onChange={(e) => setStadium(e.target.value)}
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter stadium name"
+              />
           </div>
 
           {/* Time Range */}
@@ -223,8 +302,8 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                 <Input
                   id="startTime"
                   type="time"
-                  value={startTime}
-                  onChange={(e) => setStartTime(e.target.value)}
+                  value={activityStarted}
+                  onChange={(e) => setActivityStarted(e.target.value)}
                   className="pl-9"
                   required
                 />
@@ -238,8 +317,8 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                 <Input
                   id="endTime"
                   type="time"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
+                  value={activityEnded}
+                  onChange={(e) => setActivityEnded(e.target.value)}
                   className="pl-9"
                   required
                 />
@@ -253,11 +332,11 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
             <div className="relative">
               <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                id="participants"
-                type="number"
-                placeholder="Enter number of participants"
-                value={participants}
-                onChange={(e) => setParticipants(e.target.value)}
+                id="Eventlink"
+                type="text"
+                placeholder="Enter Event link"
+                value={eventLink}
+                onChange={(e) => setEventLink(e.target.value)}
                 className="pl-9"
                 min="1"
                 required
@@ -269,7 +348,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           <Button
             type="submit"
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-            disabled={isLoading || !title || !description || !location || !startTime || !endTime || !sportType || !selectedFile}
+            disabled={ /*!isloading */!image || !description || !location || !activityStarted || !activityEnded|| !sport }
           >
             {isLoading ? "Creating story..." : "Share Story"}
           </Button>

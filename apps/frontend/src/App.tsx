@@ -40,7 +40,6 @@ function App() {
               <Route path="/signin" element={<Signin />} />
               <Route path="/post" element={<PostsPage openCreateModal={() => setCreatePostModalOpen(true)} />} />
               <Route path="/post/:id" element={<PostPage openCreateModal={() => setCreatePostModalOpen(true)} />} />
-              {/* <Route path="/addstory" element={<AddStory openCreateModal={() => setCreatePostModalOpen(true)} />} /> */}
               <Route path="/profile" element={<Profile openCreateModal={() => setCreatePostModalOpen(true)}/>} />
               <Route path="/search" element={<Search openCreateModal={() => setCreatePostModalOpen(true)} />} />
               <Route path="/events" element={<EventsPage openCreateModal={() => setCreatePostModalOpen(true)} />} />
@@ -58,7 +57,7 @@ function App() {
           </div>
         </Router>
       </AppContextProvider>
-    </QueryClientProvider>
+      </QueryClientProvider>
     </>
   )
 }

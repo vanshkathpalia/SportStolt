@@ -93,16 +93,27 @@ storyRouter.post('/', async (c) => {
 
     try {
         const userId = c.get('userId');
-        const activityStarted = new Date(body.activityStarted);
-        const activityEnded = new Date(body.activityEnded);
+
+        const today = new Date();
+        const datePart = today.toISOString().split('T')[0]; // e.g., "2025-03-21"
+
+        // Combine date with received time (hh:mmZ)
+        const combinedEndTime = `${datePart}T${body.activityEnded}`;
+        const combinedStartTime = `${datePart}T${body.activityStarted}`;
+
+        const activityEnded = new Date(combinedEndTime);
+        const activityStarted = new Date(combinedStartTime);
 
         if (activityEnded <= activityStarted) {
             c.status(400);
             return c.json({ message: "Activity Ended time must be after Activity Started time." });
         }
+        
+        const endTime = new Date(activityEnded.getTime() + 60 * 60 * 1000);
+        
 
-        const endTime = new Date();
-        endTime.setHours(activityEnded.getHours() + 1); // Story expires in 1 hour
+        console.log("Activity Ended:", activityEnded.toISOString());
+        console.log("Story Expires At:", endTime.toISOString());
 
         // Check if a story already exists for this location & sport
         let existingStory = await prisma.story.findFirst({
