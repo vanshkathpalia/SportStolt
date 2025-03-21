@@ -96,7 +96,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                 <div className="mt-2 md:mt-4 flex justify-between items-center">
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => setStoryDisplayType("sport")}
+                      onClick={() => setStoryDisplayType("sport")} //hangleStoryType -> setting type and also sending request to backend for sorting according to sport
                       className={`px-3 py-1 text-sm rounded-full ${
                         storyDisplayType === "sport"
                           ? "bg-blue-400 text-white"  
@@ -106,7 +106,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                       Sports
                     </button>
                     <button
-                      onClick={() => setStoryDisplayType("location")}
+                      onClick={() => setStoryDisplayType("location")} //hangleStoryType -> setting type and also sending request to backend for sorting according to location
                       className={`px-3 py-1 text-sm rounded-full ${
                         storyDisplayType === "location" ? "bg-blue-400 text-white" : "bg-muted text-muted-foreground"
                       }`}
@@ -138,7 +138,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                     <div className="flex space-x-2">
                       <button
                         onClick={() => {
-                          setPostSortType("following")
+                          setPostSortType("following") //hanglePostType -> setting type and also sending request to backend for sorting according to following 
                           // setSelectedSportFilter(null)
                         }}
                         className={`px-3 py-1 text-sm rounded-full ${
@@ -150,7 +150,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                         Following
                       </button>
                       <button
-                        onClick={() => setPostSortType("sport")}
+                        onClick={() => setPostSortType("sport")} //hanglePostType -> setting type and also sending request to backend for sorting according to sport - or this should be handled on frontend only 
                         className={`px-3 py-1 text-sm rounded-full ${
                           postSortType === "sport" ? "bg-blue-400 text-white" : "bg-muted text-muted-foreground"
                         }`}
