@@ -1,83 +1,96 @@
-import { useCallback, useEffect, useState } from 'react';
-import { ChevronUp, ChevronLeft, ChevronRight, X} from 'lucide-react';
-import { StoryType } from './types';
-// import { BACKEND_URL } from '../../config';
-// import axios from 'axios';
+
+"use client"
+
+import type React from "react"
+
+import { useCallback, useEffect, useState } from "react"
+import { ChevronUp, ChevronLeft, ChevronRight, X, Users, Clock, MapPin } from "lucide-react"
+import type { StoryType } from "./types"
+import { BACKEND_URL } from "../../config"
 
 interface StoryViewProps {
-  story: StoryType;
-  onClose: () => void;
+  story: StoryType
+  onClose: () => void
 }
 
 export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [showDetails, setShowDetails] = useState(false);
-  const [willAttend, setWillAttend] = useState(false);
-  // const [showVerification, setShowVerification] = useState(story.isViewed);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const [showDetails, setShowDetails] = useState(false)
+  const [willAttend, setWillAttend] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
-  const images = story.Storyimages ? story.Storyimages : (story.Storyimages ? [story.Storyimages] : [{ url: story.locationImage, UserId: story.author.UserId || '0' }]);
+  const images = story.Storyimages
+    ? story.Storyimages
+    : story.Storyimages
+      ? [story.Storyimages]
+      : [{ url: story.locationImage, userId: story.author.userId || "0" }]
 
   const handleNext = useCallback(() => {
     if (currentImageIndex < images.length - 1) {
-      setCurrentImageIndex(prev => prev + 1);
+      setCurrentImageIndex((prev) => prev + 1)
     }
-  }, [currentImageIndex, images.length]);
+  }, [currentImageIndex, images.length])
 
   const handlePrevious = useCallback(() => {
     if (currentImageIndex > 0) {
-      setCurrentImageIndex(prev => prev - 1);
+      setCurrentImageIndex((prev) => prev - 1)
     }
-  }, [currentImageIndex]);
+  }, [currentImageIndex])
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === 'ArrowRight') {
-        handleNext();
-      } else if (event.key === 'ArrowLeft') {
-        handlePrevious();
-      } else if (event.key === 'Escape') {
-        onClose();
+      if (event.key === "ArrowRight") {
+        handleNext()
+      } else if (event.key === "ArrowLeft") {
+        handlePrevious()
+      } else if (event.key === "Escape") {
+        onClose()
       }
-    };
-
-    window.addEventListener('keydown', handleKeyPress);
-    return () => window.removeEventListener('keydown', handleKeyPress);
-  }, [currentImageIndex, handleNext, handlePrevious, onClose]);
-
-  // Handle verification (tick or cross)
-  // const handleVerification = async (isVerified: boolean) => {
-  //   try {
-  //     // Send verification to backend
-  //     await fetch('/api/v1/story/verify', {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({ storyId: story.id, imageId: images[currentImageIndex].UserId, verified: isVerified }),
-  //     });
-
-  //     // Hide verification UI after submission
-  //     setShowVerification(false);
-  //     setShowDetails(true); // Allow swipe up after verification
-  //   } catch (error) {
-  //     console.error('Error verifying story:', error);
-  //   }
-  // };
-
-  // Handle "Will You Go?" Response
-  const handleWillGo = async () => {
-    try {
-      await fetch('/api/v1/story/will-go', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ storyId: story.id, userId: story.author.UserId }),
-      });
-
-      setWillAttend(true);
-    } catch (error) {
-      console.error('Error saving attendance:', error);
     }
-  };
+
+    window.addEventListener("keydown", handleKeyPress)
+    return () => window.removeEventListener("keydown", handleKeyPress)
+  }, [currentImageIndex, handleNext, handlePrevious, onClose])
+
+  const handleWillGo = async (selectedImageId: number) => {
+    try {
+      setError(null)
+
+      // Get the token from localStorage
+      const token = localStorage.getItem("token")
+
+      if (!token) {
+        setError("You need to be logged in to attend this event")
+        return
+      }
+
+      // Fix the URL (remove double slash)
+      const response = await fetch(`${BACKEND_URL}/api/v1/story/will-go`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`, // Add the authorization header
+        },
+        body: JSON.stringify({
+          storyImageId: selectedImageId, // Use exact key "storyImageId"
+          userId: Number(story.author.userId),
+          storyId: story.id, // Include storyId if available
+        }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.message || "Failed to register attendance")
+      }
+
+      const data = await response.json()
+      console.log("Response:", data)
+      setWillAttend(true)
+    } catch (error) {
+      console.error("Error saving attendance:", error)
+      setError(error instanceof Error ? error.message : "Failed to register attendance")
+    }
+  }
 
   return (
     <div className="fixed inset-0 z-50 bg-black">
@@ -85,10 +98,10 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
         {/* Main Story Image */}
         {Array.isArray(images) && (
           <img
-            src={images[Math.max(0, Math.min(currentImageIndex, images.length - 1))].url}
+            src={images[Math.max(0, Math.min(currentImageIndex, images.length - 1))].url || "/placeholder.svg"}
             alt={`${story.sport} at ${story.location}`}
             className={`w-full h-full object-contain transition-all duration-300 ${
-              showDetails ? 'blur-sm brightness-50' : ''
+              showDetails ? "blur-sm brightness-50" : ""
             }`}
           />
         )}
@@ -107,7 +120,7 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
             <div
               key={index}
               className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                index === currentImageIndex ? 'bg-white' : 'bg-white/30'
+                index === currentImageIndex ? "bg-white" : "bg-white/30"
               }`}
             />
           ))}
@@ -119,7 +132,7 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
             <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden">
               {story.author.image ? (
                 <img
-                  src={story.author.image}
+                  src={story.author.image || "/placeholder.svg"}
                   alt={story.author.name}
                   className="w-full h-full object-cover"
                 />
@@ -152,31 +165,7 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
           </button>
         )}
 
-
-        {/* what this to appear in case we got the notification, if we visited */}
-        {/* Verification UI */}
-        {/* {!showVerification && (
-          <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 bg-black/70 p-4 rounded-md text-white flex flex-col items-center z-50">
-          <p className="mb-2 text-lg">Was this information correct?</p>
-          <div className="flex gap-4">
-            <button
-              onClick={() => handleVerification(true)}
-              className="flex items-center gap-2 bg-green-500 px-4 py-2 rounded-md text-white"
-            >
-              <CheckCircle className="w-6 h-6" /> Yes
-            </button>
-            <button
-              onClick={() => handleVerification(false)}
-              className="flex items-center gap-2 bg-red-500 px-4 py-2 rounded-md text-white"
-            >
-              <XCircle className="w-6 h-6" /> No
-            </button>
-          </div>
-        </div>
-        )} */}
-
-        {/* Swipe Up Button (Only if verification is done) */}
-        {/*  */}
+        {/* Swipe Up Button */}
         {story.swipeUpEnabled && !showDetails && (
           <div className="absolute bottom-8 w-full flex justify-center">
             <button
@@ -191,34 +180,54 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
 
         {/* Details Modal */}
         {showDetails && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="bg-black/70 p-6 rounded-lg max-w-lg w-full mx-4">
-              <h2 className="text-white text-2xl font-bold mb-4">{story.sport} at {story.stadium}</h2>
-              <p className="text-white/90 mb-4">{story.description}</p>
-              <div className="text-white/80 text-sm">
-                <p><strong>Location:</strong> {story.location}</p>
-                <p><strong>Activity Started At:</strong> {new Date(story.activityStarted).toLocaleString()}</p>
-                <p><strong>Activity Will End At:</strong> {new Date(story.activityEnded).toLocaleString()}</p>
-                <p><strong>Expires At:</strong> {new Date(story.endTime).toLocaleString()}</p>
-                <p><strong>Posted:</strong> {new Date(story.createdAt).toLocaleDateString()}</p>
-              </div>
+          <div className="absolute bottom-0 left-0 right-0 bg-black/80 p-4 rounded-t-xl backdrop-blur-sm">
+            <div
+              className="w-12 h-1 bg-white/30 rounded-full mx-auto mb-4 cursor-pointer"
+              onClick={() => setShowDetails(false)}
+            ></div>
 
-              {/* Will You Go Button */}
-              {!willAttend ? (
-                <button onClick={handleWillGo} className="mt-6 bg-blue-500 px-4 py-2 rounded-md">
+            <h3 className="text-white text-lg font-bold mb-2">{story.sport}</h3>
+            <p className="text-white/80 text-sm mb-4">{story.description}</p>
+
+            <div className="space-y-3">
+              <div className="flex items-center text-white/90">
+                <MapPin className="h-4 w-4 mr-2" />
+                <span>{story.location}</span>
+              </div>
+              <div className="flex items-center text-white/90">
+                <Clock className="h-4 w-4 mr-2" />
+                <span>{/* {story.activityStarted} - {story.activityEnded} */}</span>
+              </div>
+              <div className="flex items-center text-white/90">
+                <Users className="h-4 w-4 mr-2" />
+                {/* <span>{story.participants} participants</span> */}
+              </div>
+            </div>
+
+            {/* Error message */}
+            {error && <div className="mt-4 text-red-400 text-sm">{error}</div>}
+
+            {/* Will You Go Button */}
+            {!willAttend ? (
+              Array.isArray(story.Storyimages) && story.Storyimages.length > 0 ? (
+                <button
+                  onClick={() => handleWillGo(story.Storyimages[currentImageIndex].id)}
+                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+                >
                   Yes, I will go!
                 </button>
-              ) : (
-                <p className="mt-6 text-green-400">You have confirmed attendance!</p>
-              )}
+              ) : null
+            ) : (
+              <p className="mt-6 text-green-400">You have confirmed attendance!</p>
+            )}
 
-              <button onClick={() => setShowDetails(false)} className="mt-4 pl-4 text-white/90 hover:text-white">
-                Close Details
-              </button>
-            </div>
+            <button onClick={() => setShowDetails(false)} className="mt-4 pl-4 text-white/90 hover:text-white">
+              Close Details
+            </button>
           </div>
         )}
       </div>
     </div>
-  );
-};
+  )
+}
+

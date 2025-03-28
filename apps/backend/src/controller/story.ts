@@ -4,6 +4,7 @@ import { withAccelerate } from '@prisma/extension-accelerate'
 import { verify } from 'hono/jwt'
 import { number, string, z } from "zod"
 import axios from 'axios';
+import { addHours } from 'date-fns';
 
 export const storyRouter = new Hono<{
     Bindings: {
@@ -59,7 +60,7 @@ storyRouter.use('/*', async (c, next) => {
         return c.text('');
     }
 
-    const authHeader = c.req.header("authorization") || "";
+    const authHeader = c.req.header("authorization")?.replace("Bearer ", "") || "";
     const user = await verify(authHeader, c.env.JWT_SECRET);
     if (user && typeof user.id === "number") {
         c.set("userId", user.id);
@@ -153,7 +154,7 @@ storyRouter.post('/', async (c) => {
             data: {
                 url: body.image,
                 storyImageId: existingStory.id,
-                UserId: userId,
+                userId: userId,
                 authenticityChecked: false
             }
         });
@@ -173,149 +174,266 @@ storyRouter.post('/', async (c) => {
 
 
 // Verify story content
-storyRouter.post('/verify', async (c) => {
-    const body = await c.req.json();
-    const { success } = verifyStoryInput.safeParse(body);
-    if (!success) {
-        c.status(411);
-        return c.json({
-            message: "Invalid input"
-        });
-    }
+// storyRouter.post('/verify', async (c) => {
+//     const body = await c.req.json();
+//     const { success } = verifyStoryInput.safeParse(body);
+//     if (!success) {
+//         c.status(411);
+//         return c.json({
+//             message: "Invalid input"
+//         });
+//     }
 
-    const prisma = new PrismaClient({
-        datasourceUrl: c.env.DATABASE_URL,
-    }).$extends(withAccelerate());
+//     const prisma = new PrismaClient({
+//         datasourceUrl: c.env.DATABASE_URL,
+//     }).$extends(withAccelerate());
 
-    try {
-        const userId = c.get('userId');
-        const { storyId, imageId, verified } = body;
+//     try {
+//         const userId = c.get('userId');
+//         const { storyId, imageId, verified } = body;
 
-        const existingVerification = await prisma.verification.findFirst({
-            where: {
-                verificationId: storyId,
-                userId: userId
-            }
-        });
+//         const existingVerification = await prisma.verification.findFirst({
+//             where: {
+//                 verificationId: storyId,
+//                 userId: userId
+//             }
+//         });
 
-        if (existingVerification) {
-            return c.json({ message: "You have already verified this story." });
-        }
+//         if (existingVerification) {
+//             return c.json({ message: "You have already verified this story." });
+//         }
 
-        // Create a verification record
-        await prisma.verification.create({
-            data: {
-                verificationId: storyId,
-                userId: userId,
-                verified: verified
-            }
-        });
+//         // Create a verification record
+//         await prisma.verification.create({
+//             data: {
+//                 verificationId: storyId,
+//                 userId: userId,
+//                 verified: verified
+//             }
+//         });
 
-        // Update the story image verification
-        const storyImage = await prisma.storyimages.update({
-            where: { id: imageId },
-            data: {
-                authenticityChecked: true,
-                verifiedBy: {
-                    push: userId
-                }
-            }
-        });
+//         // Update the story image verification
+//         const storyImage = await prisma.storyimages.update({
+//             where: { id: imageId },
+//             data: {
+//                 authenticityChecked: true,
+//                 verifiedBy: {
+//                     push: userId
+//                 }
+//             }
+//         });
 
-        // Fetch the updated story verification count
-        const story = await prisma.story.update({
-            where: { id: storyId },
-            data: {
-                verificationCount: { increment: verified ? 1 : 0 }
-            }
-        });
+//         // Fetch the updated story verification count
+//         const story = await prisma.story.update({
+//             where: { id: storyId },
+//             data: {
+//                 verificationCount: { increment: verified ? 1 : 0 }
+//             }
+//         });
 
-        // If a certain number of verifications is reached, mark the story as verified
-        if (story.verificationCount >= 3) {
-            await prisma.story.update({
-                where: { id: storyId },
-                data: {
-                    authenticityStatus: "verified",
-                    rewardStatus: "eligible"
-                }
-            });
+//         // If a certain number of verifications is reached, mark the story as verified
+//         if (story.verificationCount >= 3) {
+//             await prisma.story.update({
+//                 where: { id: storyId },
+//                 data: {
+//                     authenticityStatus: "verified",
+//                     rewardStatus: "eligible"
+//                 }
+//             });
 
-            // Give **points** to the author of the story
-            await prisma.user.update({
-                where: { id: story.authorId },
-                data: {
-                    points: { increment: 20 } // Reward points for getting a story verified
-                }
-            });
-        }
+//             // Give **points** to the author of the story
+//             await prisma.user.update({
+//                 where: { id: story.authorId },
+//                 data: {
+//                     points: { increment: 20 } // Reward points for getting a story verified
+//                 }
+//             });
+//         }
 
-        // Give **points** to the user for verifying
-        // await prisma.user.update({
-        //     where: { id: userId },
-        //     data: {
-        //         points: { increment: 5 } // Reward points for verifying
-        //     }
-        // });
+//         // Give **points** to the user for verifying
+//         // await prisma.user.update({
+//         //     where: { id: userId },
+//         //     data: {
+//         //         points: { increment: 5 } // Reward points for verifying
+//         //     }
+//         // });
 
-        // Update story verification count and status
-        // const story = await prisma.story.update({
-        //     where: { id: storyId },
-        //     data: {
-        //         verificationCount: {
-        //             increment: verified ? 1 : 0
-        //         },
-        //         authenticityStatus: verified ? "verified" : "not_verified",
-        //         rewardStatus: verified ? "eligible" : "pending"
-        //     }
-        // });
+//         // Update story verification count and status
+//         // const story = await prisma.story.update({
+//         //     where: { id: storyId },
+//         //     data: {
+//         //         verificationCount: {
+//         //             increment: verified ? 1 : 0
+//         //         },
+//         //         authenticityStatus: verified ? "verified" : "not_verified",
+//         //         rewardStatus: verified ? "eligible" : "pending"
+//         //     }
+//         // });
 
-        return c.json({
-            message: "Story verification updated",
-            story,
-            storyImage
-        });
-    } catch (e) {
-        console.error(e);
-        c.status(411);
-        return c.json({
-            message: "Error while verifying story"
-        });
-    }
-});
+//         return c.json({
+//             message: "Story verification updated",
+//             story,
+//             storyImage
+//         });
+//     } catch (e) {
+//         console.error(e);
+//         c.status(411);
+//         return c.json({
+//             message: "Error while verifying story"
+//         });
+//     }
+// });
+
+// storyRouter.post('/verify', async (c) => {
+//     const body = await c.req.json();
+//     const parseResult = verifyStoryInput.safeParse(body);
+//     if (!parseResult.success) {
+//       c.status(400);
+//       return c.json({ 
+//         message: "Invalid input", 
+//         errors: parseResult.error.errors.map(err => ({
+//           path: err.path.join('.'),
+//           message: err.message
+//         }))
+//       });
+//     }
+  
+//     const { storyId, imageId, verified } = body;
+//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+    
+//     try {
+//       const userId = c.get('userId');
+//       // Check if the user has already verified this story
+//       const existingVerification = await prisma.verification.findFirst({
+//         where: {
+//           verificationId: storyId,
+//           userId: userId,
+//         },
+//       });
+  
+//       if (existingVerification) {
+//         return c.json({ message: "You have already verified this story." });
+//       }
+  
+//       // Create a verification record
+//       await prisma.verification.create({
+//         data: {
+//           verificationId: storyId,
+//           userId: userId,
+//           verified: verified,
+//         },
+//       });
+  
+//       // Update the story image verification:
+//       // (Assuming your Storyimages model has fields "verficationCount" (or "verificationCount"),
+//       // "totalReviews", and "verifiedBy" as an integer array.)
+//       const updatedStoryImage = await prisma.storyimages.update({
+//         where: { id: imageId },
+//         data: {
+//           authenticityChecked: true,
+//           verifiedBy: verified ? { push: userId } : undefined,
+//           verificationCount: { increment: verified ? 1 : 0 },
+//           totalReviews: { increment: 1 },
+//         },
+//       });
+  
+//       // If a threshold is reached (e.g., 3 positive verifications), update the story status
+//       if (updatedStoryImage.verificationCount >= 3) {
+//         // Update story authenticity and reward status
+//         await prisma.story.update({
+//           where: { id: storyId },
+//           data: {
+//             authenticityStatus: "verified",
+//             rewardStatus: "eligible",
+//           },
+//         });
+  
+//         // Reward the story poster (for example, increment points by 20)
+//         const storyData = await prisma.story.findUnique({
+//           where: { id: storyId },
+//           select: { authorId: true },
+//         });
+//         if (storyData) {
+//           await prisma.user.update({
+//             where: { id: storyData.authorId },
+//             data: { points: { increment: 20 } },
+//           });
+//         }
+//       }
+  
+//       return c.json({ message: "Story verification updated" });
+//     } catch (error) {
+//       console.error("Error during verification:", error);
+//       c.status(500);
+//       return c.json({ message: "Error while verifying story" });
+//     }
+//   });
 
 
 storyRouter.get('/bulk', async (c) => {
     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
 
     try {
+        // Get current UTC time
+        const utcNow = new Date();
+
+        // Fetch non-expired stories sorted by sport & location
         const stories = await prisma.story.findMany({
-            where: { endTime: { gte: new Date() } }, // Fetch only non-expired stories
+            where: {
+                endTime: { gte: utcNow } // Fetch only upcoming events
+            },
             select: {
                 id: true,
                 location: true,
                 sport: true,
-                locationImage: true, // Include location image in response
+                locationImage: true,
                 createdAt: true,
-                activityStarted: true,  
+                activityStarted: true,
                 activityEnded: true,
                 endTime: true,
                 description: true,
                 stadium: true,
                 swipeUpEnabled: true,
-                Storyimages: { select: { url: true, UserId: true } } as any,
-                author: { select: { name: true, image: true } }
+                Storyimages: { select: { id: true, url: true, userId: true } },
+                author: { select: { id: true, name: true, image: true } }
             },
             orderBy: [{ sport: 'asc' }, { location: 'asc' }] // Group by sport & location
         });
 
         return c.json({ stories });
     } catch (e) {
-        console.error(e);
+        console.error('Error fetching stories:', e);
         c.status(500);
         return c.json({ message: "Error fetching stories" });
     }
 });
 
+
+// storyRouter.get('/bulk', async (c) => {
+//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+//     try {
+//         const nowUTC = new Date(new Date().toISOString());
+
+//         const stories = await prisma.story.findMany({
+//             where: {
+//                 endTime: {
+//                     gte: nowUTC, // Fetch only stories where endTime is greater than or equal to now
+//                 }
+//             },
+//             orderBy: {
+//                 endTime: 'asc' // Optional: Sort stories by expiration time
+//             }
+//         });
+
+//         console.log("Active Stories:", stories);
+
+//         return c.json({ stories});        
+//     } catch (error) {
+//       console.error('Error fetching stories:', error);
+//       return c.json({ error: 'Internal Server Error' }, 500);
+//     }
+//   });
+  
 
 storyRouter.get('/points', async (c) => {
     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
@@ -380,5 +498,114 @@ storyRouter.delete('/', async (c) => {
         console.error("Error deleting story:", e);
         c.status(500);
         return c.json({ message: "Error while deleting story" });
+    }
+});
+
+
+// storyRouter.post('/will-go', async (c) => {
+
+//     const prisma = new PrismaClient({
+//         datasourceUrl: c.env.DATABASE_URL,
+//     }).$extends(withAccelerate());
+
+//     try {
+//         const body = await c.req.json();
+//         const { storyId, userId } = body;
+
+//         if (!storyId || !userId) {
+//             c.status(400);
+//             return c.json({ message: "storyId and userId are required." });
+//         }
+
+//         // Check if the user already marked as attending
+//         const existingAttendance = await prisma.storyAttendance.findFirst({
+//             where: { storyId, userId },
+//         });
+
+//         if (existingAttendance) {
+//             return c.json({ message: "User already marked as attending." });
+//         }
+
+//         // Create new attendance record
+//         const attendance = await prisma.storyAttendance.create({
+//             data: {
+//                 storyId,
+//                 userId,
+//                 attendedAt: new Date(),
+//             },
+//         });
+
+//         return c.json({ message: "Attendance recorded successfully", attendance });
+//     } catch (error) {
+//         console.error("Error saving attendance:", error);
+//         c.status(500);
+//         return c.json({ message: "Internal server error" });
+//     }
+// });
+
+storyRouter.post("/will-go", async (c) => {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate());
+
+    try {
+        const receivedData = await c.req.json();
+        const storyImageId = Number(receivedData.storyImageId);
+        const userId = c.get("userId"); 
+        const storyId = receivedData.storyId ? Number(receivedData.storyId) : null;
+
+        const existingStoryImage = await prisma.storyimages.findUnique({
+        where: { id: storyImageId },
+        });
+
+        if (!existingStoryImage) {
+        throw new Error("Invalid storyImageId: Does not exist in Storyimages table");
+        }
+
+        const existingAttendance = await prisma.storyAttendance.findFirst({
+            where: { storyImageId, userId },
+        });
+      
+        if (existingAttendance) {
+        return c.json({ message: "User already marked as attending." }, 400);
+        }
+
+        await prisma.storyAttendance.create({
+        data: {
+            storyImageId,
+            userId,
+            attendedAt: new Date(),  // Automatically converts to Prisma DateTime
+            storyId,
+        },
+        });
+
+        // Get story end time
+        const storyImage = await prisma.storyimages.findUnique({
+            where: { id: storyImageId },
+            select: { story: { select: { activityEnded: true } } },
+        });
+
+        if (!storyImage) {
+            return c.json({ message: "Story image not found." }, 404);
+        }
+
+        const notificationTime = new Date(storyImage.story.activityEnded);
+
+        // Schedule notification for when the story ends
+        await prisma.notification.create({
+            data: {
+                type: "validation",
+                receiverId: userId,
+                message: "You have gone to this activity. Was the story valid or not?",
+                storyImageId,
+                scheduledAt: notificationTime,
+                seen: false,
+            },
+        });
+
+        return c.json({ message: "Attendance recorded. Notification scheduled." });
+    } catch (error) {
+        console.error("Error marking attendance:", error);
+        return c.json({ message: "Internal server error" }, 500);
     }
 });

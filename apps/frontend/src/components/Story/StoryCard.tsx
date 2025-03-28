@@ -3,6 +3,35 @@ import { StoryView } from './StoryView';
 import { useNavigate } from 'react-router-dom';
 import { BACKEND_URL } from '../../config';
 
+
+export interface StoryType {
+    id: number;
+    locationImage: string;
+    image: string;
+    location: string;
+    description?: string;
+    activityStarted: Date;
+    activityEnded: Date;
+    eventLink?: string;
+    createdAt: string;
+    sport?: string;
+    endTime: any;
+    author: {
+        name: string;
+        image?: string;
+        userId: string;
+    };
+    Storyimages: {
+        id: number;
+        url?: string;
+        userId: string;
+    }[];
+    swipeUpEnabled?: boolean;
+    authenticityStatus?: string;
+    stadium?: string;
+    isViewed?: boolean;
+}
+
 interface StoryCardProps {
     story: {
         id: number;
@@ -18,10 +47,11 @@ interface StoryCardProps {
         author: {
             name: string;
             image?: string;
-            UserId: string;
+            userId: string;
         };
         Storyimages?: {
-            UserId: number;
+            id: number;
+            userId: number;
             url: string;
         }[];
         swipeUpEnabled?: boolean;
@@ -73,8 +103,9 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
     }
 
     const images = Array.isArray(story.Storyimages) ? story.Storyimages.map((image) => ({
+        id: image?.id,
         url: image?.url,
-        UserId: image?.UserId?.toString()
+        userId: image?.userId?.toString()
     })) : [];
 
     if (images.length === 0) {
@@ -121,7 +152,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
                         author: {
                             name: story.author?.name || "Anonymous",
                             image: story.author?.image,
-                            UserId: story.author?.UserId || ""
+                            userId: story.author?.userId || ""
                         }
                     }}
                     onClose={() => setIsViewingStory(false)}
