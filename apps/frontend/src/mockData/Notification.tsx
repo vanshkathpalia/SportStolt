@@ -31,5 +31,17 @@ export const NOTIFICATIONS = [
       postPreview: "/placeholder.svg?height=40&width=40",
       time: "1h ago",
     },
+    {
+      id: 4,
+      type: "story_verification",
+      user: {
+        name: "admin",
+        avatar: "/placeholder.svg?height=40&width=40",
+      },
+      content: "requested verification for a story image",
+      storyImage: "/placeholder.svg?height=40&width=40",
+      time: "30m ago",
+      isVerified: false, // Initial state, can be updated upon verification
+    },
   ]
   

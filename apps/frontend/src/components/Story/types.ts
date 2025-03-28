@@ -13,11 +13,12 @@ export interface StoryType {
     author: {
         name: string;
         image?: string;
-        UserId: string;
+        userId: string;
     };
     Storyimages: {
+        id: number;
         url?: string;
-        UserId: string;
+        userId: string;
     }[];
     swipeUpEnabled?: boolean;
     authenticityStatus?: string;

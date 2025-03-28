@@ -33,10 +33,11 @@ export interface Story {
     author: {
         name: string;
         image?: string;
-        UserId: string;
+        userId: string;
     };
     Storyimages?: {
-        UserId: number;
+        id: number;
+        userId: number;
         url: string;
         // authenticityChecked: boolean;
     }[];

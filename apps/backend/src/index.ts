@@ -1,13 +1,14 @@
 import { Hono } from 'hono'
-import { userRouter } from '../controller/user';
-import { postRouter } from '../controller/post';
-import { storyRouter } from '../controller/story'
-import { searchRouter } from '../controller/search'
+import { userRouter } from './controller/user';
+import { postRouter } from './controller/post';
+import { storyRouter } from './controller/story'
+import { searchRouter } from './controller/search'
 import { cors } from 'hono/cors'
-import { apiPostRouter } from '../controller/apiPost';
-import { eventRouter } from '../controller/event';
+import { apiPostRouter } from './controller/apiPost';
+import { eventRouter } from './controller/event';
 import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from '@prisma/extension-accelerate'
+import { notificationRouter } from './controller/notification';
 
 const app = new Hono<{
   Bindings: {
@@ -23,6 +24,7 @@ app.route("api/v1/story", storyRouter);
 app.route("api/v1/apiPost", apiPostRouter);
 app.route("api/v1/event", eventRouter);
 app.route("api/v1/search", searchRouter);
+app.route("/api/v1/notificaiton", notificationRouter);
 
 // setInterval(async () => {
 //   const prisma = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL });
