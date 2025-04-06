@@ -1,5 +1,5 @@
 name = "backend-me"
-main = "apps/backend/src/index.ts"
+main = "./src/routes/index.ts" 
 compatibility_date = "2024-10-19"
 compatibility_flags = [ "nodejs_compat" ]
 
@@ -26,10 +26,3 @@ JWT_SECRET="mymymysecret"
 # [observability]
 # enabled = true
 # head_sampling_rate = 1
-
-[build]
-command = "npm run build"
-
-[[build.upload.rules]]
-globs = ["**/*.html"]
-type = "Text"
