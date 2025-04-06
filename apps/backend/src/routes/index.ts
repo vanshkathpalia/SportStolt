@@ -1,14 +1,14 @@
 import { Hono } from 'hono'
-import { userRouter } from './controller/user';
-import { postRouter } from './controller/post';
-import { storyRouter } from './controller/story'
-import { searchRouter } from './controller/search'
 import { cors } from 'hono/cors'
-import { apiPostRouter } from './controller/apiPost';
-import { eventRouter } from './controller/event';
+import { apiPostRouter } from '~/controller/apiPost';
+import { eventRouter } from '~/controller/event';
+import { notificationRouter } from '~/controller/notification';
+import { postRouter } from '~/controller/post';
+import { searchRouter } from '~/controller/search';
+import { storyRouter } from '~/controller/story';
+import { userRouter } from '~/controller/user';
 import { PrismaClient } from '@prisma/client/edge'
 import { withAccelerate } from '@prisma/extension-accelerate'
-import { notificationRouter } from './controller/notification';
 
 const app = new Hono<{
   Bindings: {
