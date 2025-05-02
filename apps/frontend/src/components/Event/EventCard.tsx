@@ -9,10 +9,10 @@ interface EventCardProps {
 export const EventCard: React.FC<EventCardProps> = ({ event, onRegister }) => {
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden mb-10">
-      <img src={event.imageUrl} alt={event.title} className="w-full h-48 object-cover" />
+      <img src={event.imageUrl} alt={event.location} className="w-full h-48 object-cover" />
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-semibold">{event.title}</h3>
+          <h3 className="text-xl font-semibold">{event.location}</h3>
           <span className="bg-blue-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
             {new Date(event.publishedDate).toLocaleDateString()}
           </span>
@@ -21,7 +21,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onRegister }) => {
         <div className="space-y-3 mb-6">
           <div className="flex items-center gap-2 text-gray-600">
             <Calendar className="w-8 h-8" />
-            <span>{event.content}</span> {/* Contains start and end info */}
+            <span>{event.timing}</span> {/* Contains start and end info */}
           </div>
           <div className="flex items-center gap-2 text-gray-600">
             <Users className="w-5 h-5" />

@@ -50,8 +50,14 @@ export interface EventInterface {
       avatar: string;
     };
     imageUrl: string;
-    title: string;
-    content: string;
+    location: string;
+    startTime: string;
+    name: string;
+    state: string;
+    country: string;
+    timing: string;
+    stadium: string;
+    city: string;
     likes: number;
     sportTags: string[];
     comments: any[];

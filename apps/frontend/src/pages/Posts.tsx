@@ -182,25 +182,29 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                 {/* </div> */}
 
                 {/* Posts Section */}
-                <div className="mt-2 px-6 pt-6 space-y-4 md:px-4 pb-16 md:pb-8 "> 
-                 {loading
+                <div className="mt-2 px-6 pt-6 space-y-4 md:px-4 pb-16 md:pb-8">
+                  {loading
                     ? // Post loading skeletons
                       Array(3)
                         .fill(0)
-                        .map((_) => (
-                          <PostSkeleton />
-                        ))
+                        .map((_, index) => <PostSkeleton key={index} />)
                     : // Actual posts
-                      posts.map(post => <PostCard
-                          id={post.id}
-                          author={post.author.name || "Anonymous"}
-                          
-                          title={post.title}
-                          content={post.content}
-                          // publishedDate={"date"} 
-                          expanded={false}
-                          />)}
+                      posts.length === 0 ? (
+                        <p className="text-center text-muted-foreground py-10">No posts available right now</p> // Message when no posts are available
+                      ) : (
+                        posts.map((post) => (
+                          <PostCard
+                            key={post.id}
+                            id={post.id}
+                            author={post.author.name || "Anonymous"}
+                            title={post.title}
+                            content={post.content}
+                            expanded={false}
+                          />
+                        ))
+                      )}
                 </div>
+
             
               </div>
               

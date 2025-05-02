@@ -52,121 +52,129 @@ function formatDateToDDMMYYYY(dateString: string): string {
   const year = date.getFullYear();
   return `${day}-${month}-${year}`;
 }
-
+// POST / (create event)
 eventRouter.post('/', async (c) => {
-    try {
-        // Parse the incoming request body
-        const body = await c.req.json();
-        console.log(body);
+  try {
+    const body = await c.req.json();
+    console.log(body);
 
-        // Validate the input using a schema (e.g., Zod)
-        const { success } = createEventInput.safeParse(body); 
-        if (!success) {
-            c.status(411);
-            return c.json({
-                message: "Invalid input"
-            });
-        }
-
-        // Extract userId from the context (authentication layer)
-        const userId = c.get("userId");
-        if (!userId) {
-            c.status(403);
-            return c.json({ message: "User not authenticated" });
-        }
-
-        // Ensure DATABASE_URL is set
-        if (!c.env.DATABASE_URL) {
-            c.status(500);
-            return c.json({ message: "DATABASE_URL is not set" });
-        }
-
-        // Initialize PrismaClient with database URL
-        const prisma = new PrismaClient({
-            datasources: {
-                db: { url: c.env.DATABASE_URL },
-            },
-        });
-
-        // Create the event in the database
-        const event = await prisma.event.create({
-          data: {
-              image: body.image,                      // Image URL
-              city: body.city,                        // City 
-              name: body.name,                        
-              authorId: Number(userId),               // Authenticated user's ID
-              stadium: body.stadium,                  // Stadium name
-              StartDate: new Date(body.StartDate),    // Start date
-              EndDate: new Date(body.EndDate),        // End date
-              StartTime: new Date(body.StartTime),    // Start time
-              OrganisedBy: body.OrganisedBy,          // Organizer name
-              likeCount: 0,                           // Default value
-              country: body.country || "",             // Country, default to empty string if not provided
-              state: body.state || "",                 // State, default to empty string if not provided
-          },
-      });
-      
-
-        // Return the created event ID in the response
-        return c.json({
-            id: event.id,
-        });
-    } catch (error) {
-        console.error("Unhandled error:", error);
-        c.status(500);
-        return c.json({ message: "Internal server error" });
+    const { success } = createEventInput.safeParse(body);
+    if (!success) {
+      c.status(411);
+      return c.json({ message: "Invalid input" });
     }
+
+    const userId = c.get("userId");
+    if (!userId) {
+      c.status(403);
+      return c.json({ message: "User not authenticated" });
+    }
+
+    if (!c.env.DATABASE_URL) {
+      c.status(500);
+      return c.json({ message: "DATABASE_URL is not set" });
+    }
+
+    const prisma = new PrismaClient({
+      datasources: {
+        db: { url: c.env.DATABASE_URL },
+      },
+    });
+
+    const event = await prisma.event.create({
+      data: {
+        image: body.image,
+        city: body.city,
+        name: body.name,
+        authorId: Number(userId),
+        stadium: body.stadium,
+        StartDate: new Date(body.StartDate),
+        EndDate: new Date(body.EndDate),
+        StartTime: new Date(body.StartTime),
+        OrganisedBy: body.OrganisedBy,
+        likeCount: 0,
+        country: body.country || "",
+        state: body.state || "",
+      },
+    });
+
+    return c.json({ id: event.id });
+  } catch (error) {
+    console.error("Unhandled error:", error);
+    c.status(500);
+    return c.json({ message: "Internal server error" });
+  }
 });
 
-  eventRouter.get('/bulk', async (c) => {
-    try {
-      if (!c.env.DATABASE_URL) {
-        return c.json({ message: "DATABASE_URL is not set" }, 500);
-      }
-  
-      const prisma = new PrismaClient({
-        datasources: {
-          db: { url: c.env.DATABASE_URL },
-        },
+
+// GET /bulk (fetch events)
+eventRouter.get('/bulk', async (c) => {
+  try {
+    if (!c.env.DATABASE_URL) {
+      return c.json({ message: "DATABASE_URL is not set" }, 500);
+    }
+
+    const prisma = new PrismaClient({
+      datasources: {
+        db: { url: c.env.DATABASE_URL },
+      },
+    });
+
+    const events = await prisma.event.findMany({
+      select: {
+        id: true,
+        image: true,
+        name: true,
+        country: true,
+        state: true,
+        city: true,
+        authorId: true,
+        stadium: true,
+        StartDate: true,
+        EndDate: true,
+        StartTime: true,
+        OrganisedBy: true,
+      },
+    });
+
+    const transformedEvents = events.map((event) => {
+      const startDate = new Date(event.StartDate).toLocaleDateString('en-GB');
+      const endDate = new Date(event.EndDate).toLocaleDateString('en-GB');
+      const startTime = new Date(event.StartTime).toLocaleTimeString('en-GB', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true,
       });
-  
-      const events = await prisma.event.findMany({
-        select: {
-          id: true,
-          image: true,
-          city: true,
-          authorId: true,
-          stadium: true,
-          StartDate: true,
-          EndDate: true,
-          StartTime: true,
-          OrganisedBy: true,
-        },
-      });
-  
-      const transformedEvents = events.map((event) => ({
+
+      return {
         id: event.id,
         author: {
           name: event.OrganisedBy || "Unknown Organizer",
           avatar: "https://via.placeholder.com/50",
         },
         imageUrl: event.image,
-        title: `${event.city} - ${event.stadium}`,
-        content: `Starts: ${new Date(event.StartDate).toLocaleDateString('en-GB')} at ${new Date(event.StartTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}, Ends: ${new Date(event.EndDate).toLocaleDateString('en-GB')}`,
-
+        name: event.name,
+        state: event.state,
+        country: event.country,
+        city: event.city,
+        location: `${event.city} - ${event.stadium}`,
+        startTime: `Starts: ${startDate} at ${startTime}`,
+        stadium: event.stadium,
+        timing: `Starts: ${startDate} at ${startTime}, Ends: ${endDate}`,
         likes: Math.floor(Math.random() * 100),
         sportTags: ["Live Event", event.city],
         comments: [],
         publishedDate: new Date().toISOString(),
-      }));
-      
-  
-      return c.json(transformedEvents);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-      return c.json({ message: "Failed to fetch events" }, 500);
-    }
-  });
+      };
+    });
+
+    return c.json(transformedEvents);
+  } catch (error) {
+    console.error("Error fetching events:", error);
+    return c.json({ message: "Failed to fetch events" }, 500);
+  }
+});
+
 
   eventRouter.delete('/:id', async (c) => {
     try {
