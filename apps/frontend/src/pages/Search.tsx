@@ -1,36 +1,67 @@
 import { useState, useEffect } from 'react';
 import { SearchGrid } from '../components/Search/SearchGrid';
+import { MobileNav } from '../components/StickyBars/MobileNav';
+import { Sidebar } from '../components/StickyBars/Sidebar';
+import axios from 'axios';
 
 
 export const Search = ({openCreateModal}: {openCreateModal: () => void}) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [posts, setPosts] = useState<string[]>([]);
+
 
   useEffect(() => {
-    // Simulate loading delay
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
-
-    return () => clearTimeout(timer);
+    const fetchImages = async () => {
+      try {
+        const response = await axios.get('/api/v1/search/images');
+        console.log('Fetched images:', response.data.images); // Debugging
+        setPosts(response.data.images);
+      } catch (error) {
+        console.error('Error fetching images:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+  
+    fetchImages();
   }, []);
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+
   return (
-    <div>
+      <div className="min-h-screen bg-background">
+          {isMobile && <MobileNav openCreateModal={openCreateModal} />}
 
-      <form className ="max-w-md mx-auto p-8">   
-          <label htmlFor="default-search" className="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
-          <div className="relative">
-              <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
-                  <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
-                  </svg>
-              </div>
-              <input type="search" id="default-search" className="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Search..." required />
-              <button type="submit" className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+          <div className="flex">
+            <div className="hidden md:block w-16 xl:w-52 fixed h-screen">
+              <Sidebar openCreateModal={openCreateModal} />
+            </div>
           </div>
-      </form>
 
-      <SearchGrid isLoading={isLoading} openCreateModal={openCreateModal}/>
+        <main className="flex-1 md:ml-16 xl:ml-56">
+
+          {isLoading ? (
+            <div className="max-w-screen-xl mx-auto px-4">
+              <div className="max-w-md mx-auto p-8">
+                  <div className="relative">
+                    <div className="block w-full p-4 ps-10 bg-gray-300 rounded-lg h-14"></div> {/* Input field placeholder */}
+                  </div>
+              </div>
+              <div className="grid grid-cols-3 gap-4 max-w-7xl p-3 m-2 sm:col-span-8 md:col-span-6">
+              {[...Array(9)].map((_, i) => (
+                <div key={i} className="aspect-square bg-gray-200 animate-pulse" />
+              ))}
+              </div>
+            </div>
+            ) : (
+
+              <SearchGrid posts={posts}/>
+
+          )}
+
+      
+        </main>
+      
     </div>
   );
 };
