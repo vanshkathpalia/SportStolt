@@ -1,86 +1,182 @@
-import { useState } from 'react';
-import { EventCard } from '../components/Event/EventCard';
-import { Search, Plus } from 'lucide-react';
-import { useEvents } from '../hooks';
-import { Sidebar } from '../components/StickyBars/Sidebar';
+"use client"
 
-export const EventsPage = ({openCreateModal}: {openCreateModal: () => void}) => {
-  const [searchQuery, setSearchQuery] = useState('');
+import { useState } from "react";
+import { Search, Plus } from "lucide-react";
+import { useEvents } from "../hooks";
+import { Sidebar } from "../components/StickyBars/Sidebar";
+import { EventCard } from "../components/Event/EventCard";
+import { MobileNav } from "../components/StickyBars/MobileNav";
+
+export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void }) => {
+  const [searchQuery, setSearchQuery] = useState("");
   const { loading, events } = useEvents();
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <div className="grid grid-cols-1 md:grid-cols-5">
-          <div className="pt-6 px-4 col-span-1">
-            <Sidebar openCreateModal={openCreateModal}/>
-          </div>
-          <div className="col-span-1 md:col-span-4 p-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse" />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const filteredEvents = events.filter(event =>
+    event.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="grid grid-cols-1 md:grid-cols-6">
-        <div className="pt-6 px-4 col-span-1">
-          <Sidebar openCreateModal={openCreateModal}/>
+    <div className="min-h-screen bg-background">
+      {isMobile && <MobileNav openCreateModal={openCreateModal} />}
+
+      <div className="flex">
+        <div className="hidden md:block w-16 xl:w-52 fixed h-screen">
+          <Sidebar openCreateModal={openCreateModal} />
         </div>
-        
-        <div className="col-span-1 md:col-span-4">
-          <div className="space-y-6 p-4 sm:p-6 lg:p-8">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <h1 className="text-2xl font-bold text-gray-900">Upcoming Events</h1>
-              <button 
-                onClick={() => {window.location.href = '/addevent'}}
-                className="flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+
+        {/* Main Content */}
+        <main className="flex-1 md:ml-16 xl:ml-56">
+          <div className="max-w-screen-lg mx-auto px-4 py-6">
+          
+            <div className="flex justify-between items-center mb-4">
+  
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">Upcoming Events</h1>
+
+              {/* Create Button */}
+              <button
+                onClick={openCreateModal}
+                className="hidden md:flex items-center gap-1 px-3 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
               >
-                <Plus className="w-5 h-5" />
-                <span>Create Event</span>
+                <Plus size={16} />
+                Create Event
               </button>
             </div>
-    
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                placeholder="Search events by name or location..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
-              />
-            </div>
-  
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {events.map((event, index) => (
-                <EventCard
-                  key={index}
-                  event={event}
-                  onRegister={() => alert('Registration functionality coming soon!')}
+
+            {/* Loading Skeletons */}
+            {/* Search Bar */}
+            <div className="relative w-full mb-8">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="text"
+                  placeholder="Search events..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
-              ))}
             </div>
 
-            {events.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-gray-500 text-lg">No events found</p>
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[...Array(6)].map((_, i) => (
+                  <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse" />
+                ))}
+              </div>
+            ) : filteredEvents.length === 0 ? (
+              <div className="text-center text-gray-500 text-lg mt-8">
+                No events currently.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredEvents.map(event => (
+                  <EventCard 
+                    key={event.id} 
+                    event={event} 
+                    onRegister={() => alert('Registration functionality coming soon!')} 
+                  />
+                ))}
               </div>
             )}
+
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
 };
+
+// import { useState } from 'react';
+// import { EventCard } from '../components/Event/EventCard';
+// import { Search, Plus } from 'lucide-react';
+// import { useEvents } from '../hooks';
+// import { Sidebar } from '../components/StickyBars/Sidebar';
+
+// export const EventsPage = ({openCreateModal}: {openCreateModal: () => void}) => {
+//   const [searchQuery, setSearchQuery] = useState('');
+//   const { loading, events } = useEvents();
+
+//   if (loading) {
+//     return (
+//       <div className="min-h-screen bg-gray-50">
+//         <div className="grid grid-cols-1 md:grid-cols-5">
+//           <div className="pt-6 px-4 col-span-1">
+//             <Sidebar openCreateModal={openCreateModal}/>
+//           </div>
+//           <div className="col-span-1 md:col-span-4 p-4">
+//             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+//               {[...Array(6)].map((_, i) => (
+//                 <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse" />
+//               ))}
+//             </div>
+//           </div>
+//         </div>
+//       </div>
+//     );
+//   }
+
+//   return (
+
+//     // <div className="min-h-screen bg-background">
+//     //   {isMobile && <MobileNav openCreateModal={openCreateModal} />}
+
+//     //   <div className="flex">
+//     //     <div className="hidden md:block w-16 xl:w-52 fixed h-screen">
+//     //       <Sidebar openCreateModal={openCreateModal} />
+//     //     </div>
+//     <div className="min-h-screen bg-gray-50">
+//       <div className="grid grid-cols-1 md:grid-cols-6">
+//         <div className="pt-6 px-4 col-span-1">
+//           <Sidebar openCreateModal={openCreateModal}/>
+//         </div>
+        
+//         <div className="col-span-1 md:col-span-4">
+//           <div className="space-y-6 p-4 sm:p-6 lg:p-8">
+//             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+//               <h1 className="text-2xl font-bold text-gray-900">Upcoming Events</h1>
+//               <button 
+//                 onClick={() => {window.location.href = '/addevent'}}
+//                 className="flex items-center justify-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+//               >
+//                 <Plus className="w-5 h-5" />
+//                 <span>Create Event</span>
+//               </button>
+//             </div>
+    
+//             <div className="relative">
+//               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+//                 <Search className="h-5 w-5 text-gray-400" />
+//               </div>
+//               <input
+//                 type="text"
+//                 placeholder="Search events by name or location..."
+//                 value={searchQuery}
+//                 onChange={(e) => setSearchQuery(e.target.value)}
+//                 className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-white"
+//               />
+//             </div>
+  
+//             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+//               {events.map((event, index) => (
+//                 <EventCard
+//                   key={index}
+//                   event={event}
+//                   onRegister={() => alert('Registration functionality coming soon!')}
+//                 />
+//               ))}
+//             </div>
+
+//             {events.length === 0 && (
+//               <div className="text-center py-12">
+//                 <p className="text-gray-500 text-lg">No events found</p>
+//               </div>
+//             )}
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// };
 
 
 // // "use client"
