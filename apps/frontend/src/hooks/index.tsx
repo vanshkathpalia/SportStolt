@@ -52,6 +52,9 @@ export interface EventInterface {
     imageUrl: string;
     location: string;
     startTime: string;
+    organisedBy: string;
+    endDate: string;
+    startDate: string;
     name: string;
     state: string;
     country: string;
