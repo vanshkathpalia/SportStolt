@@ -17,27 +17,30 @@ export const EventHomeSidebar = ({ events, onRegister }: EventHomeSidebarProps) 
       
 
       
-      <div className="space-y-4 max-h-[455px]  overflow-auto pr-2 ">
-        {events.map((event) => (
-          <div key={event.id} className="border border-border rounded-lg p-4 hover:border-green-500 transition-colors">
+      {events.length === 0 ? (
+        <p className="border border-border rounded-lg p-4">No events currently</p>
+      ) : (
+      <div className="space-y-4 max-h-[455px] overflow-auto pr-2">
+      {events.map((event) => (
+        <div key={event.id} className="border border-border rounded-lg p-4 hover:border-green-500 transition-colors">
             <h3 className="font-medium mb-2">{event.name}</h3>
             <div className="text-sm text-muted-foreground mb-2 space-y-1">
               <div className="flex items-center">
                 <Calendar className="h-4 w-4 mr-1 text-green-500" />
                 <span>
-                  {event.state} • {event.country}
+                  {event.startTime}
                 </span>
               </div>
               <div className="flex items-center">
                 <MapPin className="h-4 w-4 mr-1 text-green-500" />
-                <span>{event.stadium}</span>
+                <span>{event.location}</span>
               </div>
             </div>
 
             <div className="flex items-center justify-between mt-4">
               <div className="flex items-center">
                 <Users className="h-4 w-4 mr-1 text-green-500" />
-                <span className="text-sm">{event.city} hello organizers...</span>
+                <span className="text-sm">{event.author.name}</span>
               </div>
               <Button
                     onClick={onRegister}
@@ -56,6 +59,7 @@ export const EventHomeSidebar = ({ events, onRegister }: EventHomeSidebarProps) 
           </div> 
         ))}
       </div>
+    )}
       <hr />
     </div>
   )
