@@ -44,19 +44,36 @@ export interface Story {
 }
 
 export interface EventInterface {
-    id: number; // Assuming Prisma is autoincrementing the id
-    "image": string;
-    "name": string;
-    "country": string;
-    "state": string;
-    "city": string;
-    "authorId": number;
-    "stadium": string;
-    "startDate": Date;
-    "endDate": Date;
-    "startTime": Date;
-    "organisedBy": string;
-}
+    id: number;
+    author: {
+      name: string;
+      avatar: string;
+    };
+    imageUrl: string;
+    title: string;
+    content: string;
+    likes: number;
+    sportTags: string[];
+    comments: any[];
+    publishedDate: string;
+  }
+
+  
+// export interface EventInterface {
+//     id: number; // Assuming Prisma is autoincrementing the id
+//     "image": string;
+//     "name": string;
+//     "country": string;
+//     "state": string;
+//     "title": string;
+//     "city": string;
+//     "authorId": number;
+//     "stadium": string;
+//     "startDate": Date;
+//     "endDate": Date;
+//     "startTime": Date;
+//     "organisedBy": string;
+// }
 
 export const usePost = ({ id }: { id: string }) => {
     const [loading, setLoading] = useState(true);

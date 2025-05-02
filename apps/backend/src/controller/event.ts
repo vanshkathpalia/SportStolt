@@ -118,6 +118,99 @@ eventRouter.post('/', async (c) => {
     }
 });
 
+  eventRouter.get('/bulk', async (c) => {
+    try {
+      if (!c.env.DATABASE_URL) {
+        return c.json({ message: "DATABASE_URL is not set" }, 500);
+      }
+  
+      const prisma = new PrismaClient({
+        datasources: {
+          db: { url: c.env.DATABASE_URL },
+        },
+      });
+  
+      const events = await prisma.event.findMany({
+        select: {
+          id: true,
+          image: true,
+          city: true,
+          authorId: true,
+          stadium: true,
+          StartDate: true,
+          EndDate: true,
+          StartTime: true,
+          OrganisedBy: true,
+        },
+      });
+  
+      const transformedEvents = events.map((event) => ({
+        id: event.id,
+        author: {
+          name: event.OrganisedBy || "Unknown Organizer",
+          avatar: "https://via.placeholder.com/50",
+        },
+        imageUrl: event.image,
+        title: `${event.city} - ${event.stadium}`,
+        content: `Starts: ${new Date(event.StartDate).toLocaleDateString('en-GB')} at ${new Date(event.StartTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}, Ends: ${new Date(event.EndDate).toLocaleDateString('en-GB')}`,
+
+        likes: Math.floor(Math.random() * 100),
+        sportTags: ["Live Event", event.city],
+        comments: [],
+        publishedDate: new Date().toISOString(),
+      }));
+      
+  
+      return c.json(transformedEvents);
+    } catch (error) {
+      console.error("Error fetching events:", error);
+      return c.json({ message: "Failed to fetch events" }, 500);
+    }
+  });
+
+  eventRouter.delete('/:id', async (c) => {
+    try {
+      const eventId = Number(c.req.param('id'));
+      const userId = c.get("userId");
+  
+      if (!c.env.DATABASE_URL) {
+        return c.json({ message: "DATABASE_URL is not set" }, 500);
+      }
+  
+      const prisma = new PrismaClient({
+        datasources: {
+          db: { url: c.env.DATABASE_URL },
+        },
+      });
+  
+      // Check if the event exists and belongs to the user
+      const event = await prisma.event.findUnique({
+        where: { id: eventId },
+      });
+  
+      if (!event) {
+        c.status(404);
+        return c.json({ message: "Event not found" });
+      }
+  
+      if (event.authorId !== userId) {
+        c.status(403);
+        return c.json({ message: "You are not authorized to delete this event" });
+      }
+  
+      await prisma.event.delete({
+        where: { id: eventId },
+      });
+  
+      return c.json({ message: "Event deleted successfully" });
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      return c.json({ message: "Failed to delete event" }, 500);
+    }
+  });
+  
+  
+  
 
 // eventRouter.get('/bulk', async (c) => {
 //     try {
@@ -155,53 +248,3 @@ eventRouter.post('/', async (c) => {
 //       return c.json({ message: "Internal server error" }, 500);
 //     }
 //   });
-
-  eventRouter.get('/bulk', async (c) => {
-    try {
-      if (!c.env.DATABASE_URL) {
-        return c.json({ message: "DATABASE_URL is not set" }, 500);
-      }
-  
-      const prisma = new PrismaClient({
-        datasources: {
-          db: { url: c.env.DATABASE_URL },
-        },
-      });
-  
-      const events = await prisma.event.findMany({
-        select: {
-          id: true,
-          image: true,
-          city: true,
-          authorId: true,
-          stadium: true,
-          StartDate: true,
-          EndDate: true,
-          StartTime: true,
-          OrganisedBy: true,
-        },
-      });
-  
-      const transformedEvents = events.map((event) => ({
-        id: event.id,
-        author: {
-          name: event.OrganisedBy || "Unknown Organizer",
-          avatar: "https://via.placeholder.com/50", // Placeholder avatar
-        },
-        imageUrl: event.image,
-        title: `${event.city} - ${event.stadium}`,
-        content: `Starts: ${event.StartDate} at ${event.StartTime}, Ends: ${event.EndDate}`,
-        likes: Math.floor(Math.random() * 100), // Mock likes
-        sportTags: ["Live Event", event.city],
-        comments: [],
-        publishedDate: new Date().toISOString(),
-      }));
-  
-      return c.json(transformedEvents);
-    } catch (error) {
-      console.error("Error fetching events:", error);
-      return c.json({ message: "Failed to fetch events" }, 500);
-    }
-  });
-  
-  

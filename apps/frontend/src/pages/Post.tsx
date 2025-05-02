@@ -80,7 +80,7 @@ export const PostPage = ({ openCreateModal }: PostPageProps) => {
                   <div className="sm:col-span-5 sm:col-start-3 p-6 xl:col-start-2">
                       {post &&  <PostCard
                           id={post.id}
-                        //   authorName={post.author.name || "Anonymous"}
+                          author={post.author.name || "Anonymous"}
                           title={post.title}
                           content={post.content}
                         //   publishedDate={"date"} 

@@ -15,10 +15,10 @@ import { cn } from "../../lib/utils"
 
 export interface Post {
   id: number
-//   author: {
-//     name: string
-//     // avatar: string
-//   }
+  author: {
+    name: string
+    // avatar: string
+  }
 //   imageUrl: string
   title: string
   content: string
@@ -33,12 +33,14 @@ interface PostCardProps {
     title: string;
     content: string;
     id: number;
+    author: string;
     expanded: boolean;
 }
 export const PostCard = ({
     id,
     title,
     content,
+    author,
     expanded
 }: PostCardProps) => {
 //   const [liked, setLiked] = useState(false)
@@ -77,7 +79,7 @@ export const PostCard = ({
             <AvatarImage src={content} alt={title} />
             {/* <AvatarFallback>{authorInitials}</AvatarFallback> */}
           </Avatar>
-          <span className="font-medium text-sm">something</span>
+          <span className="font-medium text-sm">{author}</span>
         </div>
         <Button variant="ghost" size="icon" className="h-8 w-8">
           <MoreHorizontal className="h-5 w-5" />

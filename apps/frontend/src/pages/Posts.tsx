@@ -189,22 +189,12 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                         .fill(0)
                         .map((_) => (
                           <PostSkeleton />
-                          // <div className="bg-card rounded-md p-4 space-y-4 max-w-xl mx-auto">
-                          //   <div className="flex items-center space-x-2">
-                          //     <div className="w-10 h-10 rounded-full bg-muted animate-pulse" />
-                          //     <div className="h-4 bg-muted rounded w-24 animate-pulse" />
-                          //   </div>
-                          //   <div className="w-full aspect-square bg-muted rounded animate-pulse" />
-                          //   <div className="space-y-2">
-                          //     <div className="h-4 bg-muted rounded w-32 animate-pulse" />
-                          //     <div className="h-4 bg-muted rounded w-full animate-pulse" />
-                          //   </div>
-                          // </div>
                         ))
                     : // Actual posts
                       posts.map(post => <PostCard
                           id={post.id}
-                          // authorName={post.author.name || "Anonymous"}
+                          author={post.author.name || "Anonymous"}
+                          
                           title={post.title}
                           content={post.content}
                           // publishedDate={"date"} 
@@ -222,8 +212,6 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                           />
                       
                 </div>
-
-              
 
             </div>
           </div>
