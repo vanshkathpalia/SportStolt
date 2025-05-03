@@ -45,18 +45,26 @@ model Event {
   name        String
   Comment     Comment[]
   author      User      @relation(fields: [authorId], references: [id])
-  Like        Like[]
 }
 
 model Like {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  eventId   Int?
-  postId    Int?
-  userId    Int
-  Event     Event?   @relation(fields: [eventId], references: [id])
-  Post      Post?    @relation(fields: [postId], references: [id])
-  User      User     @relation(fields: [userId], references: [id])
+  id     Int   @id @default(autoincrement())
+  user   User  @relation(fields: [userId], references: [id])
+  userId Int
+  post   Post  @relation(fields: [postId], references: [id])
+  postId Int
+
+  @@unique([userId, postId]) // Prevent double likes
+}
+
+model Save {
+  id     Int   @id @default(autoincrement())
+  user   User  @relation(fields: [userId], references: [id])
+  userId Int
+  post   Post  @relation(fields: [postId], references: [id])
+  postId Int
+
+  @@unique([userId, postId]) // Prevent double saves
 }
 
 model Photo {
@@ -69,18 +77,19 @@ model Photo {
   User      User     @relation(fields: [userId], references: [id])
 }
 
+
 model Post {
-  id            Int            @id @default(autoincrement())
-  content       String
-  title         String
-  published     Boolean        @default(false)
-  likeCount     Int            @default(0)
-  authorId      Int
-  Comment       Comment[]
-  Like          Like[]
-  author        User           @relation(fields: [authorId], references: [id])
-  PostPhoto     PostPhoto[]
+  id       Int      @id @default(autoincrement())
+  title    String
+  content  String
+  authorId Int
+  createdAt DateTime @default(now())
+  author   User     @relation(fields: [authorId], references: [id])
+  likes    Like[]
+  saves    Save[]
   notifications Notification[]
+  Comment       Comment[]
+  PostPhoto     PostPhoto[]
 }
 
 model PostPhoto {
@@ -217,13 +226,13 @@ model Tweet {
 }
 
 model User {
+  id                    Int               @id @default(autoincrement())
   username              String            @unique
   name                  String?
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
   password              String
   points                Int               @default(0)
-  id                    Int               @id @default(autoincrement())
   image                 String?
   badge                 Badge[]
   comment               Comment[]
@@ -240,4 +249,5 @@ model User {
   receivedNotifications Notification[]    @relation("ReceivedNotifications")
   followers             Follow[]          @relation("Followers")
   following             Follow[]          @relation("Following")
+  savedPosts            Save[]
 }
