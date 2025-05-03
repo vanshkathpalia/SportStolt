@@ -56,16 +56,20 @@ postRouter.use('/*', async (c, next) => {
     //         c.json({ message: "An unexpected error occurred" });
     //     }
     // }
-    const user = await verify(authHeader, c.env.JWT_SECRET)
-    if (user && typeof user.id === "number") {
-        c.set("userId", user.id);
-        await next();
-    }
-    else {
-        c.status(403);
-        c.json({
-            message: "you are not logged in"
-        })
+    try {
+        const user = await verify(authHeader, c.env.JWT_SECRET);
+
+        // Adjusted for your expected user ID type
+        if (user && typeof user.id === "number") {
+            c.set("userId", user.id);
+            return await next();
+        } else {
+            console.warn("Token verified but no valid user ID.");
+            return c.json({ message: "Invalid token structure" }, 403);
+        }
+    } catch (err) {
+        console.error("JWT verification failed:", err);
+        return c.json({ message: "Invalid or expired token" }, 403);
     }
 });
 
@@ -114,7 +118,7 @@ postRouter.post('/', async (c) => {
         });
         prisma.$connect()
         .then(() => console.log('Prisma connected'))
-        .catch((error) => console.error('Prisma connection error:', error));
+        .catch((error: unknown) => console.error('Prisma connection error:', error));
 
 
         const post = await prisma.post.create({
@@ -272,3 +276,89 @@ postRouter.delete('/:id', async (c) => {
         return c.json({ message: "Error while deleting post" }, 500);
     }
 });
+
+// POST /api/v1/posts/:id/like
+postRouter.post('/:id/like', async (c) => {
+    const userId = c.get("userId");
+    const postId = Number(c.req.param('id'));
+  
+    const prisma = new PrismaClient({ datasources: { db: { url: c.env.DATABASE_URL } } });
+  
+    const existing = await prisma.like.findUnique({
+      where: { userId_postId: { userId, postId } }
+    });
+  
+    let liked: boolean;
+  
+    if (existing) {
+      await prisma.like.delete({
+        where: { userId_postId: { userId, postId } }
+      });
+      liked = false;
+    } else {
+      await prisma.like.create({
+        data: { userId, postId }
+      });
+      liked = true;
+    }
+  
+    const likeCount = await prisma.like.count({
+      where: { postId }
+    });
+  
+    return c.json({ success: true, liked, likeCount });
+  });
+  
+  
+  
+  
+  // POST /api/posts/:id/save
+postRouter.post('/:id/save', async (c) => {
+    const userId = c.get("userId")
+    const postId = Number(c.req.param('id'))
+  
+    const prisma = new PrismaClient({ datasources: { db: { url: c.env.DATABASE_URL } } })
+  
+    const existing = await prisma.save.findUnique({
+      where: { userId_postId: { userId, postId } }
+    })
+  
+    if (existing) {
+      await prisma.save.delete({ where: { id: existing.id } })
+    } else {
+      await prisma.save.create({ data: { userId, postId } })
+    }
+  
+    return c.json({ success: true })
+  })
+  
+
+  postRouter.get('/:id/status', async (c) => {
+    const userId = c.get("userId");
+    const postId = Number(c.req.param("id"));
+  
+    const prisma = new PrismaClient({
+      datasources: {
+        db: { url: c.env.DATABASE_URL },
+      },
+    });
+  
+    const liked = await prisma.like.findUnique({
+      where: { userId_postId: { userId, postId } },
+    });
+  
+    const saved = await prisma.save.findUnique({
+      where: { userId_postId: { userId, postId } },
+    });
+  
+    const likeCount = await prisma.like.count({
+      where: { postId },
+    });
+  
+    return c.json({
+      liked: !!liked,
+      saved: !!saved,
+      likeCount,
+    });
+  });
+  

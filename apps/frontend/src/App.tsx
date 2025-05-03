@@ -20,6 +20,9 @@ import { useState } from "react"
 import { PostsPage } from "./pages/Posts"
 import { PostPage } from "./pages/Post"
 import { AddEvent } from "./pages/AddEvent"
+import { Logout } from "./pages/Logout"; // adjust path
+
+
 
 
 const queryClient = new QueryClient()
@@ -46,6 +49,7 @@ function App() {
               <Route path="/addevent" element={<AddEvent openCreateModal={() => setCreatePostModalOpen(true)} />} />
               <Route path="/notifications"
                 element={<NotificationsPage openCreateModal={() => setCreatePostModalOpen(true)} />}/>
+              <Route path="/logout" element={<Logout />} />
             </Routes>
 
             {/* Global Create Post Modal */}

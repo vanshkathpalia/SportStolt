@@ -1,11 +1,13 @@
 "use client"
 
-// import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Avatar, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
-import { MessageCircle, Send, MoreHorizontal } from "lucide-react"
+import { MessageCircle, Send, MoreHorizontal, Heart, Bookmark } from "lucide-react"
 import { cn } from "../../lib/utils"
+import axios from "axios"
+import { BACKEND_URL } from '../../config';
 
 // interface Comment {
 //   id: number
@@ -43,12 +45,56 @@ export const PostCard = ({
     author,
     expanded
 }: PostCardProps) => {
-//   const [liked, setLiked] = useState(false)
-//   const [saved, setSaved] = useState(false)
-//   const [showAllComments, setShowAllComments] = useState(expanded)
+  const [liked, setLiked] = useState(false)
+  const [saved, setSaved] = useState(false)
+  const [likeCount, setLikeCount] = useState(0);
+  //   const [showAllComments, setShowAllComments] = useState(expanded)
+
+  const userToken = localStorage.getItem("token") || "";
+
+  useEffect(() => {
+    fetch(`${BACKEND_URL}/api/v1/post/${id}/status`, {
+      headers: { Authorization: `Bearer ${userToken}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        setLiked(data.liked);
+        setSaved(data.saved);
+        setLikeCount(data.likeCount);
+      });
+  }, [id]);
+
   const navigate = useNavigate()
 
-  // Get initials for avatar fallback
+  // const handleLike = async () => {
+  //   setLiked(!liked)
+  //   try {
+  //     await axios.post(`/api/posts/${id}/like`, {}, {
+  //       headers: {
+  //         Authorization: localStorage.getItem("token") || "", // Adjust token source
+  //       }
+  //     })
+  //   } catch (error) {
+  //     console.error("Failed to like:", error)
+  //     setLiked(!liked) // rollback
+  //   }
+  // }
+
+  const handleSave = async () => {
+    setSaved(!saved)
+    try {
+      await axios.post(`/api/post/${id}/save`, {}, {
+        headers: {
+          Authorization: localStorage.getItem("token") || "",
+        }
+      })
+    } catch (error) {
+      console.error("Failed to save:", error)
+      setSaved(!saved) // rollback
+    }
+  }
+
+//   Get initials for avatar fallback
 //   const authorInitials = post.author.name.charAt(0).toUpperCase()
 
 //   const handleLike = () => {
@@ -94,12 +140,40 @@ export const PostCard = ({
 
       {/* Post Actions */}
       <div className="p-3">
+      <div className="font-medium text-sm mb-1">{likeCount} {likeCount === 1 ? "like" : "likes"}</div>
+
         <div className="flex items-center justify-between mb-2">
           <div className="flex items-center space-x-4">
-            {/* <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleLike}>
+          
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={(e) => {
+                e.stopPropagation();
+                fetch(`${BACKEND_URL}/api/v1/post/${id}/like`, {
+                  method: "POST",
+                  headers: { Authorization: `Bearer ${userToken}` },
+
+                })
+                .then(res => res.json())
+                .then(data => {
+                  setLiked(data.liked);
+                  setLikeCount(data.likeCount); // Use backend value
+                })
+                .catch(() => {
+                  setLiked(prev => !prev); // rollback
+                });
+              }}
+            >
               <Heart className={cn("h-6 w-6", liked && "fill-red-500 text-red-500")} />
               <span className="sr-only">Like</span>
-            </Button> */}
+            </Button>
+
+            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleSave}>
+              <Bookmark className={cn("h-6 w-6", saved && "fill-current")} />
+              <span className="sr-only">Save</span>
+            </Button>
             <Button variant="ghost" size="icon" className="h-8 w-8">
               <MessageCircle className="h-6 w-6" />
               <span className="sr-only">Comment</span>

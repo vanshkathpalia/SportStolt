@@ -12,19 +12,41 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
         password: ""
     });
 
+    // async function sendRequest() {
+    //     try {
+    //         const response = await axios.post(`${BACKEND_URL}/api/v1/user/${type === "signup" ? "signup" : "signin"}`, postInputs);
+    //         const jwt = response.data.token;
+    //         if (!jwt) {
+    //             alert("Invalid credentials");
+    //             return;
+    //         }
+    //         localStorage.setItem("token", jwt);
+    //         navigate("/post");
+    //     } catch(e) {
+    //         console.log(e)
+    //         alert(type === "signup" ? "Error while signing up" : "Error while signing in")
+    //         console.log(e)
+    //         // alert the user here that the request failed
+    //     }
+    // }
+
     async function sendRequest() {
         try {
-            const response = await axios.post(`${BACKEND_URL}/api/v1/user/${type === "signup" ? "signup" : "signin"}`, postInputs);
-            const jwt = response.data;
-            localStorage.setItem("token", jwt);
-            navigate("/post");
-        } catch(e) {
-            console.log(e)
-            alert(type === "signup" ? "Error while signing up" : "Error while signing in")
-            console.log(e)
-            // alert the user here that the request failed
+          const response = await axios.post(`${BACKEND_URL}/api/v1/user/${type}`, postInputs);
+          const jwt = response.data.token;
+          if (!jwt) {
+            alert("Authentication failed");
+            return;
+          }
+          localStorage.setItem("token", jwt);
+          navigate("/post");
+        } catch (e: any) {
+          const err = e.response?.data?.error || "Unexpected error";
+          alert(err);
+          console.log(e);
         }
-    }
+      }
+      
     
     return <div className="h-screen flex justify-center flex-col">
         <div className="flex justify-center">
@@ -47,7 +69,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
                             name: e.target.value
                         })
                     }} /> : null}
-                    <LabelledInput label="Username" placeholder="vanshkumar@gmail.com" onChange={(e) => {
+                    <LabelledInput label="Email" placeholder="vanshkumar@gmail.com" onChange={(e) => {
                         setPostInputs({
                             ...postInputs,
                             username: e.target.value
