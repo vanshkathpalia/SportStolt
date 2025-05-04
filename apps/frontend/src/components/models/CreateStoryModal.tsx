@@ -1,7 +1,8 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useEffect } from "react";
+import { useState,  } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
@@ -45,8 +46,9 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
   const [sport, setSport] = useState("")
   const [stadium, setStadium] = useState("")
   const [image, setImage] = useState("")
-  const [eventLink, setEventLink] = useState("")  
+  const [participants, setParticipants] = useState("")  
   const [locationImage, setLocationImage] = useState("")  
+  const [isStartTimeInPast, setIsStartTimeInPast] = useState(false);
   // const [selectedFile, setSelectedFile] = useState<File | null>(null)
   // const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -64,66 +66,68 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
   //   }
   // }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
 
+  useEffect(() => {
+    if (!activityStarted) return;
+
+    const [hours, minutes] = activityStarted.split(":").map(Number);
+
+    const selectedDateTime = new Date();
+    selectedDateTime.setHours(hours, minutes, 0, 0);
+    setIsStartTimeInPast(selectedDateTime.getTime() < Date.now());
+
+  }, [activityStarted]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+  
     try {
-      // Here you would typically send the data to your backend
+      // Log form data to ensure it's correct
       const formData = {
         location,
         image,
         locationImage,
         description,
-        eventLink,
+        participants,
         sport,
         activityStarted,
         activityEnded,
-        stadium
-      }
-
-      console.log('Creating story:', formData)
-
-      try {
-          setIsLoading(true);
-          await axios.post(`${BACKEND_URL}/api/v1/story`, {
-              ...formData,
-              isViewed: false
-          }, {
-              headers: {
-                  Authorization: localStorage.getItem("token")
-              }
-          });
-          navigate(`/post`);
-      } catch (error) {
-          console.error('Error publishing story:', error);
-          // Handle error appropriately
-      } finally {
-          setIsLoading(false);
-      }
-      // await createStory(formData)
-
-      // Reset form
-
-      setImage("")
-      setDescription("")
-      setLocation("")
-      setActivityStarted("")
-      setActivityEnded("")
-      setSport("")
-      setEventLink("")
-      setStadium("")
-      setLocationImage("")
-      // setSelectedFile(null)
-      // setPreviewUrl(null)
-
-      onClose()
+        stadium,
+        isViewed: false,
+      };
+  
+      console.log("Form Data being sent:", formData);
+  
+      // Send data to the backend
+      await axios.post(`${BACKEND_URL}/api/v1/story`, formData, {
+          headers: {
+              Authorization: localStorage.getItem("token")
+          }
+      });
+  
+      // Navigate after successful post
+      navigate("/post");
+      
+      // Reset form data
+      setImage("");
+      setDescription("");
+      setLocation("");
+      setActivityStarted("");
+      setActivityEnded("");
+      setSport("");
+      setParticipants("");
+      setStadium("");
+      setLocationImage("");
+      onClose();
     } catch (error) {
-      console.error('Error creating story:', error)
+      console.error("Error submitting story:", error);
+      // Handle error (e.g., show a message to the user)
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+  
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -184,7 +188,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                     <Camera className="w-4 h-4 inline mr-1" />
-                    Image URL
+                    Story Image URL
                 </label>
                 <input
                   type="text"
@@ -196,7 +200,8 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
               />
           </div>
           
-          {/* Location image Input */}
+          {/* Location image Input, rendered through api, seen the name of locaiton 
+          can be used for maps later... */}
           <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
                 <Camera className="w-4 h-4 inline mr-1" />
@@ -208,7 +213,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
               value={locationImage}
                 onChange={(e) => setLocationImage(e.target.value)}
               className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter image URL"
+              placeholder="Enter location URL"
               />
           </div>
 
@@ -262,14 +267,14 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
               </select>
           </div>
 
-          {/* Location */}
+          {/* Location, for our backend api to pexel */}
           <div className="space-y-2">
             <Label htmlFor="location">Location</Label>
             <div className="relative">
               <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="location"
-                placeholder="Enter location "
+                placeholder="Enter location name"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
                 className="pl-9"
@@ -308,6 +313,9 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                   required
                 />
               </div>
+              {isStartTimeInPast && (
+                <p className="text-xs text-red-500 mt-1">Start time is in the past</p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -332,11 +340,11 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
             <div className="relative">
               <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                id="Eventlink"
+                id="Participants"
                 type="text"
                 placeholder="Enter Event link"
-                value={eventLink}
-                onChange={(e) => setEventLink(e.target.value)}
+                value={participants}
+                onChange={(e) => setParticipants(e.target.value)}
                 className="pl-9"
                 min="1"
                 required
@@ -348,7 +356,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           <Button
             type="submit"
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-            disabled={ /*!isloading */!image || !description || !location || !activityStarted || !activityEnded|| !sport }
+            disabled={ /*!isloading, was for when image was uploaded form device... */!image || !description || !location || !activityStarted || !activityEnded|| !sport }
           >
             {isLoading ? "Creating story..." : "Share Story"}
           </Button>
@@ -361,22 +369,22 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
 
 // import { useState, useRef } from "react";
 // import axios from "axios";
-// import { BACKEND_URL } from "../config";
+// import { BACKEND_URL } from "../../config";
 // import { useNavigate } from "react-router-dom";
-// // import { Sidebar } from "../components/StickyBars/Sidebar";
+// import { Sidebar } from "../../components/StickyBars/Sidebar";
+
 // import { Camera, MapPin, X, Upload, Trophy, Link as LinkIcon, FileText } from 'lucide-react';
-// // import { Appbar } from "../components/StickyBars/Appbar";
-// import { Sidebar } from "../components/StickyBars/Sidebar";
 
 
 
-// export const AddStory = ({openCreateModal}: {openCreateModal: () => void}) => {
+
+// export const CreateStoryModal = ({openCreateModal}: {openCreateModal: () => void}) => {
 //     const [formData, setFormData] = useState({
 //         location: "",
 //         image: "",
 //         locationImage: "",
 //         description: "",
-//         eventLink: "",
+//         participants: "",
 //         sport: "",
 //         activityStarted: "",
 //         activityEnded: "",
@@ -653,8 +661,8 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
 //                             </label>
 //                             <input
 //                                 type="url"
-//                                 name="eventLink"
-//                                 value={formData.eventLink}
+//                                 name="participants"
+//                                 value={formData.participants}
 //                                 onChange={handleInputChange}
 //                                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 //                                 placeholder="https://example.com/event"

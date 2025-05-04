@@ -1,6 +1,6 @@
 -- AlterTable
 ALTER TABLE "Story" ADD COLUMN     "description" TEXT,
-ADD COLUMN "eventLink" TEXT,
+ADD COLUMN "participants" TEXT,
 ADD COLUMN "rewardAmount" DOUBLE PRECISION,
 ADD COLUMN "rewardStatus" TEXT NOT NULL DEFAULT 'pending',
 ADD COLUMN "swipeUpEnabled" BOOLEAN NOT NULL DEFAULT false,

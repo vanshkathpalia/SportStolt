@@ -1,6 +1,7 @@
 "use client"
+// useEffect
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Avatar, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
@@ -52,17 +53,17 @@ export const PostCard = ({
 
   const userToken = localStorage.getItem("token") || "";
 
-  useEffect(() => {
-    fetch(`${BACKEND_URL}/api/v1/post/${id}/status`, {
-      headers: { Authorization: `Bearer ${userToken}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        setLiked(data.liked);
-        setSaved(data.saved);
-        setLikeCount(data.likeCount);
-      });
-  }, [id]);
+  // useEffect(() => {
+  //   fetch(`${BACKEND_URL}/api/v1/post/${id}/status`, {
+  //     headers: { Authorization: `Bearer ${userToken}` }
+  //   })
+  //     .then(res => res.json())
+  //     .then(data => {
+  //       setLiked(data.liked);
+  //       setSaved(data.saved);
+  //       setLikeCount(data.likeCount);
+  //     });
+  // }, [id]);
 
   const navigate = useNavigate()
 

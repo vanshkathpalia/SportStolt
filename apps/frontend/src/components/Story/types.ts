@@ -6,7 +6,7 @@ export interface StoryType {
     description?: string;
     activityStarted: Date;
     activityEnded: Date;
-    eventLink?: string;
+    participants?: number;
     createdAt: string;
     sport?: string;
     endTime: any;

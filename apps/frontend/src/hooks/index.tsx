@@ -19,7 +19,7 @@ export interface Story {
     location: string;
     isViewed?: boolean;
     description?: string;
-    eventLink?: string;
+    participants?: number;
     createdAt: string;
     sport?: string;
     endTime: Date;
@@ -132,30 +132,49 @@ export const usePosts = () => {
     const [posts, setPosts] = useState<Post[]>([]); //returning the array post[]
 
     useEffect(() => {
-        axios
-            .get(`${BACKEND_URL}/api/v1/story/bulk`, {
-                headers: {
-                    Authorization: localStorage.getItem("token")
-                }
-            })
-            .then(response => {
-                    setStory(response.data.stories);
-            })
+        const token = localStorage.getItem("token");
+    
+        Promise.all([
+        axios.get(`${BACKEND_URL}/api/v1/story/bulk`, { headers: { Authorization: token } }),
+        axios.get(`${BACKEND_URL}/api/v1/post/bulk`, { headers: { Authorization: token } }),
+        ])
+        .then(([storyRes, postRes]) => {
+            setStory(storyRes.data.stories);
+            setPosts(postRes.data.posts);
+        })
+        .catch((err) => {
+            console.error("Failed to fetch posts or stories:", err);
+        })
+        .finally(() => {
+            setLoading(false);
+        });
+    }, []);
+      
+    // useEffect(() => {
+    //     axios
+    //         .get(`${BACKEND_URL}/api/v1/story/bulk`, {
+    //             headers: {
+    //                 Authorization: localStorage.getItem("token")
+    //             }
+    //         })
+    //         .then(response => {
+    //                 setStory(response.data.stories);
+    //         })
             
-        axios
-            .get(`${BACKEND_URL}/api/v1/post/bulk`, {
-                headers: {
-                    Authorization: localStorage.getItem("token"),
-                },
-            })
-            .then((response) => {
+    //     axios
+    //         .get(`${BACKEND_URL}/api/v1/post/bulk`, {
+    //             headers: {
+    //                 Authorization: localStorage.getItem("token"),
+    //             },
+    //         })
+    //         .then((response) => {
                 
-                setPosts(response.data.posts);
-                setLoading(false);
-            })
+    //             setPosts(response.data.posts);
+    //             setLoading(false);
+    //         })
 
             
-    }, []);
+    // }, []);
     console.log(posts);
     return {
         loading,
@@ -188,7 +207,8 @@ export const useStory = (id: number) => {
         };
 
         fetchStory();
-    }, [id, story]);
+    }, [id]);
+    // [id, story]);
 
     return { loading, story, error };
 };
@@ -207,6 +227,8 @@ export const useStories = () => {
                     }
                 });
                 setStories(response.data.story);
+                // setStories(response.data.stories); // if story is an array and returing stories, but i used story for stories (many)
+                // console.log(story); 
             } catch (e) {
                 setError('Failed to fetch stories');
                 console.error(e);

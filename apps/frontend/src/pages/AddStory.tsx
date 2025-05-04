@@ -14,7 +14,7 @@
 //         image: "",
 //         locationImage: "",
 //         description: "",
-//         eventLink: "",
+//         participants: "",
 //         sport: "",
 //         activityStarted: "",
 //         activityEnded: "",
@@ -291,8 +291,8 @@
 //                             </label>
 //                             <input
 //                                 type="url"
-//                                 name="eventLink"
-//                                 value={formData.eventLink}
+//                                 name="participants"
+//                                 value={formData.participants}
 //                                 onChange={handleInputChange}
 //                                 className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 //                                 placeholder="https://example.com/event"
