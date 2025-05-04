@@ -1,3 +1,4 @@
+// this is the  story list 
 
 import { usePosts } from "../../hooks";
 import StoryCard from "./StoryCard";
@@ -67,7 +68,7 @@ export const Story = () => {
                                         locationImage: story.locationImage,
                                         location: story.location,
                                         description: story.description,
-                                        eventLink: story.eventLink,
+                                        participants: story.participants,
                                         createdAt: story.createdAt,
                                         activityEnded: story.activityEnded,
                                         activityStarted: story.activityStarted,
@@ -129,7 +130,7 @@ export const Story = () => {
 //         //                 author={{ name: story.author.name || "Anonymous" }}
 //         //                 // , image: story.author.image
 //         //                 // description={story.description}
-//         //                 // eventLink={story.eventLink}
+//         //                 // participants={story.participants}
 //         //                 // sport={story.sport}
 //         //                 // stadium={story.stadium}
 //         //                 // swipeUpEnabled={story.swipeUpEnabled}
@@ -275,7 +276,7 @@ export const Story = () => {
 // //                             locationImage: story.locationImage,
 // //                             location: story.location,
 // //                             description: story.description,
-// //                             eventLink: story.eventLink,
+// //                             participants: story.participants,
 // //                             createdAt: story.createdAt,
 // //                             sport: story.sport,
 // //                             endTime: story.endTime,

@@ -4,6 +4,8 @@ import { withAccelerate } from '@prisma/extension-accelerate'
 import { verify } from 'hono/jwt'
 import { createPostInput, updatePostInput } from '@vanshkathpalia/sportstolt-common'
 import { z } from "zod"
+import { authMiddleware } from '../middleware/authMiddleware' // adjust the path as needed
+
 
 const createPostsInput = z.object({
     title: z.string().min(1, 'Title is required'),
@@ -20,74 +22,22 @@ export const postRouter = new Hono<{
     }
 }>();
 
-//for authentication, hitting as a middleware... code comming here before any of the other route is hitted
-postRouter.use('/*', async (c, next) => {
-    // c.res.headers.append('Access-Control-Allow-Origin', '*');
-    // c.res.headers.append('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    // c.res.headers.append('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-
-    if (c.req.method === 'OPTIONS') {
-        console.log('Preflight OPTIONS request received');
-        c.status(204); // Preflight requests must return 204
-        return c.text('');
-    }
-
-    const authHeader = c.req.header("authorization") || "";
-    // console.log("Authorization Header:", authHeader);
-
-    // try {
-    //     const user = await verify(authHeader, c.env.JWT_SECRET);
-    //     if (user && typeof user.id === "string") {
-    //         c.set("userId", user.id);
-    //         await next();
-    //     } else {
-    //         throw new Error("Invalid token or user ID");
-    //     }
-    // } catch (err: unknown) {
-    //     // Type guard to ensure 'err' is an instance of Error
-    //     if (err instanceof Error) {
-    //         console.error("JWT Verification Failed:", err.message);
-    //         c.status(403);
-    //         c.json({ message: "Invalid or expired token" });
-    //     } else {
-    //         // Handle unexpected error types
-    //         console.error("Unexpected error during JWT verification:", err);
-    //         c.status(500);
-    //         c.json({ message: "An unexpected error occurred" });
-    //     }
-    // }
-    try {
-        const user = await verify(authHeader, c.env.JWT_SECRET);
-
-        // Adjusted for your expected user ID type
-        if (user && typeof user.id === "number") {
-            c.set("userId", user.id);
-            return await next();
-        } else {
-            console.warn("Token verified but no valid user ID.");
-            return c.json({ message: "Invalid token structure" }, 403);
-        }
-    } catch (err) {
-        console.error("JWT verification failed:", err);
-        return c.json({ message: "Invalid or expired token" }, 403);
-    }
-});
+postRouter.use('/*', authMiddleware);
 
  
 postRouter.post('/', async (c) => {
     // console.log('Incoming request:', c.req.method, c.req.url);
     try {
         const body = await c.req.json();
-        // console.log('Request body:', body);
+        console.log('Request body:', body);
         // console.log('createPostInput:', createPostsInput);
 
-        const { success } = createPostsInput.safeParse(body); //deprop (success) which we do in library 
-            if(!success) {
+        const { success } = createPostsInput.safeParse(body);
+        if (!success) {
             c.status(411);
-            return c.json({
-                message: "invalid"
-            })
+            return c.json({ message: "invalid" });
         }
+
         // const result = createPostsInput.safeParse(body);
         // if (!result.success) {
         //     console.error("Validation error:", result.error);
@@ -178,7 +128,54 @@ postRouter.put('/', async (c) => {
 
     return c.json({ id: updatedPost.id });
 });
-  
+
+
+// Showing all posts by all users with pagination
+// postRouter.get('/bulk', async (c) => {
+//     const prisma = new PrismaClient({
+//         datasourceUrl: c.env.DATABASE_URL,
+//     }).$extends(withAccelerate());
+
+//     const authorId = c.get("userId");
+//     const page = Number(c.req.query('page') || 1); // Default to page 1
+//     const limit = Number(c.req.query('limit') || 10); // Default to 10 posts per page
+//     const skip = (page - 1) * limit; // Calculate the number of posts to skip
+
+//     try {
+//         // Fetch paginated posts
+//         const posts = await prisma.post.findMany({
+//             select: {
+//                 content: true,
+//                 title: true,
+//                 id: true,
+//                 author: {
+//                     select: {
+//                         name: true
+//                     }
+//                 }
+//             },
+//             skip, // Skip posts for pagination
+//             take: limit, // Limit the number of posts
+//         });
+
+//         // Get total number of posts for pagination metadata
+//         const totalPosts = await prisma.post.count();
+
+//         return c.json({
+//             posts,
+//             pagination: {
+//                 totalPosts,
+//                 totalPages: Math.ceil(totalPosts / limit),
+//                 currentPage: page,
+//                 limit,
+//             },
+//         });
+//     } catch (error) {
+//         console.error("Error fetching posts:", error);
+//         return c.json({ message: "Error fetching posts" }, 500);
+//     }
+// });
+
 
 //add pagination at this 
 //showing all the posts by all the user 
@@ -309,10 +306,7 @@ postRouter.post('/:id/like', async (c) => {
     return c.json({ success: true, liked, likeCount });
   });
   
-  
-  
-  
-  // POST /api/posts/:id/save
+// POST /api/posts/:id/save
 postRouter.post('/:id/save', async (c) => {
     const userId = c.get("userId")
     const postId = Number(c.req.param('id'))
@@ -333,32 +327,32 @@ postRouter.post('/:id/save', async (c) => {
   })
   
 
-  postRouter.get('/:id/status', async (c) => {
-    const userId = c.get("userId");
-    const postId = Number(c.req.param("id"));
+//   postRouter.get('/:id/status', async (c) => {
+//     const userId = c.get("userId");
+//     const postId = Number(c.req.param("id"));
   
-    const prisma = new PrismaClient({
-      datasources: {
-        db: { url: c.env.DATABASE_URL },
-      },
-    });
+//     const prisma = new PrismaClient({
+//       datasources: {
+//         db: { url: c.env.DATABASE_URL },
+//       },
+//     });
   
-    const liked = await prisma.like.findUnique({
-      where: { userId_postId: { userId, postId } },
-    });
+//     const liked = await prisma.like.findUnique({
+//       where: { userId_postId: { userId, postId } },
+//     });
   
-    const saved = await prisma.save.findUnique({
-      where: { userId_postId: { userId, postId } },
-    });
+//     const saved = await prisma.save.findUnique({
+//       where: { userId_postId: { userId, postId } },
+//     });
   
-    const likeCount = await prisma.like.count({
-      where: { postId },
-    });
+//     const likeCount = await prisma.like.count({
+//       where: { postId },
+//     });
   
-    return c.json({
-      liked: !!liked,
-      saved: !!saved,
-      likeCount,
-    });
-  });
+//     return c.json({
+//       liked: !!liked,
+//       saved: !!saved,
+//       likeCount,
+//     });
+//   });
   

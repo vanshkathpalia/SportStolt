@@ -5,6 +5,7 @@ import { verify } from 'hono/jwt'
 import { number, string, z } from "zod"
 import axios from 'axios';
 import { addHours } from 'date-fns';
+import { authMiddleware } from '~/middleware/authMiddleware'
 
 export const storyRouter = new Hono<{
     Bindings: {
@@ -16,13 +17,18 @@ export const storyRouter = new Hono<{
     }
 }>();
 
+const viewStoryInput = z.object({
+    storyId: z.number(),
+    isViewed: z.boolean().optional()
+});
+
 const createStoryInput = z.object({
     locationImage: z.string().min(1, 'Image URL is required'),
     images: z.array(z.number()).optional(),
     isViewed: z.boolean().optional(),
     location: z.string().min(1, 'Location is required'),
     description: z.string().optional(),
-    eventLink: z.string().url().optional(),
+    participants: z.number().optional().default(0),
     sport: z.string().min(1, 'Sport type is required'),
     stadium: z.string().optional(),
     swipeUpEnabled: z.boolean().optional()
@@ -53,23 +59,8 @@ async function fetchLocationImage(location: string): Promise<string | null> {
 }
 
 
-storyRouter.use('/*', async (c, next) => {
-    if (c.req.method === 'OPTIONS') {
-        console.log('Preflight OPTIONS request received');
-        c.status(204); // Preflight requests must return 204
-        return c.text('');
-    }
-
-    const authHeader = c.req.header("authorization")?.replace("Bearer ", "") || "";
-    const user = await verify(authHeader, c.env.JWT_SECRET);
-    if (user && typeof user.id === "number") {
-        c.set("userId", user.id);
-        return next();
-    } else {
-        c.status(403);
-        return c.json({ message: "Invalid token, you are not logged in" }, 403);
-    }
-});
+storyRouter.use('/*', authMiddleware);
+// Middleware to check if the user is authenticated
 
 
 // Create story with enhanced details
@@ -125,6 +116,11 @@ storyRouter.post('/', async (c) => {
             // Fetch location image only for a new story
             const locationImage = await fetchLocationImage(body.location);
 
+            // console.log("Data passed to Prisma:", 
+            //     participants: body.participants ? body.participants : null, // or some other default value
+            // );
+            
+
             existingStory = await prisma.story.create({
                 data: {
                     location: body.location,
@@ -138,7 +134,9 @@ storyRouter.post('/', async (c) => {
                     activityEnded,
                     endTime,
                     swipeUpEnabled: true,
-                    eventLink: body.eventLink || null,
+                    participants: typeof body.participants === "number" ? body.participants : undefined,
+                    // participants: body.participants ?? 0,
+
                     rating: 0, // Initialize rating as 0
                     verificationCount: 0,
                     rewardStatus: "pending",
@@ -542,6 +540,36 @@ storyRouter.delete('/', async (c) => {
 //         return c.json({ message: "Internal server error" });
 //     }
 // });
+
+
+storyRouter.post('/view', async (c) => {
+    const body = await c.req.json();
+    const parsed = viewStoryInput.safeParse(body);
+
+    if (!parsed.success) {
+        c.status(400);
+        return c.json({ error: 'Invalid input' });
+    }
+
+    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+    try {
+        const { storyId } = parsed.data;
+
+        // Update only if it's not already viewed
+        const updated = await prisma.story.update({
+            where: { id: storyId },
+            data: { isViewed: true }
+        });
+
+        return c.json({ message: 'Story marked as viewed', updated });
+    } catch (error) {
+        console.error('Error marking story as viewed:', error);
+        c.status(500);
+        return c.json({ error: 'Server error while marking story as viewed' });
+    }
+});
+
 
 storyRouter.post("/will-go", async (c) => {
     const prisma = new PrismaClient({

@@ -1,3 +1,5 @@
+// this is each story circle that will be shown in the home page
+
 import { useState } from 'react';
 import { StoryView } from './StoryView';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +14,7 @@ export interface StoryType {
     description?: string;
     activityStarted: Date;
     activityEnded: Date;
-    eventLink?: string;
+    participants?: number;
     createdAt: string;
     sport?: string;
     endTime: any;
@@ -40,7 +42,7 @@ interface StoryCardProps {
         description?: string;
         activityStarted: Date;
         activityEnded: Date;
-        eventLink?: string;
+        participants?: number;
         createdAt: string;
         sport?: string;
         endTime: Date;
@@ -70,6 +72,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
     const [isViewed, setIsViewed] = useState(story.isViewed || false);  // Track if the story is viewed
     const navigate = useNavigate();
 
+
     const handleOpenStory = async () => {
         setIsViewingStory(true);
         setIsViewed(true); // Update local state
@@ -80,6 +83,11 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ storyId: story.id, isViewed: true }),
             });
+            // await fetch(`${BACKEND_URL}/api/v1/story/view`, {
+            //     method: 'POST',
+            //     headers: { 'Content-Type': 'application/json' },
+            //     body: JSON.stringify({ storyId: story.id, userId: <loggedInUserId>, isViewed: true }),
+            // });
         } catch (error) {
             console.error('Error updating story view status:', error);
         }
@@ -139,7 +147,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
                         image: story.locationImage,
                         location: story.location,
                         description: story.description,
-                        eventLink: story.eventLink,
+                        participants: story.participants,
                         createdAt: story.createdAt,
                         sport: story.sport,
                         activityEnded: story.activityEnded,
