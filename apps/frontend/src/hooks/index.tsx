@@ -91,7 +91,7 @@ export const usePost = ({ id }: { id: string }) => {
     useEffect(() => {
         axios.get(`${BACKEND_URL}/api/v1/post/${id}`, {
             headers: {
-                Authorization: localStorage.getItem("token")
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
             }
         })
         .then(response => {
@@ -105,7 +105,7 @@ export const usePost = ({ id }: { id: string }) => {
     //     axios
     //         .get(`${BACKEND_URL}/api/v1/post/${id}`, {
     //             headers: {
-    //                 Authorization: localStorage.getItem("token"),
+    //                 Authorization: `Bearer ${localStorage.getItem("token")}`,,
     //             },
     //         })
     //         .then((response) => {
@@ -154,7 +154,7 @@ export const usePosts = () => {
     //     axios
     //         .get(`${BACKEND_URL}/api/v1/story/bulk`, {
     //             headers: {
-    //                 Authorization: localStorage.getItem("token")
+    //                 Authorization: `Bearer ${localStorage.getItem("token")}`,
     //             }
     //         })
     //         .then(response => {
@@ -164,7 +164,7 @@ export const usePosts = () => {
     //     axios
     //         .get(`${BACKEND_URL}/api/v1/post/bulk`, {
     //             headers: {
-    //                 Authorization: localStorage.getItem("token"),
+    //                 Authorization: `Bearer ${localStorage.getItem("token")}`,,
     //             },
     //         })
     //         .then((response) => {
@@ -280,7 +280,7 @@ export const useEvents = () => {
         // axios
         //     .get(`${BACKEND_URL}/api/v1/event/bulk`, {
         //         headers: {
-        //             Authorization: localStorage.getItem("token")
+        //             Authorization: `Bearer ${localStorage.getItem("token")}`,
         //         }
         //     })
         //     .then(response => {

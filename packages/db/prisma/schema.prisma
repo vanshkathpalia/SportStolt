@@ -261,3 +261,13 @@ model Tweet {
   author    User     @relation(fields: [userId], references: [id])
 }
 
+//wasn't useful maybe
+model Playlist {
+    id         Int      @id @default(autoincrement())
+    sportName  String
+    skillLevel String
+    keywords   String
+    link       String
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+}

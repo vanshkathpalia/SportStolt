@@ -5,7 +5,7 @@ import { verify } from 'hono/jwt'
 import { number, string, z } from "zod"
 import axios from 'axios';
 import { addHours } from 'date-fns';
-import { authMiddleware } from '~/middleware/authMiddleware'
+import { authMiddleware } from '../middleware/authMiddleware'
 
 export const storyRouter = new Hono<{
     Bindings: {

@@ -42,7 +42,7 @@ export const AddEvent = ({openCreateModal}: AddEventPageProps) => {
     try {
       const response = await axios.post(`${BACKEND_URL}/api/v1/event`, formData, {
         headers: {
-          Authorization: token, // Use "Bearer" prefix if required by your API
+          Authorization: `Bearer ${token}`, // Use "Bearer" prefix if required by your API
         },
       });
 

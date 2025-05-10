@@ -80,7 +80,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
     // }
     // else {
       return <div className="min-h-screen bg-background">
-      {isMobile && <MobileNav openCreateModal={openCreateModal} />}
+        {isMobile && <MobileNav openCreateModal={openCreateModal} />}
 
       <div className="flex">
         <div className="hidden md:block w-16 xl:w-52 fixed h-screen">

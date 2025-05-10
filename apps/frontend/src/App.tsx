@@ -21,6 +21,7 @@ import { PostsPage } from "./pages/Posts"
 import { PostPage } from "./pages/Post"
 import { AddEvent } from "./pages/AddEvent"
 import { Logout } from "./pages/Logout"; // adjust path
+import { Training } from "./pages/Training"
 
 
 
@@ -47,6 +48,7 @@ function App() {
               <Route path="/search" element={<Search openCreateModal={() => setCreatePostModalOpen(true)} />} />
               <Route path="/events" element={<EventsPage openCreateModal={() => setCreatePostModalOpen(true)} />} />
               <Route path="/addevent" element={<AddEvent openCreateModal={() => setCreatePostModalOpen(true)} />} />
+              <Route path="/training" element={<Training openCreateModal={() => setCreatePostModalOpen(true)} />} />
               <Route path="/notifications"
                 element={<NotificationsPage openCreateModal={() => setCreatePostModalOpen(true)} />}/>
               <Route path="/logout" element={<Logout />} />

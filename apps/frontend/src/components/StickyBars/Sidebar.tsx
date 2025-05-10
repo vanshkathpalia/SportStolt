@@ -1,7 +1,7 @@
 
 import { Home, Search, Trophy, Activity, Bell, PlusSquare, User, Menu, DollarSign, Settings, LogOut } from "lucide-react";
 import { cn } from "../lib/utils";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
 // import NavItem from "./NavItem";
 // Utility function to combine class names
@@ -65,11 +65,21 @@ export function Sidebar({ openCreateModal }: SidebarProps) {
   return (
     <div className="h-full border-r border-border flex flex-col py-4 bg-gradient-to-b from-background to-background">
       <div className="px-2 mb-8">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col items-center gap-2">
           {/* <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
             <Trophy className="h-5 w-5 text-white" />
           </div> */}
-          <h1 className="text-xl font-bold hidden xl:block px-6 text-black">SportStolt</h1>
+          <Link to="/post" className="flex items-center px-6 cursor-pointer">
+            {/* Text for xl and above */}
+            <h1 className="text-xl font-bold hidden xl:block text-green-500">
+              SportStolt
+            </h1>
+
+            {/* Trophy icon for md to xl */}
+            <div className="hidden md:block xl:hidden">
+              <Trophy className="h-7 w-8 text-green-500" />
+            </div>
+          </Link>
         </div>
       </div>
 

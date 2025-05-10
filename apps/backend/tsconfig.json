@@ -1,10 +1,11 @@
 {
     "compilerOptions": {
-      "target": "ES2020",
-      "module": "ESNext",
+      "target": "ESNext",
+      "module": "CommonJS",
       "moduleResolution": "Node",
       "lib": ["ES2020", "WebWorker"],
       "strict": true,
+      "forceConsistentCasingInFileNames": true,
       "esModuleInterop": true,
       "skipLibCheck": true,
       "resolveJsonModule": true,
@@ -18,7 +19,7 @@
     "include": [
       "src/**/*.ts",
       "src/**/*.tsx"
-, "src/index.ts"    ],
+, "src/index.ts", "../frontend/src/utils/mailer.ts"    ],
     "exclude": [
       "node_modules"
     ]
