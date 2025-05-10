@@ -102,7 +102,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
       // Send data to the backend
       await axios.post(`${BACKEND_URL}/api/v1/story`, formData, {
           headers: {
-              Authorization: localStorage.getItem("token")
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
           }
       });
   
@@ -449,7 +449,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
 //                 isViewed: false
 //             }, {
 //                 headers: {
-//                     Authorization: localStorage.getItem("token")
+//                     Authorization: `Bearer ${localStorage.getItem("token")}`,
 //                 }
 //             });
 //             navigate(`/post`);

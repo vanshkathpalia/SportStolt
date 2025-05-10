@@ -139,12 +139,12 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
 
       <div className="flex">
         {/* Sidebar - Hidden on mobile */}
-        <div className="hidden md:block w-16 lg:w-64 fixed h-screen">
+        <div className="hidden md:block w-16 xl:w-52 fixed h-screen">
           <Sidebar openCreateModal={openCreateModal} />
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 md:ml-16 lg:ml-64 pb-16 md:pb-8">
+        <main className="flex-1 md:ml-16 xl:ml-64 pb-16 md:pb-8">
           <div className="max-w-2xl mx-auto p-4">
             <h1 className="text-2xl font-bold mb-6">Notifications</h1>
 

@@ -90,7 +90,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
               // PostPhoto: photos,
           }, {
               headers: {
-                  Authorization: localStorage.getItem("token")
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
               }
           });
           navigate('/post');

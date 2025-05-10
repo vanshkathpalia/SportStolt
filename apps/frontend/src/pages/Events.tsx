@@ -6,16 +6,16 @@ import { useEvents } from "../hooks";
 import { Sidebar } from "../components/StickyBars/Sidebar";
 import { EventCard } from "../components/Event/EventCard";
 import { MobileNav } from "../components/StickyBars/MobileNav";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 
 export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const { loading, events } = useEvents();
+  const isMobile = useMediaQuery("(max-width: 768px)")
 
   const filteredEvents = events.filter(event =>
     event.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
-
-  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
 
   return (
     <div className="min-h-screen bg-background">

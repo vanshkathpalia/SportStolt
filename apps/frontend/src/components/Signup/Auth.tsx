@@ -32,20 +32,22 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
 
     async function sendRequest() {
         try {
-          const response = await axios.post(`${BACKEND_URL}/api/v1/user/${type}`, postInputs);
-          const jwt = response.data.token;
-          if (!jwt) {
-            alert("Authentication failed");
-            return;
-          }
-          localStorage.setItem("token", jwt);
-          navigate("/post");
+            const response = await axios.post(`${BACKEND_URL}/api/v1/user/${type}`, postInputs);
+            const jwt = response.data.token;
+            if (!jwt) {
+                alert("Authentication failed");
+                return;
+            }
+            localStorage.setItem("token", jwt);
+            navigate("/post");
         } catch (e: any) {
-          const err = e.response?.data?.error || "Unexpected error";
-          alert(err);
-          console.log(e);
+            const errorMessage = e.response?.data?.error || e.response?.data?.message || "Unexpected error";
+            alert(errorMessage);
+            console.log(e);
         }
-      }
+    }
+    
+      
       
     
     return <div className="h-screen flex justify-center flex-col">

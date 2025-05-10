@@ -72,7 +72,7 @@ export const PostCard = ({
   //   try {
   //     await axios.post(`/api/posts/${id}/like`, {}, {
   //       headers: {
-  //         Authorization: localStorage.getItem("token") || "", // Adjust token source
+  //         Authorization: `Bearer ${localStorage.getItem("token")}`, || "", // Adjust token source
   //       }
   //     })
   //   } catch (error) {
@@ -86,7 +86,7 @@ export const PostCard = ({
     try {
       await axios.post(`/api/post/${id}/save`, {}, {
         headers: {
-          Authorization: localStorage.getItem("token") || "",
+          Authorization: `Bearer ${localStorage.getItem("token")}, || ""`
         }
       })
     } catch (error) {

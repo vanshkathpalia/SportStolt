@@ -3,11 +3,13 @@ import { SearchGrid } from '../components/Search/SearchGrid';
 import { MobileNav } from '../components/StickyBars/MobileNav';
 import { Sidebar } from '../components/StickyBars/Sidebar';
 import axios from 'axios';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 
 
 export const Search = ({openCreateModal}: {openCreateModal: () => void}) => {
   const [isLoading, setIsLoading] = useState(true);
   const [posts, setPosts] = useState<string[]>([]);
+  const isMobile = useMediaQuery("(max-width: 768px)")
 
 
   useEffect(() => {
@@ -25,8 +27,6 @@ export const Search = ({openCreateModal}: {openCreateModal: () => void}) => {
   
     fetchImages();
   }, []);
-
-  const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
 
   return (
       <div className="min-h-screen bg-background">
