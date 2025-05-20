@@ -4,6 +4,7 @@ import { withAccelerate } from '@prisma/extension-accelerate'
 import { verify } from 'hono/jwt'
 // import { createstoryInput, updatestoryInput } from '@vanshkathpalia/sportstolt-common'
 import { date, string, z } from "zod"
+import { authMiddleware } from '~/middleware/authMiddleware'
 
 export const eventRouter = new Hono<{
     Bindings: {
@@ -24,27 +25,6 @@ const createEventInput = z.object({
     StartTime: z.string().datetime({ message: 'StartTime must be a valid ISO datetime' }), // ISO datetime string
   });
 
-eventRouter.use('/*', async (c, next) => {
-    if (c.req.method === 'OPTIONS') {
-        console.log('Preflight OPTIONS request received');
-        c.status(204); // Preflight requests must return 204
-        return c.text('');
-    }
-
-    const authHeader = c.req.header("authorization") || "";
-    const user = await verify(authHeader, c.env.JWT_SECRET)
-    if (user && typeof user.id === "number") {
-        c.set("userId", user.id);
-        await next();
-    }
-    else {
-        c.status(403);
-        c.json({
-            message: "you are not logged in"
-        })
-    }
-});
-
 function formatDateToDDMMYYYY(dateString: string): string {
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, '0');
@@ -52,6 +32,11 @@ function formatDateToDDMMYYYY(dateString: string): string {
   const year = date.getFullYear();
   return `${day}-${month}-${year}`;
 }
+
+// authenticate all routes
+eventRouter.use('/*', authMiddleware);
+
+
 // POST / (create event)
 eventRouter.post('/', async (c) => {
   try {
@@ -105,7 +90,6 @@ eventRouter.post('/', async (c) => {
     return c.json({ message: "Internal server error" });
   }
 });
-
 
 // GET /bulk (fetch events)
 eventRouter.get('/bulk', async (c) => {
@@ -178,47 +162,103 @@ eventRouter.get('/bulk', async (c) => {
   }
 });
 
+// POST /:id/register for an event
+eventRouter.post('/:id/register', async (c) => {
+  try {
+    const eventId = Number(c.req.param('id'));
+    const userId = c.get("userId");
 
-  eventRouter.delete('/:id', async (c) => {
-    try {
-      const eventId = Number(c.req.param('id'));
-      const userId = c.get("userId");
-  
-      if (!c.env.DATABASE_URL) {
-        return c.json({ message: "DATABASE_URL is not set" }, 500);
-      }
-  
-      const prisma = new PrismaClient({
-        datasources: {
-          db: { url: c.env.DATABASE_URL },
+    const prisma = new PrismaClient({
+      datasources: {
+        db: { url: c.env.DATABASE_URL },
+      },
+    });
+
+    const alreadyRegistered = await prisma.registration.findUnique({
+      where: {
+        userId_eventId: {
+          userId,
+          eventId,
         },
-      });
-  
-      // Check if the event exists and belongs to the user
-      const event = await prisma.event.findUnique({
-        where: { id: eventId },
-      });
-  
-      if (!event) {
-        c.status(404);
-        return c.json({ message: "Event not found" });
-      }
-  
-      if (event.authorId !== userId) {
-        c.status(403);
-        return c.json({ message: "You are not authorized to delete this event" });
-      }
-  
-      await prisma.event.delete({
-        where: { id: eventId },
-      });
-  
-      return c.json({ message: "Event deleted successfully" });
-    } catch (error) {
-      console.error("Error deleting event:", error);
-      return c.json({ message: "Failed to delete event" }, 500);
+      },
+    });
+
+    if (alreadyRegistered) {
+      return c.json({ message: "Already registered for this event" }, 400);
     }
+
+    const registration = await prisma.registration.create({
+      data: {
+        userId,
+        eventId,
+      },
+    });
+
+    return c.json({ message: "Successfully registered", registration });
+  } catch (error) {
+    console.error("Registration error:", error);
+    return c.json({ message: "Failed to register" }, 500);
+  }
+});
+
+// GET (fetch registrations for an event)
+eventRouter.get('/:id/registrations', async (c) => {
+  const eventId = Number(c.req.param('id'));
+  const prisma = new PrismaClient({
+    datasources: {
+      db: { url: c.env.DATABASE_URL },
+    },
   });
+
+  const registrations = await prisma.registration.findMany({
+    where: { eventId },
+    include: { user: true }, // Assuming you want user info
+  });
+
+  return c.json(registrations);
+});
+
+
+eventRouter.delete('/:id', async (c) => {
+  try {
+    const eventId = Number(c.req.param('id'));
+    const userId = c.get("userId");
+
+    if (!c.env.DATABASE_URL) {
+      return c.json({ message: "DATABASE_URL is not set" }, 500);
+    }
+
+    const prisma = new PrismaClient({
+      datasources: {
+        db: { url: c.env.DATABASE_URL },
+      },
+    });
+
+    // Check if the event exists and belongs to the user
+    const event = await prisma.event.findUnique({
+      where: { id: eventId },
+    });
+
+    if (!event) {
+      c.status(404);
+      return c.json({ message: "Event not found" });
+    }
+
+    if (event.authorId !== userId) {
+      c.status(403);
+      return c.json({ message: "You are not authorized to delete this event" });
+    }
+
+    await prisma.event.delete({
+      where: { id: eventId },
+    });
+
+    return c.json({ message: "Event deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    return c.json({ message: "Failed to delete event" }, 500);
+  }
+});
   
   
   
