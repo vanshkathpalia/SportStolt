@@ -1,12 +1,35 @@
 import { Calendar, Users } from 'lucide-react';
 import type { EventInterface } from '../../hooks';
+import { useState } from 'react';
+import { BACKEND_URL } from '../../config';
 
 interface EventCardProps {
   event: EventInterface;
-  onRegister?: () => void;
 }
 
-export const EventCard: React.FC<EventCardProps> = ({ event, onRegister }) => {
+export const EventCard: React.FC<EventCardProps> = ({ event }) => {
+  const [isRegistered, setIsRegistered] = useState(event.isRegistered ?? false);
+
+  const handleRegister = async (eventId: number) => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await fetch(`${BACKEND_URL}/api/v1/event/${eventId}/register`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+      alert(data.message);
+      setIsRegistered(true); // ✅ Mark as registered
+    } catch (err) {
+      alert("Something went wrong while registering.");
+      console.error(err);
+    }
+  };
+
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden mb-10">
       <img src={event.imageUrl} alt={event.location} className="w-full h-48 object-cover" />
@@ -29,12 +52,29 @@ export const EventCard: React.FC<EventCardProps> = ({ event, onRegister }) => {
           </div>
         </div>
 
-        <button
+        {isRegistered ? (
+          <button
+            disabled
+            className="w-full bg-gray-400 text-white py-2 px-4 rounded-lg cursor-not-allowed"
+          >
+            Register Done 
+          </button>
+        ) : (
+          <button
+            onClick={() => handleRegister(event.id)}
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Register for Event
+          </button>
+        )}
+
+
+        {/* <button
           onClick={onRegister}
           className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
         >
           Register for Event
-        </button>
+        </button> */}
       </div>
     </div>
   );

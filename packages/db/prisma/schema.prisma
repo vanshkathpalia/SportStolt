@@ -29,6 +29,7 @@ model User {
   tweet                 Tweet[]
   verification          Verification[]
   storyAttendance       StoryAttendance[]
+  registration          Registration[]
   sentNotifications     Notification[]    @relation("SentNotifications")
   receivedNotifications Notification[]    @relation("ReceivedNotifications")
   followers             Follow[]          @relation("Followers")
@@ -36,6 +37,10 @@ model User {
   savedPosts            Save[]
 }
 
+enum UserType {
+  INDIVIDUAL
+  ORG
+}
 
 
 model Post {
@@ -190,9 +195,25 @@ model Event {
   StartTime   DateTime
   OrganisedBy String
   name        String
+  createdAt   DateTime  @default(now())
   Comment     Comment[]
+  registration Registration[]
   author      User      @relation(fields: [authorId], references: [id])
 }
+
+model Registration {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  eventId   Int
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id])
+  event Event @relation(fields: [eventId], references: [id])
+
+  @@unique([userId, eventId]) // Ensure one user can register only once per event
+}
+
+
 
 
 

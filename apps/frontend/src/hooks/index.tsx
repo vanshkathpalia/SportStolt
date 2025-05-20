@@ -65,6 +65,7 @@ export interface EventInterface {
     sportTags: string[];
     comments: any[];
     publishedDate: string;
+    isRegistered?: boolean;
   }
 
   
@@ -258,9 +259,9 @@ export const useEvents = () => {
               }
       
               const response = await axios.get(`${BACKEND_URL}/api/v1/event/bulk`, {
-                headers: {
-                  Authorization: token, // Use "Bearer" prefix if required by your API
-                },
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
               });
       
               if (response.data) {

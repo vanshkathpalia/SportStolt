@@ -73,7 +73,6 @@ export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void })
                   <EventCard 
                     key={event.id} 
                     event={event} 
-                    onRegister={() => alert('Registration functionality coming soon!')} 
                   />
                 ))}
               </div>
