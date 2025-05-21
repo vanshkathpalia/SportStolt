@@ -22,29 +22,31 @@ export function MobileNav({ openCreateModal }: MobileNavProps) {
   return (
     <>
       {/* Top Header */}
-      <div className="fixed top-0 left-0 right-0  bg-white/100 border-b border-border z-10 px-4 h-14 flex items-center justify-between">
+      <div className="fixed top-0 left-0 right-0 bg-muted z-50 px-4 h-14 flex items-center justify-between">
         <h1 className="text-xl font-bold text-green-500">SportStolt</h1>
         <div className="flex items-center gap-4">
-          <button className="focus:outline-none" onClick={() => navigate("/notifications")}>
+          <button className="focus:outline-none text-gray-700 dark:text-gray-300" onClick={() => navigate("/notifications")}>
             <Bell className="h-6 w-6" />
           </button>
-          <button className="focus:outline-none" onClick={openCreateModal}>
+          <button className="focus:outline-none text-gray-700 dark:text-gray-300" onClick={openCreateModal}>
             <PlusSquare className="h-6 w-6" />
           </button>
         </div>
       </div>
 
       {/* Bottom Navigation */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white/80 border-t border-border z-10 backdrop-blur-md shadow-lg">
+      <div className="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-black/80 z-10 backdrop-blur-md shadow-lg">
         <div className="flex justify-around items-center h-14">
           {navItems.map((item) => (
             <Link
               key={item.href}
-              onClick={() => navigate(item.href)}
               to={item.href}
+              onClick={() => navigate(item.href)}
               className={cn(
-                "flex flex-col items-center justify-center w-full h-full",
-                pathname === item.href ? "text-green-500" : "text-muted-foreground"
+                "flex flex-col items-center justify-center w-full h-full transition-colors",
+                pathname === item.href
+                  ? "text-green-500"
+                  : "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               )}
             >
               <item.icon className="h-6 w-6" />

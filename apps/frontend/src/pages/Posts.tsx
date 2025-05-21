@@ -1,125 +1,78 @@
 "use client"
 
 import { useState } from "react"
-
-// import { StoryList } from "../components/stories/StoryList"
 import { useMediaQuery } from "../hooks/useMediaQuery"
 import { PlusCircle } from "lucide-react"
 import { Button } from "../components/ui/button"
-// import { CreateStoryModal } from "../components/modals/CreateStoryModel"
-
-// Mock data
-// import { STORIES, POSTS, EVENTS } from "../data/mockData"
 import { MobileNav } from "../components/StickyBars/MobileNav"
 import { Sidebar } from "../components/StickyBars/Sidebar"
 import { useEvents, usePosts } from "../hooks"
-// import { EventCardHome } from "../components/Event/EventCardHome"
 import { PostCard } from "../components/Post/PostCard"
-// import { StorySkeleton } from "../components/Story/StorySkeleton"
-// import { PostSkeleton } from "../components/Post/PostSkeleton"
 import { Story } from "../components/Story/Story"
 import { EventHomeSidebar } from "../components/Event/EventHomeSidebar"
 import { PostSkeleton } from "../components/Post/PostSkeleton"
 import { CreateStoryModal } from "../components/models/CreateStoryModal"
-// import { Appbar } from "../components/StickyBars/Appbar"
-// import { EventHomeSidebar } from "../components/Event/EventHomeSidebar"
-
-
-// import { EventCardHome } from "../components/Event/EventCardHome"
+import { useNavigate } from "react-router-dom"
 
 interface PostsPageProps {
   openCreateModal: () => void
 }
 
 export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
-  const { loading, posts } = usePosts();
-  const { events } = useEvents();
+  const navigate = useNavigate();
+  const { loading, posts } = usePosts()
+  const { events } = useEvents()
   const [storyDisplayType, setStoryDisplayType] = useState<"sport" | "location">("sport")
   const [postSortType, setPostSortType] = useState<"following" | "sport">("following")
-  // const [selectedSportFilter, setSelectedSportFilter] = useState<string | null>(null)
   const [createStoryModalOpen, setCreateStoryModalOpen] = useState(false)
   const isMobile = useMediaQuery("(max-width: 768px)")
 
-  // Extract all unique sport tags for filtering
-  // const allSportTags = Array.from(new Set(POSTS.flatMap((post) => post.sportTags || [])))
-
-  // Filter posts based on selected sport tag
-//   const filteredPosts = selectedSportFilter
-//     ? POSTS.filter((post) => post.sportTags?.includes(selectedSportFilter))
-//     : POSTS
-
-//   useEffect(() => {
-//     // Simulate loading data
-//     const timer = setTimeout(() => {
-//       setLoading(false)
-//     }, 1000)
-
-//     return () => clearTimeout(timer)
-//   }, [])
-
-    //  if (loading) {
-    //     return <div className="flex flex-row">
-    //         <div className = "pt-6 px-4" >
-    //             <Sidebar openCreateModal={openCreateModal} />
-    //         </div> 
-    //         <div>
-    //           <div className="grid grid-cols-9 p-2">
-    //               <div className="px-1 md:px-4 mt-2">
-    //                     <StorySkeleton />
-    //                 </div>
-    //                 <div className="col-start-2 sm:col-span-5 sm:col-start-3 p-4 xl:col-start-2">
-    //                     <PostSkeleton />
-    //                     <PostSkeleton />
-    //                     <PostSkeleton />
-    //                     <PostSkeleton />
-    //                     <PostSkeleton />
-    //                 </div>       
-    //             </div>
-    //         </div>
-    //     </div>
-    // }
-    // else {
-      return <div className="min-h-screen bg-background">
-        {isMobile && <MobileNav openCreateModal={openCreateModal} />}
+  return (
+    <div className="min-h-screen bg-background">
+      {isMobile && <MobileNav openCreateModal={openCreateModal} />}
 
       <div className="flex">
         <div className="hidden md:block w-16 xl:w-52 fixed h-screen">
           <Sidebar openCreateModal={openCreateModal} />
         </div>
+
         {/* Main Content */}
         <main className="flex-1 md:ml-16 xl:ml-56">
           <div className="max-w-screen-xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+
               {/* Stories and Posts Column */}
               <div className="md:col-span-3 p-2 lg:col-span-3">
                 {/* Story Display Type Toggle */}
                 <div className="mt-2 md:mt-4 flex justify-between items-center">
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => setStoryDisplayType("sport")} //hangleStoryType -> setting type and also sending request to backend for sorting according to sport
-                      className={`px-3 py-1 text-sm rounded-full ${
+                      onClick={() => setStoryDisplayType("sport")}
+                      className={`px-3 py-1 text-sm rounded-full transition ${
                         storyDisplayType === "sport"
-                          ? "bg-blue-400 text-white"  
-                          : "bg-muted text-muted-foreground"
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                       }`}
                     >
                       Sports
                     </button>
                     <button
-                      onClick={() => setStoryDisplayType("location")} //hangleStoryType -> setting type and also sending request to backend for sorting according to location
-                      className={`px-3 py-1 text-sm rounded-full ${
-                        storyDisplayType === "location" ? "bg-blue-400 text-white" : "bg-muted text-muted-foreground"
+                      onClick={() => setStoryDisplayType("location")}
+                      className={`px-3 py-1 text-sm rounded-full transition ${
+                        storyDisplayType === "location"
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                       }`}
                     >
                       Locations
                     </button>
                   </div>
 
-                  {/* Create Post Button (Desktop) */}
+                  {/* Create Post Button */}
                   <Button
                     onClick={openCreateModal}
                     size="sm"
-                    className="hidden md:flex items-center gap-1 bg-primary hover:bg-blue-300 text-primary-foreground"
+                    className="hidden md:flex items-center gap-1 bg-blue-500 text-white hover:bg-blue-600"
                   >
                     <PlusCircle className="h-4 w-4" />
                     Create Post
@@ -127,32 +80,31 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                 </div>
 
                 {/* Stories Section */}
-                  <div className="pt-2 ">
-                    <Story />
-                  </div>
-                  <hr />
+                <div className="pt-2">
+                  <Story />
+                </div>
+                {/* <hr className="my-4 dark:border-gray-700" /> */}
 
                 {/* Post Sorting Options */}
                 <div className="mt-4 mb-2">
-                  <div className="flex justify-between items-center ">
+                  <div className="flex justify-between items-center">
                     <div className="flex space-x-2">
                       <button
-                        onClick={() => {
-                          setPostSortType("following") //hanglePostType -> setting type and also sending request to backend for sorting according to following 
-                          // setSelectedSportFilter(null)
-                        }}
-                        className={`px-3 py-1 text-sm rounded-full ${
+                        onClick={() => setPostSortType("following")}
+                        className={`px-3 py-1 text-sm rounded-full transition ${
                           postSortType === "following"
-                            ? "bg-blue-400 text-white"
-                            : "bg-muted text-muted-foreground"
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                         }`}
                       >
                         Following
                       </button>
                       <button
-                        onClick={() => setPostSortType("sport")} //hanglePostType -> setting type and also sending request to backend for sorting according to sport - or this should be handled on frontend only 
-                        className={`px-3 py-1 text-sm rounded-full ${
-                          postSortType === "sport" ? "bg-blue-400 text-white" : "bg-muted text-muted-foreground"
+                        onClick={() => setPostSortType("sport")}
+                        className={`px-3 py-1 text-sm rounded-full transition ${
+                          postSortType === "sport"
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                         }`}
                       >
                         Sports
@@ -161,70 +113,281 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                   </div>
                 </div>
 
-                  {/* Sport Tags Filter - Only visible when "Sports" is selected */}
-                  {/* {postSortType === "sport" && (
-                    <div className="flex flex-wrap gap-2 mt-2 pb-2 overflow-x-auto">
-                      {allSportTags.map((tag) => (
-                        <button
-                          key={tag}
-                          onClick={() => setSelectedSportFilter(tag === selectedSportFilter ? null : tag)}
-                          className={`px-3 py-1 text-xs rounded-full border ${
-                            tag === selectedSportFilter
-                              ? "bg-blue-500 text-white border-blue-500"
-                              : "bg-background text-foreground border-border"
-                          }`}
-                        >
-                          {tag}
-                        </button>
-                    ))}
-                    </div>
-                  )}  */}
-                {/* </div> */}
-
                 {/* Posts Section */}
                 <div className="mt-2 px-6 pt-6 space-y-4 md:px-4 pb-16 md:pb-8">
-                  {loading
-                    ? // Post loading skeletons
-                      Array(3)
-                        .fill(0)
-                        .map((_, index) => <PostSkeleton key={index} />)
-                    : // Actual posts
-                      posts.length === 0 ? (
-                        <p className="text-center text-muted-foreground py-10">No posts available right now</p> // Message when no posts are available
-                      ) : (
-                        posts.map((post) => (
-                          <PostCard
-                            key={post.id}
-                            id={post.id}
-                            author={post.author.name || "Anonymous"}
-                            title={post.title}
-                            content={post.content}
-                            expanded={false}
-                          />
-                        ))
-                      )}
+                  {loading ? (
+                    Array(3)
+                      .fill(0)
+                      .map((_, index) => <PostSkeleton key={index} />)
+                  ) : posts.length === 0 ? (
+                    <p className="text-center text-gray-500 dark:text-gray-400 py-10">
+                      No posts available right now
+                    </p>
+                  ) : (
+                    posts.map((post) => (
+                      <PostCard
+                        key={post.id}
+                        id={post.id}
+                        author={post.author.name || "Anonymous"}
+                        title={post.title}
+                        content={post.content}
+                        expanded={false}
+                      />
+                    ))
+                  )}
                 </div>
-
-            
               </div>
-              
-                <div className="hidden lg:block lg:col-span-2 ">
-                  
-                          <EventHomeSidebar
-                            events={events}
-                            onRegister={() => alert('Registration functionality coming soon!')}
-                          />
-                      
-                </div>
 
+              {/* Sidebar Events */}
+              <div className="hidden lg:block lg:col-span-2">
+                <EventHomeSidebar
+                  events={events}
+                  onRegister={() => navigate("/events")}
+                />
+              </div>
             </div>
           </div>
         </main>
-      {/* Create Story Modal */}
-      <CreateStoryModal isOpen={createStoryModalOpen} onClose={() => setCreateStoryModalOpen(false)} />
+
+        {/* Create Story Modal */}
+        <CreateStoryModal
+          isOpen={createStoryModalOpen}
+          onClose={() => setCreateStoryModalOpen(false)}
+        />
       </div>
     </div>
-  }
+  )
+}
+
+
+
+// "use client"
+
+// import { useState } from "react"
+
+// // import { StoryList } from "../components/stories/StoryList"
+// import { useMediaQuery } from "../hooks/useMediaQuery"
+// import { PlusCircle } from "lucide-react"
+// import { Button } from "../components/ui/button"
+// // import { CreateStoryModal } from "../components/modals/CreateStoryModel"
+
+// // Mock data
+// // import { STORIES, POSTS, EVENTS } from "../data/mockData"
+// import { MobileNav } from "../components/StickyBars/MobileNav"
+// import { Sidebar } from "../components/StickyBars/Sidebar"
+// import { useEvents, usePosts } from "../hooks"
+// // import { EventCardHome } from "../components/Event/EventCardHome"
+// import { PostCard } from "../components/Post/PostCard"
+// // import { StorySkeleton } from "../components/Story/StorySkeleton"
+// // import { PostSkeleton } from "../components/Post/PostSkeleton"
+// import { Story } from "../components/Story/Story"
+// import { EventHomeSidebar } from "../components/Event/EventHomeSidebar"
+// import { PostSkeleton } from "../components/Post/PostSkeleton"
+// import { CreateStoryModal } from "../components/models/CreateStoryModal"
+// // import { Appbar } from "../components/StickyBars/Appbar"
+// // import { EventHomeSidebar } from "../components/Event/EventHomeSidebar"
+
+
+// // import { EventCardHome } from "../components/Event/EventCardHome"
+
+// interface PostsPageProps {
+//   openCreateModal: () => void
+// }
+
+// export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
+//   const { loading, posts } = usePosts();
+//   const { events } = useEvents();
+//   const [storyDisplayType, setStoryDisplayType] = useState<"sport" | "location">("sport")
+//   const [postSortType, setPostSortType] = useState<"following" | "sport">("following")
+//   // const [selectedSportFilter, setSelectedSportFilter] = useState<string | null>(null)
+//   const [createStoryModalOpen, setCreateStoryModalOpen] = useState(false)
+//   const isMobile = useMediaQuery("(max-width: 768px)")
+
+//   // Extract all unique sport tags for filtering
+//   // const allSportTags = Array.from(new Set(POSTS.flatMap((post) => post.sportTags || [])))
+
+//   // Filter posts based on selected sport tag
+// //   const filteredPosts = selectedSportFilter
+// //     ? POSTS.filter((post) => post.sportTags?.includes(selectedSportFilter))
+// //     : POSTS
+
+// //   useEffect(() => {
+// //     // Simulate loading data
+// //     const timer = setTimeout(() => {
+// //       setLoading(false)
+// //     }, 1000)
+
+// //     return () => clearTimeout(timer)
+// //   }, [])
+
+//     //  if (loading) {
+//     //     return <div className="flex flex-row">
+//     //         <div className = "pt-6 px-4" >
+//     //             <Sidebar openCreateModal={openCreateModal} />
+//     //         </div> 
+//     //         <div>
+//     //           <div className="grid grid-cols-9 p-2">
+//     //               <div className="px-1 md:px-4 mt-2">
+//     //                     <StorySkeleton />
+//     //                 </div>
+//     //                 <div className="col-start-2 sm:col-span-5 sm:col-start-3 p-4 xl:col-start-2">
+//     //                     <PostSkeleton />
+//     //                     <PostSkeleton />
+//     //                     <PostSkeleton />
+//     //                     <PostSkeleton />
+//     //                     <PostSkeleton />
+//     //                 </div>       
+//     //             </div>
+//     //         </div>
+//     //     </div>
+//     // }
+//     // else {
+//       return <div className="min-h-screen bg-background">
+//         {isMobile && <MobileNav openCreateModal={openCreateModal} />}
+
+//       <div className="flex">
+//         <div className="hidden md:block w-16 xl:w-52 fixed h-screen">
+//           <Sidebar openCreateModal={openCreateModal} />
+//         </div>
+//         {/* Main Content */}
+//         <main className="flex-1 md:ml-16 xl:ml-56">
+//           <div className="max-w-screen-xl mx-auto">
+//             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+//               {/* Stories and Posts Column */}
+//               <div className="md:col-span-3 p-2 lg:col-span-3">
+//                 {/* Story Display Type Toggle */}
+//                 <div className="mt-2 md:mt-4 flex justify-between items-center">
+//                   <div className="flex space-x-2">
+//                     <button
+//                       onClick={() => setStoryDisplayType("sport")} //hangleStoryType -> setting type and also sending request to backend for sorting according to sport
+//                       className={`px-3 py-1 text-sm rounded-full ${
+//                         storyDisplayType === "sport"
+//                           ? "bg-blue-400 text-white"  
+//                           : "bg-muted text-muted-foreground"
+//                       }`}
+//                     >
+//                       Sports
+//                     </button>
+//                     <button
+//                       onClick={() => setStoryDisplayType("location")} //hangleStoryType -> setting type and also sending request to backend for sorting according to location
+//                       className={`px-3 py-1 text-sm rounded-full ${
+//                         storyDisplayType === "location" ? "bg-blue-400 text-white" : "bg-muted text-muted-foreground"
+//                       }`}
+//                     >
+//                       Locations
+//                     </button>
+//                   </div>
+
+//                   {/* Create Post Button (Desktop) */}
+//                   <Button
+//                     onClick={openCreateModal}
+//                     size="sm"
+//                     className="hidden md:flex items-center gap-1 bg-primary hover:bg-blue-300 text-primary-foreground"
+//                   >
+//                     <PlusCircle className="h-4 w-4" />
+//                     Create Post
+//                   </Button>
+//                 </div>
+
+//                 {/* Stories Section */}
+//                   <div className="pt-2 ">
+//                     <Story />
+//                   </div>
+//                   <hr />
+
+//                 {/* Post Sorting Options */}
+//                 <div className="mt-4 mb-2">
+//                   <div className="flex justify-between items-center ">
+//                     <div className="flex space-x-2">
+//                       <button
+//                         onClick={() => {
+//                           setPostSortType("following") //hanglePostType -> setting type and also sending request to backend for sorting according to following 
+//                           // setSelectedSportFilter(null)
+//                         }}
+//                         className={`px-3 py-1 text-sm rounded-full ${
+//                           postSortType === "following"
+//                             ? "bg-blue-400 text-white"
+//                             : "bg-muted text-muted-foreground"
+//                         }`}
+//                       >
+//                         Following
+//                       </button>
+//                       <button
+//                         onClick={() => setPostSortType("sport")} //hanglePostType -> setting type and also sending request to backend for sorting according to sport - or this should be handled on frontend only 
+//                         className={`px-3 py-1 text-sm rounded-full ${
+//                           postSortType === "sport" ? "bg-blue-400 text-white" : "bg-muted text-muted-foreground"
+//                         }`}
+//                       >
+//                         Sports
+//                       </button>
+//                     </div>
+//                   </div>
+//                 </div>
+
+//                   {/* Sport Tags Filter - Only visible when "Sports" is selected */}
+//                   {/* {postSortType === "sport" && (
+//                     <div className="flex flex-wrap gap-2 mt-2 pb-2 overflow-x-auto">
+//                       {allSportTags.map((tag) => (
+//                         <button
+//                           key={tag}
+//                           onClick={() => setSelectedSportFilter(tag === selectedSportFilter ? null : tag)}
+//                           className={`px-3 py-1 text-xs rounded-full border ${
+//                             tag === selectedSportFilter
+//                               ? "bg-blue-500 text-white border-blue-500"
+//                               : "bg-background text-foreground border-border"
+//                           }`}
+//                         >
+//                           {tag}
+//                         </button>
+//                     ))}
+//                     </div>
+//                   )}  */}
+//                 {/* </div> */}
+
+//                 {/* Posts Section */}
+//                 <div className="mt-2 px-6 pt-6 space-y-4 md:px-4 pb-16 md:pb-8">
+//                   {loading
+//                     ? // Post loading skeletons
+//                       Array(3)
+//                         .fill(0)
+//                         .map((_, index) => <PostSkeleton key={index} />)
+//                     : // Actual posts
+//                       posts.length === 0 ? (
+//                         <p className="text-center text-muted-foreground py-10">No posts available right now</p> // Message when no posts are available
+//                       ) : (
+//                         posts.map((post) => (
+//                           <PostCard
+//                             key={post.id}
+//                             id={post.id}
+//                             author={post.author.name || "Anonymous"}
+//                             title={post.title}
+//                             content={post.content}
+//                             expanded={false}
+//                           />
+//                         ))
+//                       )}
+//                 </div>
+
+            
+//               </div>
+              
+//                 <div className="hidden lg:block lg:col-span-2 ">
+                  
+//                           <EventHomeSidebar
+//                             events={events}
+//                             onRegister={() => alert('Registration functionality coming soon!')}
+//                           />
+                      
+//                 </div>
+
+//             </div>
+//           </div>
+//         </main>
+//       {/* Create Story Modal */}
+//       <CreateStoryModal isOpen={createStoryModalOpen} onClose={() => setCreateStoryModalOpen(false)} />
+//       </div>
+//     </div>
+//   }
 
 
       

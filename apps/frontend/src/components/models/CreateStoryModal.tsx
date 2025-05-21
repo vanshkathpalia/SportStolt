@@ -131,7 +131,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-white">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800">
         <DialogHeader>
           <DialogTitle>Create New Story</DialogTitle>
         </DialogHeader>
@@ -186,8 +186,8 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           </div> */}
 
           <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                    <Camera className="w-4 h-4 inline mr-1" />
+                <label className="block text-sm font-medium dark:text-white text-black mb-2">
+                    <Camera className="w-4 h-4 inline mr-1 " />
                     Story Image URL
                 </label>
                 <input
@@ -195,7 +195,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                   name="image"
                   value={image}
                   onChange={(e) => setImage(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter image URL"
               />
           </div>
@@ -203,7 +203,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           {/* Location image Input, rendered through api, seen the name of locaiton 
           can be used for maps later... */}
           <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium dark:text-white text-black mb-2">
                 <Camera className="w-4 h-4 inline mr-1" />
                 Location Name
             </label>
@@ -212,7 +212,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
               name="locationImage"
               value={locationImage}
                 onChange={(e) => setLocationImage(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2  dark:border-gray-700 border dark:bg-gray-700 rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter location URL"
               />
           </div>
@@ -241,14 +241,14 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
               placeholder="Describe your story..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="min-h-[100px]"
+              className="min-h-[100px] dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300"
               required
             />
           </div>
 
           {/* Sport Type */}
           <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-black- mb-2">
                   <Trophy className="w-4 h-4 inline mr-1" />
                   Sport
               </label>
@@ -256,7 +256,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                   name="sport"
                   value={sport}
                   onChange={(e) => setSport(e.target.value)}
-                  className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border  dark:border-gray-700 dark:bg-gray-900 rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                   <option value="">Select a sport</option>
                   <option value="Cricket">Cricket</option>
@@ -277,14 +277,14 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                 placeholder="Enter location name"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                className="pl-9"
+                className="pl-9  dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300"
                 required
               />
             </div>
           </div>
 
           <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-black dark:text-white mb-2">
                   <MapPin className="w-4 h-4 inline mr-1" />
                   Stadium
               </label>
@@ -293,7 +293,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                 name="stadium"
                 value={stadium}
                 onChange={(e) => setStadium(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border  dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter stadium name"
               />
           </div>
@@ -309,7 +309,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                   type="time"
                   value={activityStarted}
                   onChange={(e) => setActivityStarted(e.target.value)}
-                  className="pl-9"
+                  className="pl-9  dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300"
                   required
                 />
               </div>
@@ -327,7 +327,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                   type="time"
                   value={activityEnded}
                   onChange={(e) => setActivityEnded(e.target.value)}
-                  className="pl-9"
+                  className="pl-9  dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300"
                   required
                 />
               </div>
@@ -345,7 +345,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                 placeholder="Enter Event link"
                 value={participants}
                 onChange={(e) => setParticipants(e.target.value)}
-                className="pl-9"
+                className="pl-9 dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300"
                 min="1"
                 required
               />
@@ -355,7 +355,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           {/* Submit Button */}
           <Button
             type="submit"
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:hover:bg-gray-900 dark:text-white"
             disabled={ /*!isloading, was for when image was uploaded form device... */!image || !description || !location || !activityStarted || !activityEnded|| !sport }
           >
             {isLoading ? "Creating story..." : "Share Story"}

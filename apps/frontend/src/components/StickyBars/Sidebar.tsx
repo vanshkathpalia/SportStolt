@@ -1,56 +1,64 @@
-
-import { Home, Search, Trophy, Activity, Bell, PlusSquare, User, Menu, DollarSign, Settings, LogOut } from "lucide-react";
+import {
+  Home,
+  Search,
+  Trophy,
+  Activity,
+  Bell,
+  PlusSquare,
+  User,
+  Menu,
+  DollarSign,
+  Settings,
+  LogOut,
+} from "lucide-react";
 import { cn } from "../lib/utils";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-// import NavItem from "./NavItem";
-// Utility function to combine class names
 
 interface SidebarItemProps {
-  icon: React.ElementType
-  label: string
-  href: string
-  active?: boolean
-  onClick?: () => void
+  icon: React.ElementType;
+  label: string;
+  href: string;
+  active?: boolean;
+  onClick?: () => void;
 }
 
-
-
-// for handling toggle in and out, appear and disappear for more options
 const SidebarItem = ({ icon: Icon, label, href, active, onClick }: SidebarItemProps) => {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (onClick) {
-      onClick()
+      onClick();
     } else if (href) {
-      navigate(href)
+      navigate(href);
     }
-  }
+  };
+
   return (
     <a
       href={href}
-      className={cn(
-        "flex items-center gap-4 px-4 py-3 rounded-md transition-colors hover:bg-accent",
-        active && "font-semibold"
-      )}
       onClick={handleClick}
+      className={cn(
+        "flex items-center gap-4 px-4 py-3 rounded-md transition-colors",
+        "hover:bg-accent dark:hover:bg-gray-700",
+        active && "font-semibold text-green-500"
+      )}
     >
-      <Icon className={cn("h-6 w-6", active && "text-green-500")} />
-      <span className="hidden xl:block">{label}</span>
+      <Icon className={cn("h-6 w-6", active ? "text-green-500" : "text-gray-600 dark:text-gray-300")} />
+      <span className="hidden xl:block text-gray-800 dark:text-gray-200">{label}</span>
     </a>
   );
 };
 
 interface SidebarProps {
-  openCreateModal: () => void
+  openCreateModal: () => void;
 }
 
 export function Sidebar({ openCreateModal }: SidebarProps) {
-  const location = useLocation()
-  const pathname = location.pathname
-  const [moreOpen, setMoreOpen] = useState(false)
+  const location = useLocation();
+  const pathname = location.pathname;
+  const [moreOpen, setMoreOpen] = useState(false);
 
   const navItems = [
     { icon: Home, label: "Home", href: "/post" },
@@ -63,19 +71,12 @@ export function Sidebar({ openCreateModal }: SidebarProps) {
   ];
 
   return (
-    <div className="h-full border-r border-border flex flex-col py-4 bg-gradient-to-b from-background to-background">
+    <div className="h-full flex flex-col py-4 bg-backgroundtransition-colors">
+      {/* Logo */}
       <div className="px-2 mb-8">
         <div className="flex flex-col items-center gap-2">
-          {/* <div className="w-8 h-8 bg-black rounded-full flex items-center justify-center">
-            <Trophy className="h-5 w-5 text-white" />
-          </div> */}
           <Link to="/post" className="flex items-center px-6 cursor-pointer">
-            {/* Text for xl and above */}
-            <h1 className="text-xl font-bold hidden xl:block text-green-500">
-              SportStolt
-            </h1>
-
-            {/* Trophy icon for md to xl */}
+            <h1 className="text-xl font-bold hidden xl:block text-green-500">SportStolt</h1>
             <div className="hidden md:block xl:hidden">
               <Trophy className="h-7 w-8 text-green-500" />
             </div>
@@ -83,6 +84,7 @@ export function Sidebar({ openCreateModal }: SidebarProps) {
         </div>
       </div>
 
+      {/* Nav Items */}
       <nav className="flex-1 space-y-1">
         {navItems.map((item) => (
           <SidebarItem
@@ -96,11 +98,11 @@ export function Sidebar({ openCreateModal }: SidebarProps) {
         ))}
       </nav>
 
-      
+      {/* More Dropdown */}
       <div className="mt-auto relative">
         <SidebarItem icon={Menu} label="More" href="#" onClick={() => setMoreOpen(!moreOpen)} />
         {moreOpen && (
-          <div className="absolute bottom-12 left-0 w-48 bg-white shadow-lg rounded-lg p-2 z-50">
+          <div className="absolute bottom-12 left-0 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-2 z-50">
             <SidebarItem icon={Settings} label="Settings" href="/settings" />
             <SidebarItem icon={DollarSign} label="Be an Earner" href="/earn" />
             <SidebarItem icon={LogOut} label="Logout" href="/logout" />
@@ -110,6 +112,7 @@ export function Sidebar({ openCreateModal }: SidebarProps) {
     </div>
   );
 }
+
 
 
 // import { Home, PlusSquare, Film, User, Calendar, Search } from 'lucide-react';

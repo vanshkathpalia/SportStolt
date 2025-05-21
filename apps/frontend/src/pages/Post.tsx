@@ -8,6 +8,7 @@ import { Sidebar } from "../components/StickyBars/Sidebar";
 import { Button } from "../components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { PostCard } from "../components/Post/PostCard";
+import { PostSkeleton } from "../components/Post/PostSkeleton";
 
 // // import { Sidebar } from "../components/StickyBars/Sidebar"
 // // import { MobileNav } from "../components/StickyBars/MobileNav"
@@ -54,30 +55,32 @@ export const PostPage = ({ openCreateModal }: PostPageProps) => {
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 md:ml-16 lg:ml-64">
+        <main className="flex-1 md:ml-16 lg:ml-64bg-background">
           <div className="max-w-2xl mx-auto p-4">
             {/* Back button */}
-            <Button variant="ghost" size="sm" className="mb-4 flex items-center gap-1" onClick={handleBack}>
+            <Button variant="ghost" size="sm" className="mb-4 flex items-center gap-1 dark:text-white" onClick={handleBack}>
               <ArrowLeft className="h-4 w-4" />
               Back
             </Button>
 
             {loading ? (
               // Loading skeleton
-              <div className="bg-card rounded-md p-4 space-y-4 max-w-xl mx-auto">
-                <div className="flex items-center space-x-2">
-                  <div className="w-10 h-10 rounded-full bg-muted animate-pulse" />
-                  <div className="h-4 bg-muted rounded w-24 animate-pulse" />
-                </div>
-                <div className="w-full aspect-square bg-muted rounded animate-pulse" />
-                <div className="space-y-2">
-                  <div className="h-4 bg-muted rounded w-32 animate-pulse" />
-                  <div className="h-4 bg-muted rounded w-full animate-pulse" />
-                </div>
-              </div>
+              // <div className="bg-white dark:bg-gray-800 rounded-md p-8 mb-20 space-y-4 max-w-xl mx-auto">
+              //   <div className="flex items-center dark:border-gray-900 kspace-x-2">
+              //     <div className="w-10 h-10 rounded-full bg-gray-200 dark:bg-gray-600 animate-pulse" />
+              //     <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-24 animate-pulse" />
+              //   </div>
+              //   <div className="w-full aspect-square bg-gray-200 dark:bg-gray-600 rounded animate-pulse" />
+              //   <div className="space-y-2">
+              //     <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-32 animate-pulse" />
+              //     <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full animate-pulse" />
+              //   </div>
+              // </div>
+              PostSkeleton()
+
             ) : post ? (
               // Post detail view
-                  <div className="sm:col-span-5 sm:col-start-3 p-6 xl:col-start-2">
+                  <div className="sm:col-span-5 sm:col-start-3 p-3xl:col-start-2">
                       {post &&  <PostCard
                           id={post.id}
                           author={post.author.name || "Anonymous"}

@@ -38,7 +38,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
   }
 
   return (
-    <div className="h-screen flex justify-center flex-col">
+    <div className="h-screen bg-gray-50 dark:bg-gray-800 flex justify-center flex-col transition-colors duration-300">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -54,7 +54,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
             transition={{ duration: 0.6, ease: "easeInOut" }}
           >
             <div className="px-10">
-              <div className="text-3xl font-extrabold">
+              <div className="text-3xl text-black dark:text-slate-400 font-extrabold">
                 {type === "signup" ? "Create an account" : "Sign in to your account"}
               </div>
               <div className="text-slate-500">
@@ -89,12 +89,12 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
               />
               <button
                 type="submit"
-                className={`mt-8 w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 flex items-center justify-center transition-all duration-300 ${
+                className={`mt-8 w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2  dark:bg-slate-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 flex items-center justify-center transition-all duration-300 ${
                   loading ? "cursor-wait" : ""
                 }`}
                 disabled={loading}
               >
-                {loading ? <Loader2 className="animate-spin mr-2" /> : null }
+                {loading ? <Loader2 className=" animate-spin mr-2" /> : null }
                 {loading ? "Processing..." : type === "signup" ? "Sign up" : "Sign in"}
               </button>
             </div>
@@ -115,11 +115,14 @@ interface LabelledInputType {
 function LabelledInput({ label, placeholder, onChange, type }: LabelledInputType) {
   return (
     <div>
-      <label className="block mb-2 text-sm text-black font-semibold pt-4">{label}</label>
+      <label className="block mb-2 text-sm font-semibold pt-4 text-gray-800 dark:text-gray-200">
+        {label}
+      </label>
+
       <input
         onChange={onChange}
         type={type || "text"}
-        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 transition-all duration-300"
+        className="bg-white dark:bg-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 text-gray-900 dark:placeholder-gray-400 text-sm rounded-lg focus:ring-blue-200 focus:border-blue-500 block w-full p-2.5 transition-all duration-300"
         placeholder={placeholder}
         required
       />

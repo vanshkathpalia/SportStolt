@@ -28,25 +28,23 @@ export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void })
 
         {/* Main Content */}
         <main className="flex-1 md:ml-16 xl:ml-56">
-          <div className="max-w-screen-lg mx-auto px-4 py-6">
-          
-            <div className="flex justify-between items-center mb-4">
-  
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Upcoming Events</h1>
+          {/* Fixed Header */}
+          <div className="fixed md:top-0 left-0 right-0 md:left-16 xl:left-56 z-50 bg-background pb-2">
+            <div className="max-w-screen-lg mx-auto px-4 py-4">
+              <div className="flex justify-between items-center">
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-slate-300">
+                  Upcoming Events
+                </h1>
+                <button
+                  onClick={openCreateModal}
+                  className="hidden md:flex items-center gap-1 px-3 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
+                >
+                  <Plus size={16} />
+                  Create Event
+                </button>
+              </div>
 
-              {/* Create Button */}
-              <button
-                onClick={openCreateModal}
-                className="hidden md:flex items-center gap-1 px-3 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
-              >
-                <Plus size={16} />
-                Create Event
-              </button>
-            </div>
-
-            {/* Loading Skeletons */}
-            {/* Search Bar */}
-            <div className="relative w-full mb-8">
+              <div className="relative w-full mt-4">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                 <input
                   type="text"
@@ -55,12 +53,16 @@ export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void })
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 />
+              </div>
             </div>
+          </div>
 
+          {/* Scrollable Content */}
+          <div className="max-w-screen-lg mx-auto px-4 pt-[100px] md:pt-[160px] pb-6">
             {loading ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[...Array(6)].map((_, i) => (
-                  <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse" />
+                  <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse dark:opacity-10 opacity-80" />
                 ))}
               </div>
             ) : filteredEvents.length === 0 ? (
@@ -69,17 +71,15 @@ export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void })
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredEvents.map(event => (
-                  <EventCard 
-                    key={event.id} 
-                    event={event} 
-                  />
+                {filteredEvents.map((event) => (
+                  <EventCard key={event.id} event={event} />
                 ))}
               </div>
             )}
-
           </div>
         </main>
+
+
       </div>
     </div>
   );

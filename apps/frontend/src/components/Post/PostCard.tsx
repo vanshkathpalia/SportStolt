@@ -115,7 +115,7 @@ export const PostCard = ({
   return (
     <div
       className={cn(
-        "bg-background border border-border rounded-md max-w-xl mx-auto mb-6", 
+        "bg-background bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md max-w-xl mx-auto mb-5", 
         // !expanded && "cursor-pointer"
       )} onClick={handlePostClick}
     >
@@ -141,54 +141,68 @@ export const PostCard = ({
 
       {/* Post Actions */}
       <div className="p-3">
-      <div className="font-medium text-sm mb-1">{likeCount} {likeCount === 1 ? "like" : "likes"}</div>
+      <div className={cn("font-medium text-sm mb-1 p-1")}>{likeCount} {likeCount === 1 ? "like" : likeCount === 0 ? "like" : "likes"}</div>
 
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center space-x-4">
-          
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8"
+        <div className="flex justify-between items-center mb-2">
+          <div className="flex space-x-4">
+            <button
               onClick={(e) => {
                 e.stopPropagation();
                 fetch(`${BACKEND_URL}/api/v1/post/${id}/like`, {
                   method: "POST",
                   headers: { Authorization: `Bearer ${userToken}` },
-
                 })
-                .then(res => res.json())
-                .then(data => {
-                  setLiked(data.liked);
-                  setLikeCount(data.likeCount); // Use backend value
-                })
-                .catch(() => {
-                  setLiked(prev => !prev); // rollback
-                });
+                  .then(res => res.json())
+                  .then(data => {
+                    setLiked(data.liked);
+                    setLikeCount(data.likeCount);
+                  })
+                  .catch(() => {
+                    setLiked(prev => !prev);
+                  });
               }}
+              className={cn(
+                "text-gray-600 dark:text-gray-400 hover:text-red-500 transition-colors",
+                liked && "text-red-500"
+              )}
             >
-              <Heart className={cn("h-6 w-6", liked && "fill-red-500 text-red-500")} />
+              <Heart className={cn("w-6 h-6", liked && "fill-red-500")} />
               <span className="sr-only">Like</span>
-            </Button>
+            </button>
 
-            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleSave}>
-              <Bookmark className={cn("h-6 w-6", saved && "fill-current")} />
-              <span className="sr-only">Save</span>
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MessageCircle className="h-6 w-6" />
+            <button
+              onClick={() => {
+                // Comment logic here if needed
+              }}
+              className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              <MessageCircle className="w-6 h-6" />
               <span className="sr-only">Comment</span>
-            </Button>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <Send className="h-6 w-6" />
+            </button>
+
+            <button
+              onClick={() => {
+                // Share logic here if needed
+              }}
+              className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              <Send className="w-6 h-6" />
               <span className="sr-only">Share</span>
-            </Button>
+            </button>
           </div>
-          {/* <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleSave}>
-            <Bookmark className={cn("h-6 w-6", saved && "fill-current")} />
+
+          <button
+            onClick={handleSave}
+            className={cn(
+              "text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors",
+              saved && "text-primary"
+            )}
+          >
+            <Bookmark className={cn("w-6 h-6", saved && "fill-current")} />
             <span className="sr-only">Save</span>
-          </Button> */}
+          </button>
         </div>
+
 
         {/* Sport Tags */}
         {/* {post.sportTags && post.sportTags.length > 0 && (
