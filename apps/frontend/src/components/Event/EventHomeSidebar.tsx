@@ -12,18 +12,18 @@ export const EventHomeSidebar = ({ events, onRegister }: EventHomeSidebarProps) 
     <div className="p-10 sticky top-4 ">
       <div className="flex items-center mb-6">
         <Trophy className="h-6 w-6 mr-2 text-green-500" />
-        <h2 className="text-lg font-semibold">Upcoming Top Events</h2>
+        <h2 className="text-lg dark:text-slate-300 font-semibold">Upcoming Top Events</h2>
       </div>
       
 
       
       {events.length === 0 ? (
-        <p className="border border-border rounded-lg p-4">No events currently</p>
+        <p className="border border-border dark:text-slate-300 rounded-lg p-4">No events currently</p>
       ) : (
       <div className="space-y-4 max-h-[455px] overflow-auto pr-2">
       {events.map((event) => (
         <div key={event.id} className="border border-border rounded-lg p-4 hover:border-green-500 transition-colors">
-            <h3 className="font-medium mb-2">{event.name}</h3>
+            <h3 className="font-medium dark:text-gray-400 mb-2">{event.name}</h3>
             <div className="text-sm text-muted-foreground mb-2 space-y-1">
               <div className="flex items-center">
                 <Calendar className="h-4 w-4 mr-1 text-green-500" />
@@ -40,7 +40,7 @@ export const EventHomeSidebar = ({ events, onRegister }: EventHomeSidebarProps) 
             <div className="flex items-center justify-between mt-4">
               <div className="flex items-center">
                 <Users className="h-4 w-4 mr-1 text-green-500" />
-                <span className="text-sm">{event.author.name}</span>
+                <span className="text-sm dark:text-slate-400">{event.author.name}</span>
               </div>
               <Button
                     onClick={onRegister}

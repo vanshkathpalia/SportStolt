@@ -127,9 +127,9 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className=" dark:bg-gray-800 sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-white">
+      <DialogContent className=" dark:bg-gray-800 sm:max-w-[600px] test-black max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Post</DialogTitle>
+          <DialogTitle className="test-black dark:text-white">Create New Post</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="dark:bg-gray-800 space-y-6">
@@ -249,25 +249,25 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
               name="image"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full px-3 py-2 dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300"
+              className="w-full px-3 py-2 dark:border-gray-700 test-black dark:bg-gray-700 rounded-lg dark:text-gray-300"
               placeholder="Enter image URL"
             />
           </div>
 
           {/* Caption */}
-          <div className="space-y-2">
-            <Label htmlFor="caption">Write a caption</Label>
+          <div className=" test-black dark:text-white space-y-2">
+            <Label htmlFor="caption">Caption</Label>
             <Textarea
               id="caption"
               placeholder="Write a caption for your post..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="min-h-[100px] dark:border-gray-700 dark:bg-gray-700 dark:text-gray-300"
+              className="min-h-[100px] dark:border-gray-700 test-black dark:bg-gray-700 rounded-lg dark:text-gray-300"
             />
           </div>
 
           {/* Image URL */}
-          <div className="space-y-2">
+          <div className="space-y-2 test-black dark:text-white">
             <Label htmlFor="location">Add Image URL</Label>
             <div className="relative">
               <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -302,7 +302,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
           {/* Submit Button */}
           <Button
             type="submit"
-            className="w-full dark:bg-gray-600 dark:hover:bg-gray-700 dark:text-white"
+            className="w-full dark:bg-gray-900 dark:hover:bg-gray-600 dark:text-white"
             disabled={ /* isLoading || (!previewUrl && activeTab === "photo") || */ !content || !title}
           >
             {isLoading ? "Creating post..." : "Share Post"}

@@ -133,7 +133,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800">
         <DialogHeader>
-          <DialogTitle>Create New Story</DialogTitle>
+          <DialogTitle className="text-black dark:text-white">Create New Story</DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -234,7 +234,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           </div> */}
 
           {/* Description */}
-          <div className="space-y-2">
+          <div className="space-y-2 dark:text-white text-black">
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
@@ -248,8 +248,8 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
 
           {/* Sport Type */}
           <div>
-              <label className="block text-sm font-medium text-black- mb-2">
-                  <Trophy className="w-4 h-4 inline mr-1" />
+              <label className="block text-sm font-medium  mb-2 dark:text-white text-black">
+                  <Trophy className="w-4 h-4 inline mr-1 " />
                   Sport
               </label>
               <select
@@ -268,7 +268,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           </div>
 
           {/* Location, for our backend api to pexel */}
-          <div className="space-y-2">
+          <div className="space-y-2 dark:text-white text-black">
             <Label htmlFor="location">Location</Label>
             <div className="relative">
               <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -299,7 +299,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           </div>
 
           {/* Time Range */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 dark:text-white text-black">
             <div className="space-y-2">
               <Label htmlFor="startTime">Start Time</Label>
               <div className="relative">
@@ -335,7 +335,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           </div>
 
           {/* Participants */}
-          <div className="space-y-2">
+          <div className="space-y-2 dark:text-white text-black">
             <Label htmlFor="participants">Expected Participants</Label>
             <div className="relative">
               <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -355,7 +355,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           {/* Submit Button */}
           <Button
             type="submit"
-            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-800 dark:hover:bg-gray-900 dark:text-white"
+            className="w-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-900 dark:hover:bg-gray-600 dark:text-white"
             disabled={ /*!isloading, was for when image was uploaded form device... */!image || !description || !location || !activityStarted || !activityEnded|| !sport }
           >
             {isLoading ? "Creating story..." : "Share Story"}

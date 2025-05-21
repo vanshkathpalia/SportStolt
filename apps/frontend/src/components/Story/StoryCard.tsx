@@ -17,7 +17,7 @@ export interface StoryType {
     participants?: number;
     createdAt: string;
     sport?: string;
-    endTime: any;
+    endTime: any; //HERE
     author: {
         name: string;
         image?: string;

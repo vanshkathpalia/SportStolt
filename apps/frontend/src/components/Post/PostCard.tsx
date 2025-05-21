@@ -121,12 +121,12 @@ export const PostCard = ({
     >
       {/* Post Header */}
       <div className="flex items-center justify-between p-3" onClick={handlePostClick}>
-        <div className="flex items-center space-x-2">
+        <div className="flex dark:text-slate-200 items-center space-x-2">
           <Avatar className="w-8 h-8">
             <AvatarImage src={content} alt={title} />
             {/* <AvatarFallback>{authorInitials}</AvatarFallback> */}
           </Avatar>
-          <span className="font-medium text-sm">{author}</span>
+          <span className="font-medium dark:text-slate-200 text-sm">{author}</span>
         </div>
         <Button variant="ghost" size="icon" className="h-8 w-8">
           <MoreHorizontal className="h-5 w-5" />
@@ -136,12 +136,12 @@ export const PostCard = ({
 
       {/* Post Image */}
       <div className="relative aspect-square" >
-        <img src={content || "/placeholder.svg"} alt={title} className="w-full h-full object-cover" />
+        <img src={content || "/placeholder.svg"} alt={title} className="dark:text-slate-200 w-full h-full object-cover" />
       </div>
 
       {/* Post Actions */}
       <div className="p-3">
-      <div className={cn("font-medium text-sm mb-1 p-1")}>{likeCount} {likeCount === 1 ? "like" : likeCount === 0 ? "like" : "likes"}</div>
+      <div className={cn("font-medium dark:text-slate-200 text-sm mb-1 p-1")}>{likeCount} {likeCount === 1 ? "like" : likeCount === 0 ? "like" : "likes"}</div>
 
         <div className="flex justify-between items-center mb-2">
           <div className="flex space-x-4">

@@ -22,7 +22,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
       const data = await res.json();
       alert(data.message);
-      setIsRegistered(true); // ✅ Mark as registered
+      setIsRegistered(true); 
     } catch (err) {
       alert("Something went wrong while registering.");
       console.error(err);
@@ -35,7 +35,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
       <img src={event.imageUrl} alt={event.location} className="w-full h-48 object-cover" />
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-semibold">{event.location}</h3>
+          <h3 className="text-xl dark:text-slate-300 font-semibold">{event.location}</h3>
           <span className="bg-blue-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
             {new Date(event.publishedDate).toLocaleDateString()}
           </span>
