@@ -66,7 +66,7 @@ export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void })
                 ))}
               </div>
             ) : filteredEvents.length === 0 ? (
-              <div className="text-center text-gray-500 text-lg mt-8">
+              <div className="text-center text-gray-500 dark:text-slate-300 text-lg mt-8">
                 No events currently.
               </div>
             ) : (

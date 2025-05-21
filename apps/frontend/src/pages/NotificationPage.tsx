@@ -146,10 +146,10 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
         {/* Main Content */}
         <main className="flex-1 md:ml-16 xl:ml-64 pb-16 md:pb-8">
           <div className="max-w-2xl mx-auto p-4">
-            <h1 className="text-2xl font-bold mb-6">Notifications</h1>
+            <h1 className="text-2xl dark:text-slate-300 font-bold mb-6">Notifications</h1>
 
             <Tabs defaultValue="all" className="mb-6">
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full bg-gray-700 grid-cols-3">
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="mentions">Mentions</TabsTrigger>
                 <TabsTrigger value="events">Events</TabsTrigger>
@@ -179,16 +179,17 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
                       {TODAY_NOTIFICATIONS.map((notification) => (
                         <div
                           key={notification.id}
-                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
                         >
-                          <Avatar className="h-10 w-10">
+                          <Avatar className="h-10 w-10 text-ring bg-muted">
                             <AvatarImage src={notification.user.avatar} />
                             <AvatarFallback>{notification.user.name.charAt(0).toUpperCase()}</AvatarFallback>
                           </Avatar>
 
                           <div className="flex-1 min-w-0">
                             <p className="text-sm">
-                              <span className="font-medium">{notification.user.name}</span> {notification.content}
+                              <span className="font-medium dark:text-slate-200">{notification.user.name}</span> 
+                              <span className="text-muted-foreground"> {notification.content} </span> 
                             </p>
                             <p className="text-xs text-muted-foreground">{notification.time}</p>
                           </div>
@@ -207,7 +208,7 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
                             )}
 
                             {notification.type === "follow" && (
-                              <Button size="sm" variant="outline" className="text-xs h-8">
+                              <Button size="sm" variant="outline" className="dark:text-slate-200 text-xs h-8">
                                 Follow
                               </Button>
                             )}
@@ -249,7 +250,7 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
                       {EARLIER_NOTIFICATIONS.map((notification) => (
                         <div
                           key={notification.id}
-                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted/50 transition-colors"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-background transition-colors" //what is the use of many of them
                         >
                           <Avatar className="h-10 w-10">
                             <AvatarImage src={notification.user.avatar} />
@@ -298,7 +299,7 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
               <TabsContent value="mentions" className="mt-4">
                 <div className="flex flex-col items-center justify-center py-12 text-center">
                   <MessageCircle className="h-12 w-12 text-muted-foreground mb-4" />
-                  <h3 className="text-lg font-medium">No mentions yet</h3>
+                  <h3 className="text-lg text-foreground font-medium">No mentions yet</h3>
                   <p className="text-muted-foreground max-w-sm">
                     When someone mentions you in a comment or post, you'll see it here.
                   </p>

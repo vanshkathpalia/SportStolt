@@ -1,4 +1,4 @@
 /* index.css or app.css */
-/* body {
+body {
   @apply transition-colors duration-300 bg-white text-black dark:bg-gray-900 dark:text-white;
-} */
+}

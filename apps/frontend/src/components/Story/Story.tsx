@@ -85,7 +85,7 @@ export const Story = () => {
                             );
                         })
                     ) : (
-                        <div className="flex items-center justify-center pb-4">
+                        <div className="flex items-center dark:text-slate-400 justify-center pb-4">
                             <p>
                                 No stories available
                             </p>
