@@ -31,7 +31,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden mb-10">
+    <div className="bg-muted rounded-lg shadow-md overflow-hidden mb-10">
       <img src={event.imageUrl} alt={event.location} className="w-full h-48 object-cover" />
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
@@ -41,12 +41,12 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
           </span>
         </div>
 
-        <div className="space-y-3 mb-6">
-          <div className="flex items-center gap-2 text-gray-600">
+        <div className="space-y-3 mb-6 p-2 rounded-lg">
+          <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
             <Calendar className="w-8 h-8" />
             <span>{event.timing}</span> {/* Contains start and end info */}
           </div>
-          <div className="flex items-center gap-2 text-gray-600">
+          <div className="flex items-center gap-2  text-gray-600 dark:text-gray-400">
             <Users className="w-5 h-5" />
             <span>Organized by: {event.author.name}</span>
           </div>
@@ -79,6 +79,89 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
     </div>
   );
 };
+
+
+
+// import { motion } from "framer-motion";
+// import { Calendar, Users } from 'lucide-react';
+// import type { EventInterface } from '../../hooks';
+// import { useState } from 'react';
+// import { BACKEND_URL } from '../../config';
+
+// interface EventCardProps {
+//   event: EventInterface;
+// }
+
+// export const EventCard: React.FC<EventCardProps> = ({ event }) => {
+//   const [isRegistered, setIsRegistered] = useState(event.isRegistered ?? false);
+
+//   const handleRegister = async (eventId: number) => {
+//     try {
+//       const token = localStorage.getItem("token");
+//       const res = await fetch(`${BACKEND_URL}/api/v1/event/${eventId}/register`, {
+//         method: "POST",
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       });
+
+//       const data = await res.json();
+//       alert(data.message);
+//       setIsRegistered(true);
+//     } catch (err) {
+//       alert("Something went wrong while registering.");
+//       console.error(err);
+//     }
+//   };
+
+//   return (
+//     <motion.div
+//       className="bg-background rounded-lg shadow-md overflow-hidden mb-10"
+//       initial={{ opacity: 0, y: 50 }} // starts faded and shifted down
+//       whileInView={{ opacity: 1, y: 0 }} // becomes visible when in view
+//       viewport={{ once: true, amount: 0.2 }} // only animate once, when 20% visible
+//       transition={{ duration: 0.6, ease: "easeOut" }}
+//     >
+//       <img src={event.imageUrl} alt={event.location} className="w-full h-48 object-cover" />
+//       <div className="p-6">
+//         <div className="flex items-center justify-between mb-4">
+//           <h3 className="text-xl font-semibold">{event.location}</h3>
+//           <span className="bg-blue-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
+//             {new Date(event.publishedDate).toLocaleDateString()}
+//           </span>
+//         </div>
+
+//         <div className="space-y-3 mb-6 dark:bg-gray-700 p-2 rounded-lg">
+//           <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
+//             <Calendar className="w-8 h-8" />
+//             <span>{event.timing}</span>
+//           </div>
+//           <div className="flex items-center gap-2  text-gray-600 dark:text-gray-400">
+//             <Users className="w-5 h-5" />
+//             <span>Organized by: {event.author.name}</span>
+//           </div>
+//         </div>
+
+//         {isRegistered ? (
+//           <button
+//             disabled
+//             className="w-full bg-gray-400 text-white py-2 px-4 rounded-lg cursor-not-allowed"
+//           >
+//             Register Done 
+//           </button>
+//         ) : (
+//           <button
+//             onClick={() => handleRegister(event.id)}
+//             className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+//           >
+//             Register for Event
+//           </button>
+//         )}
+//       </div>
+//     </motion.div>
+//   );
+// };
+
 
 // import { Calendar, MapPin, Users } from 'lucide-react';
 // import type { EventInterface } from '../../hooks';

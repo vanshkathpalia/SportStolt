@@ -1,11 +1,17 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import path from 'path'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'), // Optional: Cleaner imports
+    },
+  },
   build: {
-    outDir: 'dist', // Ensure this is correctly set
+    outDir: 'dist',
+    emptyOutDir: true, // Ensures old build is cleaned
   },
   server: {
     proxy: {
@@ -15,6 +21,11 @@ export default defineConfig({
         secure: false,
       },
     },
-  // historyApiFallback: true,
+  },
+  // Enable this for client-side routing (e.g., React Router)
+  preview: {
+    headers: {
+      'Cache-Control': 'no-cache',
+    },
   },
 });

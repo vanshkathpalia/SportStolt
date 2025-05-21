@@ -1,3 +1,29 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%; /* white */
+    --foreground: 240 10% 3.9%;
+    --muted: 240 4.8% 98.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5% 64.9%;
+  }
+
+  .dark {
+    --background: 222 14% 20%; /* <-- this is Tailwind's gray-800 (hsl) */
+    --foreground: 0 0% 98%;
+    --muted: 222 13% 22%;       /* closer to gray-700 */
+    --muted-foreground: 240 5% 64.9%;
+    --border: 222 13% 25%;      /* same as muted */
+    --input: 222 13% 25%;
+    --ring: 240 4.9% 83.9%;
+  }
+}

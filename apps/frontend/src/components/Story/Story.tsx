@@ -36,7 +36,7 @@ export const Story = () => {
 
     return (
         <div className="flex flex-col">
-            <div className="bg-white gap-4 flex justify-center">
+            <div className="bg-background gap-4 flex justify-center">
                 <div className="pt-2 scroll-pr-24 gap-4 overflow-x-auto w-screen pb-2 max-24 flex flex-row">
 
                     {/* ✅ Add Story Button (Visible Always) */}
@@ -44,12 +44,12 @@ export const Story = () => {
                         className="flex flex-col items-center justify-center gap-1 cursor-pointer"
                         onClick={openCreateStoryModal}
                     >
-                        <div className="p-[2px] rounded-full bg-gray-300 relative">
-                            <div className="bg-white p-[2px] rounded-full flex items-center justify-center w-14 h-14">
+                        <div className="p-[2px] rounded-full bg-gray-300 dark:bg-gray-300 relative">
+                            <div className="bg-white p-[2px] dark:bg-gray-200 rounded-full flex items-center justify-center w-14 h-14">
                                 <span className="text-2xl font-bold text-gray-500">+</span>
                             </div>
                         </div>
-                        <span className="text-xs truncate w-16 text-center text-gray-500">Add Story</span>
+                        <span className="text-xs truncate w-16 text-center text-gray-400">Add Story</span>
                     </div>
 
                     <CreateStoryModal

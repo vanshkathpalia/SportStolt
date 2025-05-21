@@ -127,12 +127,12 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-white">
+      <DialogContent className=" dark:bg-gray-800 sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-white">
         <DialogHeader>
           <DialogTitle>Create New Post</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit} className="dark:bg-gray-800 space-y-6">
           {/* <Tabs defaultValue="photo" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="photo" className="flex items-center gap-2">
@@ -240,7 +240,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
           </Tabs> */}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium test-black dark:text-white mb-2">
                 <Camera className="w-4 h-4 inline mr-1" />
                 Image Content URL
             </label>
@@ -249,7 +249,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
               name="image"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300"
               placeholder="Enter image URL"
             />
           </div>
@@ -262,7 +262,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
               placeholder="Write a caption for your post..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="min-h-[100px]"
+              className="min-h-[100px] dark:border-gray-700 dark:bg-gray-700 dark:text-gray-300"
             />
           </div>
 
@@ -276,7 +276,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
                 placeholder="Add location"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="pl-9"
+                className="pl-9 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
               />
             </div>
           </div>
@@ -302,7 +302,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
           {/* Submit Button */}
           <Button
             type="submit"
-            className="w-full"
+            className="w-full dark:bg-gray-600 dark:hover:bg-gray-700 dark:text-white"
             disabled={ /* isLoading || (!previewUrl && activeTab === "photo") || */ !content || !title}
           >
             {isLoading ? "Creating post..." : "Share Post"}
