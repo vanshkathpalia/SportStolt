@@ -149,7 +149,7 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
             <h1 className="text-2xl dark:text-slate-300 font-bold mb-6">Notifications</h1>
 
             <Tabs defaultValue="all" className="mb-6">
-              <TabsList className="grid w-full bg-gray-700 grid-cols-3">
+              <TabsList className="grid w-full bg-slate-100 dark:bg-gray-700 grid-cols-3">
                 <TabsTrigger value="all">All</TabsTrigger>
                 <TabsTrigger value="mentions">Mentions</TabsTrigger>
                 <TabsTrigger value="events">Events</TabsTrigger>
@@ -174,14 +174,14 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
                 ) : (
                   <div>
                     {/* Today's notifications */}
-                    <h2 className="text-sm font-medium text-muted-foreground mb-2">Today</h2>
+                    <h2 className="text-sm font-medium dark:text-muted-foreground mb-2">Today</h2>
                     <div className="space-y-1 mb-6">
                       {TODAY_NOTIFICATIONS.map((notification) => (
                         <div
                           key={notification.id}
                           className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
                         >
-                          <Avatar className="h-10 w-10 text-ring bg-muted">
+                          <Avatar className="h-10 w-10 dark:text-ring bg-muted">
                             <AvatarImage src={notification.user.avatar} />
                             <AvatarFallback>{notification.user.name.charAt(0).toUpperCase()}</AvatarFallback>
                           </Avatar>
@@ -245,7 +245,7 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
                     </div>
 
                     {/* Earlier notifications */}
-                    <h2 className="text-sm font-medium text-muted-foreground mb-2">Earlier</h2>
+                    <h2 className="text-sm font-medium dark:text-muted-foreground mb-2">Earlier</h2>
                     <div className="space-y-1">
                       {EARLIER_NOTIFICATIONS.map((notification) => (
                         <div

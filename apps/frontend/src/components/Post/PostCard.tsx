@@ -128,7 +128,7 @@ export const PostCard = ({
           </Avatar>
           <span className="font-medium dark:text-slate-200 text-sm">{author}</span>
         </div>
-        <Button variant="ghost" size="icon" className="h-8 w-8">
+        <Button variant="ghost" size="icon" className="h-8 w-8 dark:text-slate-200">
           <MoreHorizontal className="h-5 w-5" />
           <span className="sr-only">More options</span>
         </Button>

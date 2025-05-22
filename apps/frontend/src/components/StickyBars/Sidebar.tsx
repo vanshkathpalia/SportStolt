@@ -1,16 +1,4 @@
-import {
-  Home,
-  Search,
-  Trophy,
-  Activity,
-  Bell,
-  PlusSquare,
-  User,
-  Menu,
-  DollarSign,
-  Settings,
-  LogOut,
-} from "lucide-react";
+import { Home, Search, PlusSquare, Trophy, User, Bell, Activity, Menu, DollarSign, Settings, LogOut } from "lucide-react";
 import { cn } from "../lib/utils";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -58,7 +46,35 @@ interface SidebarProps {
 export function Sidebar({ openCreateModal }: SidebarProps) {
   const location = useLocation();
   const pathname = location.pathname;
+  const navigate = useNavigate();
   const [moreOpen, setMoreOpen] = useState(false);
+
+    const handleLogout = () => {
+    // Optional: Add back-button handling logic
+    window.history.pushState(null, "", window.location.href);
+
+    const onPopState = () => {
+      const leave = window.confirm("Do you want to close this page?");
+      if (leave) {
+        window.close(); // This might work only for JS-opened tabs
+      } else {
+        window.history.pushState(null, "", window.location.href);
+      }
+    };
+
+    window.addEventListener("popstate", onPopState);
+
+    // Remove after a short delay to avoid interfering with other routes
+    setTimeout(() => {
+      window.removeEventListener("popstate", onPopState);
+    }, 1000);
+
+    // Perform logout
+    localStorage.removeItem("token");
+
+    // Redirect to signin
+    navigate("/signin");
+  };
 
   const navItems = [
     { icon: Home, label: "Home", href: "/post" },
@@ -102,10 +118,10 @@ export function Sidebar({ openCreateModal }: SidebarProps) {
       <div className="mt-auto relative">
         <SidebarItem icon={Menu} label="More" href="#" onClick={() => setMoreOpen(!moreOpen)} />
         {moreOpen && (
-          <div className="absolute bottom-12 left-0 w-48 bg-white dark:bg-gray-800 shadow-lg rounded-lg p-2 z-50">
+          <div className="absolute bottom-12 left-0 w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg ml-1 z-50">
             <SidebarItem icon={Settings} label="Settings" href="/settings" />
             <SidebarItem icon={DollarSign} label="Be an Earner" href="/earn" />
-            <SidebarItem icon={LogOut} label="Logout" href="/logout" />
+            <SidebarItem icon={LogOut} label="Logout" href="#" onClick={handleLogout} />
           </div>
         )}
       </div>
