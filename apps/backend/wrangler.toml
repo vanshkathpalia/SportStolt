@@ -8,6 +8,8 @@ DATABASE_URL="prisma://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsI
 JWT_SECRET="mymymysecret"
 YOUTUBE_API_KEY ="AIzaSyAZzFU5xMXgs5bIb5Wgl1Z96VOqUqe0wyk"
 GEOLOCATION_API_KEY="1698e16e9d9731"
+# FRONTEND_BASE_URL = "http://localhost:5173"
+FRONTEND_BASE_URL="https://sport-stolt.vercel.app"
 
 [env.production]
 dns_resolvers = ["1.1.1.1", "8.8.8.8"]

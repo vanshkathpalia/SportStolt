@@ -1,4 +1,4 @@
-import { Home, Search, PlusSquare, Trophy, User, Bell, Activity, Menu, DollarSign, Settings, LogOut } from "lucide-react";
+import { Home, Search, PlusSquare, Trophy, User, Bell, Activity, Menu, DollarSign, Settings, LogOut, Newspaper } from "lucide-react";
 import { cn } from "../lib/utils";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
@@ -18,6 +18,7 @@ export function MobileNav({ openCreateModal }: MobileNavProps) {
     { icon: Search, label: "Search", href: "/search" },
     { icon: Trophy, label: "Competitions", href: "/events" },
     { icon: Activity, label: "Training", href: "/training" },
+    { icon: Newspaper, label: "News", href: "/news" },
     { icon: User, label: "Profile", href: "/profile" },
   ];
 

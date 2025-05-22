@@ -21,7 +21,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
       const response = await axios.post(`${BACKEND_URL}/api/v1/user/${type}`, postInputs);
       const jwt = response.data.token;
       if (!jwt) {
-        alert("Authentication failed");
+        alert("Forgot Password? Change your password");
         setLoading(false);
         return;
       }
@@ -104,6 +104,13 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
                   placeholder="asdasd"
                   onChange={(e) => setPostInputs({ ...postInputs, password: e.target.value })}
                 />
+
+                {type === "signin" && (
+                  <div className="text-sm text-right mt-2 text-blue-600 dark:text-blue-400 hover:underline">
+                    <Link to="/forgot-password">Forgot Password?</Link>
+                  </div>
+                )}
+
                 <button
                   type="submit"
                   className={`mt-8 w-full text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 mb-2  dark:bg-slate-600 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700 flex items-center justify-center transition-all duration-300 ${

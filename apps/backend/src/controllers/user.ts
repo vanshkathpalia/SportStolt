@@ -1,18 +1,29 @@
+const failedLoginAttempts: Record<string, number> = {};
 import { Hono } from "hono";
 import { PrismaClient } from "@prisma/client/edge"
 import { withAccelerate } from '@prisma/extension-accelerate'
 import { sign } from 'hono/jwt'
 import { signupInput, signinInput } from '@vanshkathpalia/sportstolt-common'
 import bcrypt from 'bcryptjs';
-import axios from "axios";
+import crypto from 'crypto';
+import { z } from 'zod';
+import nodemailer from 'nodemailer';
+// import axios from "axios";
 
 export const userRouter = new Hono<{
     Bindings: {
       DATABASE_URL: string;
       JWT_SECRET: string;
       GEOLOCATION_API_KEY: string;
+      FRONTEND_BASE_URL: string;
     }
 }>();
+
+const UserUpdateInput = z.object({
+  // existing properties...
+  resetToken: z.string(),
+  resetTokenExpiry: z.date(),
+});
 
 // User Signup Route (Without Mailer Logic)
 userRouter.post('/signup', async (c) => {
@@ -56,36 +67,290 @@ userRouter.post('/signup', async (c) => {
 });
 
 // User Signin Route (Without Mailer Logic)
-userRouter.post('/signin', async (c) => {
-    const body = await c.req.json();
-    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+  userRouter.post('/signin', async (c) => {
+      const body = await c.req.json();
+      const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
 
-    try {
-        const user = await prisma.user.findUnique({ where: { username: body.username } });
-        if (!user) {
-            c.status(404);
-            return c.json({ error: "User not found. Please sign up." });
-        }
+      try {
+          const user = await prisma.user.findUnique({ where: { username: body.username } });
+          if (!user) {
+              c.status(404);
+              return c.json({ error: "User not found. Please sign up." });
+          }
 
-        const isPasswordCorrect = await bcrypt.compare(body.password, user.password);
-        if (!isPasswordCorrect) {
-            c.status(401);
-            return c.json({ error: "Incorrect password." });
-        }
+          const isPasswordCorrect = await bcrypt.compare(body.password, user.password);
+          if (!isPasswordCorrect) {
+              c.status(401);
+              return c.json({ error: "Incorrect password. Change your password" });
+          }
 
-        const jwt = await sign(
-            { id: user.id, username: user.username, iat: Math.floor(Date.now() / 1000) },
-            c.env.JWT_SECRET
-        );
+          const jwt = await sign(
+              { id: user.id, username: user.username, iat: Math.floor(Date.now() / 1000) },
+              c.env.JWT_SECRET
+          );
 
-        c.status(200);
-        return c.json({ token: jwt });
-    } catch (e) {
-        console.error(e);
-        c.status(500);
-        return c.json({ error: "Internal server error during signin" });
-    }
+          c.status(200);
+          return c.json({ token: jwt });
+      } catch (e) {
+          console.error(e);
+          c.status(500);
+          return c.json({ error: "Internal server error during signin" });
+      }
+  });
+
+// User multiple wrong password attempts
+// userRouter.post('/signin', async (c) => {
+//     const body = await c.req.json();
+//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+//     try {
+//         const user = await prisma.user.findUnique({ where: { username: body.username } });
+//         if (!user) {
+//             c.status(404);
+//             return c.json({ error: "User not found. Please sign up." });
+//         }
+
+//         const isPasswordCorrect = await bcrypt.compare(body.password, user.password);
+
+//         if (!isPasswordCorrect) {
+//             // Increment failed attempts
+//             failedLoginAttempts[body.username] = (failedLoginAttempts[body.username] || 0) + 1;
+
+//             if (failedLoginAttempts[body.username] >= 3) {
+//                 return c.json({
+//                     error: "Too many failed attempts. Please try 'Forgot Password'."
+//                 });
+//             }
+
+//             c.status(401);
+//             return c.json({
+//                 error: `Incorrect password. ${3 - failedLoginAttempts[body.username]} attempts left.`
+//             });
+//         }
+
+//         // On successful login, reset attempt counter
+//         delete failedLoginAttempts[body.username];
+
+//         const jwt = await sign(
+//             { id: user.id, username: user.username, iat: Math.floor(Date.now() / 1000) },
+//             c.env.JWT_SECRET
+//         );
+
+//         c.status(200);
+//         return c.json({ token: jwt });
+
+//     } catch (e) {
+//         console.error(e);
+//         c.status(500);
+//         return c.json({ error: "Internal server error during signin" });
+//     }
+// });
+
+
+
+userRouter.post('/forgot-password', async (c) => {
+  const { username } = await c.req.json();
+
+  if (!username) {
+    c.status(400);
+    return c.json({ error: 'Username (email) is required.' });
+  }
+
+  const emailSchema = z.string().email();
+  if (!emailSchema.safeParse(username).success) {
+    c.status(400);
+    return c.json({ error: 'Invalid email format.' });
+  }
+
+  const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+  const user = await prisma.user.findUnique({ where: { username } });
+
+  if (!user) {
+    c.status(404);
+    return c.json({ error: 'User not found' });
+  }
+
+  // Generate reset token and expiry (15 minutes)
+  const token = crypto.randomBytes(32).toString('hex');
+  const expiry = new Date(Date.now() + 15 * 60 * 1000);
+
+  await prisma.user.update({
+    where: { username },
+    data: {
+      resetToken: token,
+      resetTokenExpiry: expiry,
+    },
+  });
+
+  const resetLink = `${c.env.FRONTEND_BASE_URL}/reset-password?token=${encodeURIComponent(token)}`;
+  console.log(resetLink)
+
+  // Setup Nodemailer transporter using Gmail
+  const transporter = nodemailer.createTransport({
+    service: 'Gmail',
+    auth: {
+      user: "noreply.sportstolt@gmail.com",          // e.g. 'noreply.sportstolt@gmail.com'
+      pass: "vsalxnxrhpkajcea",      // Gmail app password or OAuth token
+    },
+  });
+
+  const mailOptions = {
+    from: "noreply.sportstolt@gmail.com",
+    to: username,
+    subject: 'Password Reset Request - Sportstolt',
+    text: `Hi ${user.name || ''},
+
+You requested a password reset. Click the link below to reset your password. This link is valid for 15 minutes.
+
+${resetLink}
+
+If you did not request this, please ignore this email.
+
+Thanks,
+Sportstolt Team
+    `,
+    html: `
+      <p>Hi ${user.name || ''},</p>
+      <p>You requested a password reset. Click the link below to reset your password. This link is valid for 15 minutes.</p>
+      <p><a href="${resetLink}">Reset Password</a></p>
+      <p>If you did not request this, please ignore this email.</p>
+      <br/>
+      <p>Thanks,<br/>Sportstolt Team</p>
+    `,
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    return c.json({ message: 'Password reset link sent to your email.' });
+  } catch (error) {
+    console.error('Nodemailer error:', error);
+    c.status(500);
+    return c.json({ error: 'Failed to send password reset email. Please try again later.' });
+  }
 });
+
+
+
+// User Reset Password Route
+userRouter.post('/reset-password', async (c) => {
+  const { token, newPassword } = await c.req.json();
+
+  if (!token || !newPassword) {
+    c.status(400);
+    return c.json({ error: 'Token and new password are required.' });
+  }
+
+  if (newPassword.length < 6) {
+    c.status(400);
+    return c.json({ error: 'New password must be at least 6 characters.' });
+  }
+
+  const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+  const user = await prisma.user.findFirst({
+    where: {
+      resetToken: token,
+      resetTokenExpiry: { gte: new Date() },
+    },
+  });
+
+  if (!user) {
+    c.status(400);
+    return c.json({ error: 'Invalid or expired token.' });
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 6);
+
+  await prisma.user.update({
+    where: { id: user.id },
+    data: {
+      password: hashedPassword,
+      resetToken: null,
+      resetTokenExpiry: null,
+    },
+  });
+
+  return c.json({ message: 'Password has been reset successfully.' });
+});
+
+
+
+// User Forgot Password Route
+// userRouter.post('/forgot-password', async (c) => {
+//   const { username } = await c.req.json();
+
+//   if (!username) {
+//     c.status(400);
+//     return c.json({ error: 'Username (email) is required.' });
+//   }
+
+//   // Optional: validate email format with zod or regex here
+//   const emailSchema = z.string().email();
+//   if (!emailSchema.safeParse(username).success) {
+//     c.status(400);
+//     return c.json({ error: 'Invalid email format.' });
+//   }
+
+//   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+//   const user = await prisma.user.findUnique({ where: { username } });
+
+//   if (!user) {
+//     c.status(404);
+//     return c.json({ error: 'User not found' });
+//   }
+
+//   // Generate reset token and expiry (15 minutes)
+//   const token = crypto.randomBytes(32).toString('hex');
+//   const expiry = new Date(Date.now() + 15 * 60 * 1000);
+
+//   await prisma.user.update({
+//     where: { username },
+//     data: {
+//       resetToken: token,
+//       resetTokenExpiry: expiry,
+//     },
+//   });
+
+//   const resetLink = `${c.env.FRONTEND_BASE_URL}/reset-password?token=${token}`;
+
+//   // Setup SendGrid
+//   sgMail.setApiKey(c.env.SENDGRID_API_KEY);
+
+//   const msg = {
+//     to: username,
+//     from: c.env.EMAIL_FROM,
+//     subject: 'Password Reset Request - Sportstolt',
+//     text: `Hi ${user.name || ''},
+
+// You requested a password reset. Click the link below to reset your password. This link is valid for 15 minutes.
+
+// ${resetLink}
+
+// If you did not request this, please ignore this email.
+
+// Thanks,
+// Sportstolt Team
+//     `,
+//     html: `
+//       <p>Hi ${user.name || ''},</p>
+//       <p>You requested a password reset. Click the link below to reset your password. This link is valid for 15 minutes.</p>
+//       <p><a href="${resetLink}">Reset Password</a></p>
+//       <p>If you did not request this, please ignore this email.</p>
+//       <br/>
+//       <p>Thanks,<br/>Sportstolt Team</p>
+//     `,
+//   };
+
+//   try {
+//     await sgMail.send(msg);
+//     return c.json({ message: 'Password reset link sent to your email.' });
+//   } catch (error) {
+//     console.error('SendGrid error:', error);
+//     c.status(500);
+//     return c.json({ error: 'Failed to send password reset email. Please try again later.' });
+//   }
+// });
+
 
 
 // import { Hono } from "hono";
