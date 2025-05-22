@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useMediaQuery } from "../hooks/useMediaQuery"
 import { PlusCircle } from "lucide-react"
 import { Button } from "../components/ui/button"
@@ -19,13 +19,72 @@ interface PostsPageProps {
 }
 
 export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const { loading, posts } = usePosts()
   const { events } = useEvents()
   const [storyDisplayType, setStoryDisplayType] = useState<"sport" | "location">("sport")
   const [postSortType, setPostSortType] = useState<"following" | "sport">("following")
   const [createStoryModalOpen, setCreateStoryModalOpen] = useState(false)
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const isMobile = useMediaQuery("(max-width: 768px)")
+
+  // When user clicks back
+  // useEffect(() => {
+  //   // Push dummy state so back triggers popstate event
+  //   window.history.pushState(null, "", window.location.href);
+
+  //   const onPopState = () => {
+  //     const leave = window.confirm("Do you want to close this page?");
+  //     if (leave) {
+  //       window.close(); // This will close the tab because it was opened by JS
+  //     } else {
+  //       // User canceled, so push state again to prevent accidental close
+  //       window.history.pushState(null, "", window.location.href);
+  //     }
+  //   };
+
+  //   window.addEventListener("popstate", onPopState);
+  //   return () => {
+  //     window.removeEventListener("popstate", onPopState);
+  //   };
+  // }, []);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      // Push the user back to current URL silently
+      window.history.pushState(null, "", window.location.pathname);
+    };
+
+    // Push initial state
+    window.history.pushState(null, "", window.location.pathname);
+    window.addEventListener("popstate", handlePopState);
+
+    return () => {
+      window.removeEventListener("popstate", handlePopState);
+    };
+  }, []); 
+
+
+
+
+  const handleLogout = () => {
+    // Clear your auth/session here:
+    localStorage.clear();
+    sessionStorage.clear();
+
+    // Close modal if you use one
+    setShowLogoutConfirm(false);
+
+    // Close this tab/window (only works if opened by JS)
+    window.close();
+  };
+
+
+  const handleStayLoggedIn = () => {
+    setShowLogoutConfirm(false)
+    // Push the same state again to prevent back navigation
+    window.history.pushState(null, "", window.location.href)
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -40,7 +99,6 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
         <main className="flex-1 md:ml-16 xl:ml-56">
           <div className="max-w-screen-xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
-
               {/* Stories and Posts Column */}
               <div className="md:col-span-3 p-2 lg:col-span-3">
                 {/* Story Display Type Toggle */}
@@ -83,7 +141,6 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                 <div className="pt-2">
                   <Story />
                 </div>
-                {/* <hr className="my-4 dark:border-gray-700" /> */}
 
                 {/* Post Sorting Options */}
                 <div className="mt-4 mb-2">
@@ -140,10 +197,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
 
               {/* Sidebar Events */}
               <div className="hidden lg:block lg:col-span-2">
-                <EventHomeSidebar
-                  events={events}
-                  onRegister={() => navigate("/events")}
-                />
+                <EventHomeSidebar events={events} onRegister={() => navigate("/events")} />
               </div>
             </div>
           </div>
@@ -155,6 +209,34 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
           onClose={() => setCreateStoryModalOpen(false)}
         />
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+          onClick={() => setShowLogoutConfirm(false)} // clicking backdrop closes modal
+        >
+          <div
+            className="bg-white dark:bg-gray-800 p-6 rounded-md shadow-md max-w-sm w-full"
+            onClick={(e) => e.stopPropagation()} // prevent closing modal on content click
+          >
+            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-gray-100">
+              Are you sure you want to logout?
+            </h2>
+            <p className="mb-6 text-gray-700 dark:text-gray-300">
+              Press Logout to leave the site or Stay Logged In to remain here.
+            </p>
+            <div className="flex justify-end space-x-4">
+              <Button variant="outline" onClick={handleStayLoggedIn}>
+                Stay Logged In
+              </Button>
+              <Button variant="destructive" onClick={handleLogout}>
+                Logout
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
