@@ -37,7 +37,7 @@ app.route("api/v1/search", searchRouter);
 app.route("/api/v1/notificaiton", notificationRouter);
 app.route("/api/v1/training", trainingRouter)
 
-let cleanupInterval: NodeJS.Timeout | null = null;
+// let cleanupInterval: NodeJS.Timeout | null = null; //what is the use of this ?
 
 // const cleanupExpiredStories = async () => {
 //   const prisma = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL });

@@ -12,8 +12,6 @@ import { Search } from './pages/Search'
 import { EventsPage } from './pages/Events'
 import NotificationsPage from './pages/NotificationPage'
 import { CreatePostModal } from './components/models/CreatePostModal'
-
-
 import { AppContextProvider } from "./context/AppContext"
 // import e from "express"
 import { useState } from "react"
@@ -22,6 +20,10 @@ import { PostPage } from "./pages/Post"
 import { AddEvent } from "./pages/AddEvent"
 import { Logout } from "./pages/Logout"; 
 import { Training } from "./pages/Training"
+import { ForgotPassword } from "./pages/ForgotPassword"
+import { ResetPassword } from "./pages/ResetPassword";
+import { NewsPage} from "./pages/News"
+
 
 const queryClient = new QueryClient()
 
@@ -39,11 +41,14 @@ function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/signin" element={<Signin />} />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/post" element={<PostsPage openCreateModal={() => setCreatePostModalOpen(true)} />} />
                 <Route path="/post/:id" element={<PostPage openCreateModal={() => setCreatePostModalOpen(true)} />} />
                 <Route path="/profile" element={<Profile openCreateModal={() => setCreatePostModalOpen(true)}/>} />
                 <Route path="/search" element={<Search openCreateModal={() => setCreatePostModalOpen(true)} />} />
                 <Route path="/events" element={<EventsPage openCreateModal={() => setCreatePostModalOpen(true)} />} />
+                <Route path="/news" element={<NewsPage openCreateModal={() => setCreatePostModalOpen(true)} />} />  
                 <Route path="/addevent" element={<AddEvent openCreateModal={() => setCreatePostModalOpen(true)} />} />
                 <Route path="/training" element={<Training openCreateModal={() => setCreatePostModalOpen(true)} />} />
                 <Route path="/notifications"

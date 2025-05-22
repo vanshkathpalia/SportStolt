@@ -18,6 +18,8 @@ model User {
   password              String
   points                Int               @default(0)
   image                 String?
+  resetToken            String?           
+  resetTokenExpiry      DateTime?         
   badge                 Badge[]
   comment               Comment[]
   event                 Event[]
@@ -36,6 +38,7 @@ model User {
   following             Follow[]          @relation("Following")
   savedPosts            Save[]
 }
+
 
 enum UserType {
   INDIVIDUAL
