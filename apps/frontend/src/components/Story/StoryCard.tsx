@@ -19,7 +19,7 @@ export interface StoryType {
     sport?: string;
     endTime: any; //HERE
     author: {
-        name: string;
+        username: string;
         image?: string;
         userId: string;
     };
@@ -47,7 +47,7 @@ interface StoryCardProps {
         sport?: string;
         endTime: Date;
         author: {
-            name: string;
+            username: string;
             image?: string;
             userId: string;
         };
@@ -158,7 +158,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
                         swipeUpEnabled: story.swipeUpEnabled,
                         Storyimages: images,
                         author: {
-                            name: story.author?.name || "Anonymous",
+                            username: story.author?.username || "Anonymous",
                             image: story.author?.image,
                             userId: story.author?.userId || ""
                         }

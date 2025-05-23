@@ -4,7 +4,7 @@ import { BACKEND_URL } from "../config";
 import { motion } from "framer-motion";
 
 export const ForgotPassword = () => {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export const ForgotPassword = () => {
       const res = await fetch(`${BACKEND_URL}/api/v1/user/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username }),
+        body: JSON.stringify({ email }),
       });
 
       const data = await res.json();
@@ -70,8 +70,8 @@ export const ForgotPassword = () => {
             <input
               type="email"
               placeholder="example@email.com"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="bg-white dark:bg-gray-800 dark:text-white border border-gray-300 dark:border-gray-600 text-sm rounded-lg focus:ring-blue-200 focus:border-blue-500 block w-full p-2.5 transition-all duration-300"
               required
               autoComplete="email"

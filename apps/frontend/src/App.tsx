@@ -2,27 +2,30 @@
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { useState } from "react"
+// import e from "express"
 
-import { Signup } from './pages/Signup'
-import { Signin } from './pages/Signin'
 import { Home } from './pages/Home'
+import { Signup } from './pages/Signup'
+// import { SignupStep } from "./pages/SignupStep"
+import { Signin } from './pages/Signin'
+import { ForgotPassword } from "./pages/ForgotPassword"
+import { ResetPassword } from "./pages/ResetPassword";
+import { PostsPage } from "./pages/Posts"
+import { PostPage } from "./pages/Post"
+import { CreatePostModal } from './components/models/CreatePostModal'
 // import { AddStory } from './pages/AddStory'
-import { Profile } from './pages/Profile'
+import { AppContextProvider } from "./context/AppContext"
+import { AddEvent } from "./pages/AddEvent"
 import { Search } from './pages/Search'
 import { EventsPage } from './pages/Events'
 import NotificationsPage from './pages/NotificationPage'
-import { CreatePostModal } from './components/models/CreatePostModal'
-import { AppContextProvider } from "./context/AppContext"
-// import e from "express"
-import { useState } from "react"
-import { PostsPage } from "./pages/Posts"
-import { PostPage } from "./pages/Post"
-import { AddEvent } from "./pages/AddEvent"
-import { Logout } from "./pages/Logout"; 
 import { Training } from "./pages/Training"
-import { ForgotPassword } from "./pages/ForgotPassword"
-import { ResetPassword } from "./pages/ResetPassword";
 import { NewsPage} from "./pages/News"
+import { Profile } from './pages/Profile'
+import { Logout } from "./pages/Logout"; 
+
+
 
 
 const queryClient = new QueryClient()
@@ -40,19 +43,20 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/signup" element={<Signup />} />
+                {/* <Route path="/signup/step" element={<SignupStep />} />  */}
                 <Route path="/signin" element={<Signin />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password" element={<ResetPassword />} />
                 <Route path="/post" element={<PostsPage openCreateModal={() => setCreatePostModalOpen(true)} />} />
                 <Route path="/post/:id" element={<PostPage openCreateModal={() => setCreatePostModalOpen(true)} />} />
-                <Route path="/profile" element={<Profile openCreateModal={() => setCreatePostModalOpen(true)}/>} />
                 <Route path="/search" element={<Search openCreateModal={() => setCreatePostModalOpen(true)} />} />
                 <Route path="/events" element={<EventsPage openCreateModal={() => setCreatePostModalOpen(true)} />} />
-                <Route path="/news" element={<NewsPage openCreateModal={() => setCreatePostModalOpen(true)} />} />  
                 <Route path="/addevent" element={<AddEvent openCreateModal={() => setCreatePostModalOpen(true)} />} />
-                <Route path="/training" element={<Training openCreateModal={() => setCreatePostModalOpen(true)} />} />
                 <Route path="/notifications"
                   element={<NotificationsPage openCreateModal={() => setCreatePostModalOpen(true)} />}/>
+                <Route path="/training" element={<Training openCreateModal={() => setCreatePostModalOpen(true)} />} />
+                <Route path="/news" element={<NewsPage openCreateModal={() => setCreatePostModalOpen(true)} />} />  
+                <Route path="/profile" element={<Profile openCreateModal={() => setCreatePostModalOpen(true)}/>} />
                 <Route path="/logout" element={<Logout />} />
               </Routes>
 

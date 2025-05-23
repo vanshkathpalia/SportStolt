@@ -3,7 +3,7 @@ export const NOTIFICATIONS = [
       id: 1,
       type: "like",
       user: {
-        name: "emma_smith",
+        username: "emma_smith",
         avatar: "/placeholder.svg?height=40&width=40",
       },
       content: "liked your post",
@@ -14,7 +14,7 @@ export const NOTIFICATIONS = [
       id: 2,
       type: "follow",
       user: {
-        name: "john.doe",
+        username: "john.doe",
         avatar: "/placeholder.svg?height=40&width=40",
       },
       content: "started following you",
@@ -24,7 +24,7 @@ export const NOTIFICATIONS = [
       id: 3,
       type: "comment",
       user: {
-        name: "travel_guy",
+        username: "travel_guy",
         avatar: "/placeholder.svg?height=40&width=40",
       },
       content: 'commented: "Great form on that jump shot!"',
@@ -35,7 +35,7 @@ export const NOTIFICATIONS = [
       id: 4,
       type: "story_verification",
       user: {
-        name: "admin",
+        username: "admin",
         avatar: "/placeholder.svg?height=40&width=40",
       },
       content: "requested verification for a story image",

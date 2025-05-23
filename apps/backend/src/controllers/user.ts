@@ -3,12 +3,26 @@ import { Hono } from "hono";
 import { PrismaClient } from "@prisma/client/edge"
 import { withAccelerate } from '@prisma/extension-accelerate'
 import { sign } from 'hono/jwt'
+import { verify } from "hono/jwt";
 import { signupInput, signinInput } from '@vanshkathpalia/sportstolt-common'
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { z } from 'zod';
 import nodemailer from 'nodemailer';
+import { authMiddleware } from "~/middleware/authMiddleware";
 // import axios from "axios";
+
+// export const signupInput = z.object({
+//   name: z.string().min(1),
+//   email: z.string().email(),
+//   password: z.string().min(6),
+//   role: z.enum(["INDIVIDUAL", "ORGANIZATION"])
+// });
+
+// export const signinInput = z.object({
+//   email: z.string().email(),
+//   password: z.string().min(6),
+// });
 
 export const userRouter = new Hono<{
     Bindings: {
@@ -25,7 +39,7 @@ const UserUpdateInput = z.object({
   resetTokenExpiry: z.date(),
 });
 
-// User Signup Route (Without Mailer Logic)
+
 userRouter.post('/signup', async (c) => {
     const body = await c.req.json();
     const result = signupInput.safeParse(body);
@@ -37,7 +51,7 @@ userRouter.post('/signup', async (c) => {
     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
 
     try {
-        const existingUser = await prisma.user.findUnique({ where: { username: body.username } });
+        const existingUser = await prisma.user.findUnique({ where: { email: body.email } });
 
         if (existingUser) {
             c.status(409); // Conflict
@@ -47,9 +61,9 @@ userRouter.post('/signup', async (c) => {
         const hashedPassword = await bcrypt.hash(body.password, 6);
         const user = await prisma.user.create({
             data: {
-                username: body.username,
+                email: body.email,
                 password: hashedPassword,
-                name: body.name
+                username: body.username,
             }
         });
 
@@ -67,36 +81,111 @@ userRouter.post('/signup', async (c) => {
 });
 
 // User Signin Route (Without Mailer Logic)
-  userRouter.post('/signin', async (c) => {
-      const body = await c.req.json();
-      const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+userRouter.post('/signin', async (c) => {
+    const body = await c.req.json();
+    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
 
-      try {
-          const user = await prisma.user.findUnique({ where: { username: body.username } });
-          if (!user) {
-              c.status(404);
-              return c.json({ error: "User not found. Please sign up." });
-          }
+    try {
+        const user = await prisma.user.findUnique({ where: { email: body.email } });
+        if (!user) {
+            c.status(404);
+            return c.json({ error: "User not found. Please sign up." });
+        }
 
-          const isPasswordCorrect = await bcrypt.compare(body.password, user.password);
-          if (!isPasswordCorrect) {
-              c.status(401);
-              return c.json({ error: "Incorrect password. Change your password" });
-          }
+        const isPasswordCorrect = await bcrypt.compare(body.password, user.password);
+        if (!isPasswordCorrect) {
+            c.status(401);
+            return c.json({ error: "Incorrect password." });
+        }
 
-          const jwt = await sign(
-              { id: user.id, username: user.username, iat: Math.floor(Date.now() / 1000) },
-              c.env.JWT_SECRET
-          );
+        const jwt = await sign(
+            { id: user.id, username: user.username, iat: Math.floor(Date.now() / 1000) },
+            c.env.JWT_SECRET
+        );
 
-          c.status(200);
-          return c.json({ token: jwt });
-      } catch (e) {
-          console.error(e);
-          c.status(500);
-          return c.json({ error: "Internal server error during signin" });
-      }
-  });
+        c.status(200);
+        return c.json({ token: jwt });
+    } catch (e) {
+        console.error(e);
+        c.status(500);
+        return c.json({ error: "Internal server error during signin" });
+    }
+});
+
+
+// // User Signup Route (Without Mailer Logic)
+// userRouter.post('/signup', async (c) => {
+//     const body = await c.req.json();
+//     const result = signupInput.safeParse(body);
+//     if (!result.success) {
+//         c.status(400);
+//         return c.json({ error: "Invalid input", details: result.error });
+//     }
+
+//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+//     try {
+//         const existingUser = await prisma.user.findUnique({ where: { email: body.email } });
+
+//         if (existingUser) {
+//             c.status(409); // Conflict
+//             return c.json({ error: "User already exists. Try signing in." });
+//         }
+
+//         const hashedPassword = await bcrypt.hash(body.password, 6);
+//         const user = await prisma.user.create({
+//             data: {
+//                 email: body.email,
+//                 password: hashedPassword,
+//                 username: body.username,
+//                 type: body.type,
+//             }
+//         });
+
+//         const jwt = await sign(
+//             { id: user.id, email: user.email, timestamp: Date.now() },
+//             c.env.JWT_SECRET
+//         );
+
+//         return c.json({ token: jwt });
+//     } catch (e) {
+//         c.status(500);
+//         console.error(e);
+//         return c.json({ error: "Internal server error during signup" });
+//     }
+// });
+
+// // User Signin Route (Without Mailer Logic)
+// userRouter.post('/signin', async (c) => {
+//     const body = await c.req.json();
+//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+//     try {
+//         const user = await prisma.user.findUnique({ where: { email: body.email } });
+//         if (!user) {
+//             c.status(404);
+//             return c.json({ error: "User not found. Please sign up." });
+//         }
+
+//         const isPasswordCorrect = await bcrypt.compare(body.password, user.password);
+//         if (!isPasswordCorrect) {
+//             c.status(401);
+//             return c.json({ error: "Incorrect password. Change your password" });
+//         }
+
+//         const jwt = await sign(
+//             { id: user.id, email: user.email, iat: Math.floor(Date.now() / 1000) },
+//             c.env.JWT_SECRET
+//         );
+
+//         c.status(200);
+//         return c.json({ token: jwt });
+//     } catch (e) {
+//         console.error(e);
+//         c.status(500);
+//         return c.json({ error: "Internal server error during signin" });
+//     }
+// });
 
 // User multiple wrong password attempts
 // userRouter.post('/signin', async (c) => {
@@ -147,23 +236,22 @@ userRouter.post('/signup', async (c) => {
 // });
 
 
-
 userRouter.post('/forgot-password', async (c) => {
-  const { username } = await c.req.json();
+  const { email } = await c.req.json();
 
-  if (!username) {
+  if (!email) {
     c.status(400);
-    return c.json({ error: 'Username (email) is required.' });
+    return c.json({ error: 'Email is required.' });
   }
 
   const emailSchema = z.string().email();
-  if (!emailSchema.safeParse(username).success) {
+  if (!emailSchema.safeParse(email).success) {
     c.status(400);
     return c.json({ error: 'Invalid email format.' });
   }
 
   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-  const user = await prisma.user.findUnique({ where: { username } });
+  const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user) {
     c.status(404);
@@ -175,7 +263,7 @@ userRouter.post('/forgot-password', async (c) => {
   const expiry = new Date(Date.now() + 15 * 60 * 1000);
 
   await prisma.user.update({
-    where: { username },
+    where: { email },
     data: {
       resetToken: token,
       resetTokenExpiry: expiry,
@@ -196,9 +284,9 @@ userRouter.post('/forgot-password', async (c) => {
 
   const mailOptions = {
     from: "noreply.sportstolt@gmail.com",
-    to: username,
+    to: email,
     subject: 'Password Reset Request - Sportstolt',
-    text: `Hi ${user.name || ''},
+    text: `Hi ${user.username || ''},
 
 You requested a password reset. Click the link below to reset your password. This link is valid for 15 minutes.
 
@@ -210,7 +298,7 @@ Thanks,
 Sportstolt Team
     `,
     html: `
-      <p>Hi ${user.name || ''},</p>
+      <p>Hi ${user.username || ''},</p>
       <p>You requested a password reset. Click the link below to reset your password. This link is valid for 15 minutes.</p>
       <p><a href="${resetLink}">Reset Password</a></p>
       <p>If you did not request this, please ignore this email.</p>
@@ -228,8 +316,6 @@ Sportstolt Team
     return c.json({ error: 'Failed to send password reset email. Please try again later.' });
   }
 });
-
-
 
 // User Reset Password Route
 userRouter.post('/reset-password', async (c) => {
@@ -272,7 +358,6 @@ userRouter.post('/reset-password', async (c) => {
 
   return c.json({ message: 'Password has been reset successfully.' });
 });
-
 
 
 // User Forgot Password Route
@@ -348,6 +433,231 @@ userRouter.post('/reset-password', async (c) => {
 //     console.error('SendGrid error:', error);
 //     c.status(500);
 //     return c.json({ error: 'Failed to send password reset email. Please try again later.' });
+//   }
+// });
+
+
+
+
+// const stepInput = z.object({
+//   fullName: z.string().min(1),
+//   phone: z.string().optional(),
+//   address: z.string().optional(),
+//   // Add any other fields you want to collect at step 2 here
+// });
+
+// const stepInputIndividual = z.object({
+//   age: z.number().int().min(0),
+//   gender: z.string(),
+//   city: z.string(),
+//   country: z.string(),
+// });
+
+// const stepInputOrganization = z.object({
+//   orgName: z.string(),
+//   address: z.string(),
+//   city: z.string(),
+//   country: z.string(),
+//   size: z.number().int().min(1),
+// });
+
+// type JwtPayload = {
+//   id: number;
+//   email?: string;
+//   // add more fields if needed
+// };
+
+// 👇 Use middleware for this route
+// userRouter.post("/signup/step", authMiddleware, async (c) => {
+//   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+//   const userId = c.var.userId;
+
+//   // Fetch user from DB
+//   const user = await prisma.user.findUnique({
+//     where: { id: userId },
+//   });
+
+//   if (!user) {
+//     return c.json({ error: "User not found" }, 404);
+//   }
+
+//   try {
+//     const body = await c.req.json();
+
+//     if (user.type === "INDIVIDUAL") {
+//       const result = stepInputIndividual.safeParse(body);
+
+//       if (!result.success) {
+//         return c.json({ error: "Invalid input", details: result.error }, 400);
+//       }
+
+//       const profile = await prisma.individualProfile.upsert({
+//         where: { userId },
+//         create: {
+//           userId,
+//           ...result.data,
+//         },
+//         update: result.data,
+//       });
+
+//       return c.json({ message: "Individual profile updated", profile });
+//     }
+
+//     if (user.type === "ORG") {
+//       const result = stepInputOrganization.safeParse(body);
+
+//       if (!result.success) {
+//         return c.json({ error: "Invalid input", details: result.error }, 400);
+//       }
+
+//       const profile = await prisma.organizationProfile.upsert({
+//         where: { userId },
+//         create: {
+//           userId,
+//           ...result.data,
+//         },
+//         update: result.data,
+//       });
+
+//       return c.json({ message: "Organization profile updated", profile });
+//     }
+
+//     return c.json({ error: "Unknown user type" }, 400);
+//   } catch (e) {
+//     console.error(e);
+//     return c.json({ error: "Failed to update profile" }, 500);
+//   }
+// });
+
+// Route to update user profile info after initial signup
+// userRouter.post('/signup/step', async (c) => {
+//   // Get token from Authorization header
+//   const authHeader = c.req.header("Authorization");
+//   if (!authHeader || !authHeader.startsWith("Bearer ")) {
+//     c.status(401);
+//     return c.json({ error: "Missing or invalid authorization header" });
+//   }
+//   const token = authHeader.substring(7);
+
+//   // Verify JWT token
+//   let payload;
+//   // try {
+//   //   const payload = await verify(token, c.env.JWT_SECRET) as { id: number };
+
+//   //   if (!payload || !payload.id) {
+//   //     c.status(401);
+//   //     return c.json({ error: "Invalid token payload" });
+//   //   }
+
+//   //   const user = await prisma.user.findUnique({
+//   //     where: { id: payload.id },
+//   //   });
+
+//   //   if (!user) {
+//   //     c.status(404);
+//   //     return c.json({ error: "User not found" });
+//   //   }
+
+//   //   // proceed with user
+//   // } catch (err) {
+//   //   c.status(401);
+//   //   return c.json({ error: "Invalid or expired token" });
+//   // }
+
+//   try {
+//     // const payload = await verify(token, c.env.JWT_SECRET) as JwtPayload;
+//     const payload = (await verify(token, c.env.JWT_SECRET)) as { id?: number } | undefined;
+
+//     if (!payload?.id) {
+//       c.status(401);
+//       return c.json({ error: "Invalid token" });
+//     }
+//     } catch (e) {
+//       c.status(401);
+//       return c.json({ error: "Invalid or expired token" });
+//     }
+
+//   // Fetch user with type from DB (to know which profile to update)
+//   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+//   const user = await prisma.user.findUnique({
+//     where: { id: payload.id },
+//   });
+//   if (!user) {
+//     c.status(404);
+//     return c.json({ error: "User not found" });
+//   }
+
+//   try {
+//     if (user.type === "INDIVIDUAL") {
+//       // Parse individual profile input
+//       const body = await c.req.json();
+//       const result = stepInputIndividual.safeParse(body);
+//       if (!result.success) {
+//         c.status(400);
+//         return c.json({ error: "Invalid input", details: result.error });
+//       }
+
+//       // Upsert individual profile
+//       const profile = await prisma.individualProfile.upsert({
+//         where: { userId: user.id },
+//         create: {
+//           userId: user.id,
+//           age: result.data.age,
+//           gender: result.data.gender,
+//           city: result.data.city,
+//           country: result.data.country,
+//         },
+//         update: {
+//           age: result.data.age,
+//           gender: result.data.gender,
+//           city: result.data.city,
+//           country: result.data.country,
+//         }
+//       });
+
+//       c.status(200);
+//       return c.json({ message: "Individual profile updated", profile });
+
+//     } else if (user.type === "ORG") {
+//       // Parse organization profile input
+//       const body = await c.req.json();
+//       const result = stepInputOrganization.safeParse(body);
+//       if (!result.success) {
+//         c.status(400);
+//         return c.json({ error: "Invalid input", details: result.error });
+//       }
+
+//       // Upsert organization profile
+//       const profile = await prisma.organizationProfile.upsert({
+//         where: { userId: user.id },
+//         create: {
+//           userId: user.id,
+//           orgName: result.data.orgName,
+//           address: result.data.address,
+//           city: result.data.city,
+//           country: result.data.country,
+//           size: result.data.size,
+//         },
+//         update: {
+//           orgName: result.data.orgName,
+//           address: result.data.address,
+//           city: result.data.city,
+//           country: result.data.country,
+//           size: result.data.size,
+//         }
+//       });
+
+//       c.status(200);
+//       return c.json({ message: "Organization profile updated", profile });
+
+//     } else {
+//       c.status(400);
+//       return c.json({ error: "Unknown user type" });
+//     }
+//   } catch (e) {
+//     console.error(e);
+//     c.status(500);
+//     return c.json({ error: "Failed to update profile" });
 //   }
 // });
 
@@ -625,3 +935,57 @@ userRouter.post('/reset-password', async (c) => {
 // //     return c.json({ message: "Login successful", user: { username: user.username, name: user.name } });
 
 // //     instead of returning the username and name we should retun the token
+
+
+
+// userRouter.post('/signup', async (c) => {
+//   const body = await c.req.json();
+//   const result = signupInput.safeParse(body);
+//   if (!result.success) {
+//       c.status(400);
+//       return c.json({ error: "Invalid input", details: result.error });
+//   }
+
+//   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+//   try {
+//       const existingUser = await prisma.user.findUnique(
+//         { where: { username: body.username } 
+//       });
+
+//       if (existingUser) {
+//           c.status(409); // Conflict
+//           return c.json({ error: "User already exists. Try signing in." });
+//       }
+
+//       const password = body.password;
+
+//       const hashedPassword = await bcrypt.hash(body.password, 6);
+//       const user = await prisma.user.create({
+//           data: {
+//             username: body.username,
+//             password: hashedPassword,
+//             name: body.name
+//           }
+//       });
+
+//       const jwt = await sign(
+//           { id: user.id, username: user.username, timestamp: Date.now() },
+//           c.env.JWT_SECRET
+//       );
+
+//       console.log("Sending email to user:", user.username, "with JWT:", jwt);
+
+//       // Send email after signup
+//       await sendEmail(user.username, user?.name ?? '', password);
+
+//       // Log after the email is sent successfully
+//       console.log("Email sent successfully to:", user.username);
+
+//       return c.json({ token: jwt });
+//   } catch (e) {
+//       c.status(500);
+//       console.error(e);
+//       return c.json({ error: "Internal server error during signup" });
+//   }
+// });
