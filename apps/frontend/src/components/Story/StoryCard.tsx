@@ -98,10 +98,10 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
         return (
             <div
                 className="flex flex-col items-center justify-center gap-1 cursor-pointer"
-                onClick={() => navigate("/addstory")}
+                onClick={() => navigate("/add-story")} // why still here 
             >
                 <div className="p-[2px] rounded-full bg-gray-300 relative">
-                    <div className="bg-white p-[2px] rounded-full flex items-center justify-center w-14 h-14">
+                    <div className="bg-white p-[2px] rounded-full flex items-center justify-center w-40 h-14">
                         <span className="text-2xl font-bold text-gray-500">+</span>
                     </div>
                 </div>
@@ -123,7 +123,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
     return (
         <>
             <div 
-                className="flex flex-col items-center hover:bg-gray-100 justify-center gap-1 cursor-pointer"
+                className="flex flex-col items-center hover:bg-muted justify-center gap-1 cursor-pointer"
                 onClick={handleOpenStory}  // Call handleOpenStory instead
             >
                 <div className={`p-[2px] rounded-full ${isViewed ? 'bg-gray-300' : 'bg-gradient-to-tr from-yellow-400 to-pink-600'}`}>
@@ -135,7 +135,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
                         />
                     </div>
                 </div>
-                <span className="text-xs truncate w-16 text-center">{story.location}</span>
+                <span className="text-xs truncate w-16 dark:text-slate-300 text-center">{story.location}</span>
             </div>
 
             {isViewingStory && (

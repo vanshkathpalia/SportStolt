@@ -59,7 +59,7 @@ function App() {
               {/* Global Create Post Modal */}
               <CreatePostModal isOpen={createPostModalOpen} onClose={() => setCreatePostModalOpen(false)} />
 
-              {/* Global Create Event Modal */}
+              {/* Global Create Event Modal -> but i have planed it to be in event page only */}
               {/* <CreateEventModal isOpen={createEventModalOpen} onClose={() => setCreateEventModalOpen(false)} /> */}
               
             </div>

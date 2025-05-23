@@ -7,6 +7,7 @@ import { Sidebar } from "../components/StickyBars/Sidebar";
 import { EventCard } from "../components/Event/EventCard";
 import { MobileNav } from "../components/StickyBars/MobileNav";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { CreateEventModal } from "../components/models/CreateEventModal";
 
 export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void }) => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -16,6 +17,19 @@ export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void })
   const filteredEvents = events.filter(event =>
     event.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const reversedEvents = [...filteredEvents].reverse();
+
+  const [isCreateStoryModalOpen, setIsCreateStoryModalOpen] = useState(false);
+
+    const openCreateEventModal = () => {
+        setIsCreateStoryModalOpen(true);
+    };
+    
+      // Function to close the modal
+    const closeCreateEventModal = () => {
+        setIsCreateStoryModalOpen(false);
+    };
 
   return (
     <div className="min-h-screen bg-background">
@@ -36,12 +50,17 @@ export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void })
                   Upcoming Events
                 </h1>
                 <button
-                  onClick={openCreateModal}
+                  onClick={openCreateEventModal}
                   className="hidden md:flex items-center gap-1 px-3 py-2 rounded-md bg-blue-500 text-white hover:bg-blue-600"
                 >
                   <Plus size={16} />
                   Create Event
                 </button>
+
+                <CreateEventModal
+                  isOpen={isCreateStoryModalOpen}
+                  onClose={closeCreateEventModal}
+                />
               </div>
 
               <div className="relative w-full mt-4">
@@ -65,13 +84,13 @@ export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void })
                   <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse dark:opacity-10 opacity-80" />
                 ))}
               </div>
-            ) : filteredEvents.length === 0 ? (
+            ) : reversedEvents.length === 0 ? (
               <div className="text-center text-gray-500 dark:text-slate-300 text-lg mt-8">
                 No events currently.
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {filteredEvents.map((event) => (
+                {reversedEvents.map((event) => (
                   <EventCard key={event.id} event={event} />
                 ))}
               </div>

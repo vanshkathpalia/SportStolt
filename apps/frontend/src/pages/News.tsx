@@ -193,7 +193,7 @@ const SkeletonCard = () => (
 //     } catch (err) {
 //       console.error("Error fetching news:", err);
 //       setError("Failed to load news.");
-//     } finally {
+//     } finally {ff
 //       setLoading(false);
 //     }
 //   };

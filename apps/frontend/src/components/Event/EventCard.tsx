@@ -32,10 +32,14 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
   return (
     <div className="bg-muted rounded-lg shadow-md overflow-hidden mb-10">
-      <img src={event.imageUrl} alt={event.location} className="w-full h-48 object-cover" />
+      <img src={event.imageUrl} alt={event.name} className="w-full h-48 object-cover" />
       <div className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl dark:text-slate-300 font-semibold">{event.location}</h3>
+          <h3 className="text-xl dark:text-slate-300 font-semibold">
+            {event.name} at
+            <br />
+            <span>{event.stadium}</span>
+          </h3>
           <span className="bg-blue-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
             {new Date(event.publishedDate).toLocaleDateString()}
           </span>
@@ -44,11 +48,17 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
         <div className="space-y-3 mb-6 p-2 rounded-lg">
           <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
             <Calendar className="w-8 h-8" />
-            <span>{event.timing}</span> {/* Contains start and end info */}
+            <span>{event.timing}</span>  
+            {/* Contains start and end info*
+            this date and time will not work bc in interface be expect string... not date/}
+            {/* <span>
+              {new Date(event.StartDate).toLocaleDateString()} - {new Date(event.EndDate).toLocaleDateString()}
+            </span> */}
+
           </div>
           <div className="flex items-center gap-2  text-gray-600 dark:text-gray-400">
             <Users className="w-5 h-5" />
-            <span>Organized by: {event.author.name}</span>
+            <span>Organized by: {event.organisedBy}</span>
           </div>
         </div>
 
@@ -134,7 +144,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
 //         <div className="space-y-3 mb-6 dark:bg-gray-700 p-2 rounded-lg">
 //           <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
 //             <Calendar className="w-8 h-8" />
-//             <span>{event.timing}</span>
+            // <span>{event.timing}</span>
 //           </div>
 //           <div className="flex items-center gap-2  text-gray-600 dark:text-gray-400">
 //             <Users className="w-5 h-5" />

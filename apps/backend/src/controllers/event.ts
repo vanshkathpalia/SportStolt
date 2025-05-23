@@ -16,13 +16,23 @@ export const eventRouter = new Hono<{
     }
 }>();
 
+
 const createEventInput = z.object({
     image: z.string().min(1, { message: 'Image URL is required' }), // Image URL must be non-empty
     city: z.string().min(1, { message: 'City is necessary field'}),
     stadium: z.string().min(1, { message: 'Stadium name is required' }), // Stadium name must be non-empty
-    StartDate: z.string().datetime({ message: 'StartDate must be a valid ISO datetime' }), // ISO datetime string
-    EndDate: z.string().datetime({ message: 'EndDate must be a valid ISO datetime' }), // ISO datetime string
-    StartTime: z.string().datetime({ message: 'StartTime must be a valid ISO datetime' }), // ISO datetime string
+    StartDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+      message: "StartDate must be a valid date string",
+    }),
+    EndDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+      message: "EndDate must be a valid date string",
+    }),
+    StartTime: z.string().refine(val => !isNaN(Date.parse(val)), {
+      message: "StartTime must be a valid datetime string",
+    }),
+    // StartDate: z.string().datetime({ message: 'StartDate must be a valid ISO datetime' }), // ISO datetime string
+    // EndDate: z.string().datetime({ message: 'EndDate must be a valid ISO datetime' }), // ISO datetime string
+    // StartTime: z.string().datetime({ message: 'StartTime must be a valid ISO datetime' }), // ISO datetime string
   });
 
 function formatDateToDDMMYYYY(dateString: string): string {
@@ -41,12 +51,19 @@ eventRouter.use('/*', authMiddleware);
 eventRouter.post('/', async (c) => {
   try {
     const body = await c.req.json();
-    console.log(body);
+    console.log("Received event body:", JSON.stringify(body, null, 2));
 
-    const { success } = createEventInput.safeParse(body);
-    if (!success) {
-      c.status(411);
-      return c.json({ message: "Invalid input" });
+    const parseResult = createEventInput.safeParse(body);
+    if (!parseResult.success) {
+      console.error("Validation Errors:", parseResult.error.errors);
+      c.status(400);
+      return c.json({
+        message: "Invalid input",
+        errors: parseResult.error.errors.map(err => ({
+          path: err.path.join('.'),
+          message: err.message
+        })),
+      });
     }
 
     const userId = c.get("userId");
@@ -66,6 +83,35 @@ eventRouter.post('/', async (c) => {
       },
     });
 
+    // Use publishedDate sent from frontend or assign current date if none provided
+    const publishedDate = body.publishedDate
+      ? new Date(body.publishedDate)
+      : new Date();
+
+    const startDate = new Date(body.StartDate);
+    const endDate = new Date(body.EndDate);
+    const startTime = new Date(body.StartTime);
+
+    console.log(`publishedDate: ${publishedDate.toISOString()}`);
+    console.log(`startDate: ${startDate.toISOString()}`);
+    console.log(`endDate: ${endDate.toISOString()}`);
+    console.log(`startTime: ${startTime.toISOString()}`);
+
+    if (startDate < publishedDate || endDate < publishedDate) {
+      c.status(400);
+      return c.json({ message: "Event start and end dates must be after the published date." });
+    }
+
+    if (startDate > endDate) {
+      c.status(400);
+      return c.json({ message: "Start date must be before or equal to end date." });
+    }
+
+    if (startTime < startDate) {
+      c.status(400);
+      return c.json({ message: "Start time cannot be before the start date." });
+    }
+
     const event = await prisma.event.create({
       data: {
         image: body.image,
@@ -73,15 +119,17 @@ eventRouter.post('/', async (c) => {
         name: body.name,
         authorId: Number(userId),
         stadium: body.stadium,
-        StartDate: new Date(body.StartDate),
-        EndDate: new Date(body.EndDate),
-        StartTime: new Date(body.StartTime),
+        StartDate: startDate,
+        EndDate: endDate,
+        StartTime: startTime,
         OrganisedBy: body.OrganisedBy,
         likeCount: 0,
         country: body.country || "",
         state: body.state || "",
       },
     });
+
+    console.log("Event created successfully:", event);
 
     return c.json({ id: event.id });
   } catch (error) {
@@ -90,6 +138,7 @@ eventRouter.post('/', async (c) => {
     return c.json({ message: "Internal server error" });
   }
 });
+
 
 // GET /bulk (fetch events)
 eventRouter.get('/bulk', async (c) => {

@@ -16,7 +16,7 @@ export function MobileNav({ openCreateModal }: MobileNavProps) {
   const navItems = [
     { icon: Home, label: "Home", href: "/post" },
     { icon: Search, label: "Search", href: "/search" },
-    { icon: Trophy, label: "Competitions", href: "/events" },
+    { icon: Trophy, label: "Events", href: "/events" },
     { icon: Activity, label: "Training", href: "/training" },
     { icon: Newspaper, label: "News", href: "/news" },
     { icon: User, label: "Profile", href: "/profile" },

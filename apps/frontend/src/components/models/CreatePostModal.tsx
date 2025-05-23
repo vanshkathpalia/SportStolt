@@ -127,12 +127,12 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className=" dark:bg-gray-800 sm:max-w-[600px] test-black max-h-[90vh] overflow-y-auto">
+      <DialogContent className=" dark:bg-background sm:max-w-[600px] test-black max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="test-black dark:text-white">Create New Post</DialogTitle>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="dark:bg-gray-800 space-y-6">
+        <form onSubmit={handleSubmit} className="dark:bg-background space-y-6">
           {/* <Tabs defaultValue="photo" value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="photo" className="flex items-center gap-2">
@@ -249,7 +249,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
               name="image"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full px-3 py-2 dark:border-gray-700 test-black dark:bg-gray-700 rounded-lg dark:text-gray-300"
+              className="w-full px-3 py-2 test-black dark:bg-background rounded-lg dark:text-gray-300 dark:border-gray-700"
               placeholder="Enter image URL"
             />
           </div>
@@ -262,7 +262,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
               placeholder="Write a caption for your post..."
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="min-h-[100px] dark:border-gray-700 test-black dark:bg-gray-700 rounded-lg dark:text-gray-300"
+              className="min-h-[100px] dark:border-gray-700 test-black dark:bg-background rounded-lg dark:text-gray-300"
             />
           </div>
 
@@ -276,7 +276,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
                 placeholder="Add location"
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
-                className="pl-9 dark:border-gray-700 dark:bg-gray-700 dark:text-white"
+                className="pl-9 dark:border-gray-700 dark:bg-background dark:text-white"
               />
             </div>
           </div>
