@@ -183,12 +183,12 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
                         >
                           <Avatar className="h-10 w-10 dark:text-ring bg-muted">
                             <AvatarImage src={notification.user.avatar} />
-                            <AvatarFallback>{notification.user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                            <AvatarFallback>{notification.user.username.charAt(0).toUpperCase()}</AvatarFallback>
                           </Avatar>
 
                           <div className="flex-1 min-w-0">
                             <p className="text-sm">
-                              <span className="font-medium dark:text-slate-200">{notification.user.name}</span> 
+                              <span className="font-medium dark:text-slate-200">{notification.user.username}</span> 
                               <span className="text-muted-foreground"> {notification.content} </span> 
                             </p>
                             <p className="text-xs text-muted-foreground">{notification.time}</p>
@@ -254,12 +254,12 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
                         >
                           <Avatar className="h-10 w-10">
                             <AvatarImage src={notification.user.avatar} />
-                            <AvatarFallback>{notification.user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                            <AvatarFallback>{notification.user.username.charAt(0).toUpperCase()}</AvatarFallback>
                           </Avatar>
 
                           <div className="flex-1 min-w-0">
                             <p className="text-sm">
-                              <span className="font-medium">{notification.user.name}</span> {notification.content}
+                              <span className="font-medium">{notification.user.username}</span> {notification.content}
                             </p>
                             <p className="text-xs text-muted-foreground">{notification.time}</p>
                           </div>
@@ -315,12 +315,12 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
                     >
                       <Avatar className="h-10 w-10">
                         <AvatarImage src={notification.user.avatar} />
-                        <AvatarFallback>{notification.user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                        <AvatarFallback>{notification.user.username.charAt(0).toUpperCase()}</AvatarFallback>
                       </Avatar>
 
                       <div className="flex-1 min-w-0">
                         <p className="text-sm">
-                          <span className="font-medium">{notification.user.name}</span> {notification.content}
+                          <span className="font-medium">{notification.user.username}</span> {notification.content}
                         </p>
                         <p className="text-xs text-muted-foreground">{notification.time}</p>
                       </div>
@@ -471,12 +471,12 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
 //                         >
 //                           <Avatar className="h-10 w-10">
 //                             <AvatarImage src={notification.user.avatar} />
-//                             <AvatarFallback>{notification.user.name.charAt(0).toUpperCase()}</AvatarFallback>
+//                             <AvatarFallback>{notification.user.username.charAt(0).toUpperCase()}</AvatarFallback>
 //                           </Avatar>
 
 //                           <div className="flex-1 min-w-0">
 //                             <p className="text-sm">
-//                               <span className="font-medium">{notification.user.name}</span> {notification.content}
+//                               <span className="font-medium">{notification.user.username}</span> {notification.content}
 //                             </p>
 //                             <p className="text-xs text-muted-foreground">{notification.time}</p>
 //                           </div>
@@ -542,12 +542,12 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
 //                         >
 //                           <Avatar className="h-10 w-10">
 //                             <AvatarImage src={notification.user.avatar} />
-//                             <AvatarFallback>{notification.user.name.charAt(0).toUpperCase()}</AvatarFallback>
+//                             <AvatarFallback>{notification.user.username.charAt(0).toUpperCase()}</AvatarFallback>
 //                           </Avatar>
 
 //                           <div className="flex-1 min-w-0">
 //                             <p className="text-sm">
-//                               <span className="font-medium">{notification.user.name}</span> {notification.content}
+//                               <span className="font-medium">{notification.user.username}</span> {notification.content}
 //                             </p>
 //                             <p className="text-xs text-muted-foreground">{notification.time}</p>
 //                           </div>
@@ -603,12 +603,12 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
 //                     >
 //                       <Avatar className="h-10 w-10">
 //                         <AvatarImage src={notification.user.avatar} />
-//                         <AvatarFallback>{notification.user.name.charAt(0).toUpperCase()}</AvatarFallback>
+//                         <AvatarFallback>{notification.user.username.charAt(0).toUpperCase()}</AvatarFallback>
 //                       </Avatar>
 
 //                       <div className="flex-1 min-w-0">
 //                         <p className="text-sm">
-//                           <span className="font-medium">{notification.user.name}</span> {notification.content}
+//                           <span className="font-medium">{notification.user.username}</span> {notification.content}
 //                         </p>
 //                         <p className="text-xs text-muted-foreground">{notification.time}</p>
 //                       </div>
@@ -721,11 +721,11 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
 // //                   >
 // //                     <Avatar className="h-10 w-10">
 // //                       <AvatarImage src={notification.sender?.avatar || "/placeholder.svg"} />
-// //                       <AvatarFallback>{notification.sender?.name?.charAt(0).toUpperCase()}</AvatarFallback>
+// //                       <AvatarFallback>{notification.sender?.username?.charAt(0).toUpperCase()}</AvatarFallback>
 // //                     </Avatar>
 // //                     <div className="flex-1 min-w-0">
 // //                       <p className="text-sm">
-// //                         <span className="font-medium">{notification.sender?.name}</span> {notification.message}
+// //                         <span className="font-medium">{notification.sender?.username}</span> {notification.message}
 // //                       </p>
 // //                       <p className="text-xs text-muted-foreground">
 // //                         {new Date(notification.createdAt).toLocaleString()}

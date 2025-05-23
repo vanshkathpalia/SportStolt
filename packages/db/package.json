@@ -10,7 +10,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
-    "@prisma/client": "^6.5.0"
+    "@prisma/client": "^6.5.0",
+    "@vanshkathpalia/sportstolt-common": "^1.0.3"
   },
   "export": {
     "./client": "./src/routes/index.ts"

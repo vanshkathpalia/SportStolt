@@ -1,5 +1,7 @@
 generator client {
   provider = "prisma-client-js"
+  // output   = "./node_modules/@prisma/client"
+  // output   = "./../../node_modules/@prisma/client"
 }
 
 datasource db {
@@ -11,15 +13,20 @@ datasource db {
 
 model User {
   id                    Int               @id @default(autoincrement())
-  username              String            @unique
-  name                  String?
+  email                 String            @unique
+  username              String?
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
   password              String
   points                Int               @default(0)
   image                 String?
   resetToken            String?           
-  resetTokenExpiry      DateTime?         
+  resetTokenExpiry      DateTime?   
+  // individualProfile   IndividualProfile? @relation(fields: [individualProfileId], references: [id])
+  // orgProfile   OrganizationProfile? @relation(fields: [orgProfileId], references: [id]) 
+  // individualProfile     IndividualProfile?
+  // orgProfile            OrganizationProfile?   
+  // type                  UserType 
   badge                 Badge[]
   comment               Comment[]
   event                 Event[]
@@ -39,11 +46,49 @@ model User {
   savedPosts            Save[]
 }
 
+// model IndividualProfile {
+//   id       Int      @id @default(autoincrement())
+//   userId   Int      @unique
+//   fullname String
+//   age      Int
+//   sportInterest String
+//   gender   String
+//   city     String
+//   state    String
+//   country  String
+//   user     User     @relation(fields: [userId], references: [id])
+// }
 
-enum UserType {
-  INDIVIDUAL
-  ORG
-}
+// model OrganizationProfile {
+//   id         Int      @id @default(autoincrement())
+//   userId     Int      @unique
+//   type       OrganizationType
+//   orgName    String
+//   orgType    String?
+//   orgWebsite String?
+//   noOfStudent Int
+//   address    String?
+//   city       String
+//   state      String
+//   country    String
+//   user       User     @relation(fields: [userId], references: [id])
+// }
+
+// enum OrganizationType {
+//   SCHOOL
+//   COLLEGE
+//   University
+//   ACADEMY
+//   CLUB
+//   COMPANY
+//   NGO
+//   OTHER
+// }
+
+// enum UserType {
+//   INDIVIDUAL
+//   ORG
+// }
 
 
 model Post {

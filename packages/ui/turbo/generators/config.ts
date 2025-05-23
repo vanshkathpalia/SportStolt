@@ -16,7 +16,7 @@ export default function generator(plop: PlopTypes.NodePlopAPI): void {
     actions: [
       {
         type: "add",
-        path: "src/{{kebabCase name}}.tsx",
+        path: "src/{{kebabCase username:}}.tsx",
         templateFile: "templates/component.hbs",
       },
       {

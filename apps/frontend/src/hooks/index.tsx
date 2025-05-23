@@ -31,7 +31,7 @@ export interface Story {
     verificationCount?: number;
     rewardStatus?: string;
     author: {
-        name: string;
+        username: string;
         image?: string;
         userId: string;
     };
@@ -46,7 +46,7 @@ export interface Story {
 export interface EventInterface {
     id: number;
     author: {
-      name: string;
+      username: string;
       avatar: string;
     };
     imageUrl: string;
@@ -55,7 +55,7 @@ export interface EventInterface {
     organisedBy: string;
     endDate: string;
     startDate: string;
-    name: string;
+    username: string;
     state: string;
     country: string;
     timing: string;
