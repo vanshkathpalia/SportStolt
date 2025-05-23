@@ -8,7 +8,7 @@ import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 import { Label } from "../ui/label"
-import { MapPin, Clock, Trophy, Camera, Users } from "lucide-react"
+import { Clock, Trophy, Camera, Users } from "lucide-react"
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { BACKEND_URL } from "../../config"
 import axios from "axios"
@@ -46,7 +46,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
   const [sport, setSport] = useState("")
   const [stadium, setStadium] = useState("")
   const [image, setImage] = useState("")
-  const [participants, setParticipants] = useState("")  
+  const [participants, setParticipants] = useState<number | undefined>(undefined);
   const [locationImage, setLocationImage] = useState("")  
   const [isStartTimeInPast, setIsStartTimeInPast] = useState(false);
   // const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -65,6 +65,27 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
   //     reader.readAsDataURL(file)
   //   }
   // }
+
+  // const FormField = ({ label, value, onChange, type = "text", required = false }: {
+  //   label: string
+  //   value: string | number
+  //   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void
+  //   type?: string
+  //   required?: boolean
+  // }) => (
+  //   <div>
+  //     <label className="block text-sm font-medium dark:text-white text-black mb-1">
+  //       {label}
+  //     </label>
+  //     <input
+  //       type={type}
+  //       value={value}
+  //       onChange={onChange}
+  //       required={required}
+  //       className=" w-full px-3 py-2 border dark:border-gray-700 dark:bg-background rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+  //     />
+  //   </div>
+  // )
 
 
   useEffect(() => {
@@ -116,7 +137,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
       setActivityStarted("");
       setActivityEnded("");
       setSport("");
-      setParticipants("");
+      setParticipants(undefined);
       setStadium("");
       setLocationImage("");
       onClose();
@@ -131,7 +152,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto bg-white dark:bg-background">
         <DialogHeader>
           <DialogTitle className="text-black dark:text-white">Create New Story</DialogTitle>
         </DialogHeader>
@@ -188,14 +209,14 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           <div>
                 <label className="block text-sm font-medium dark:text-white text-black mb-2">
                     <Camera className="w-4 h-4 inline mr-1 " />
-                    Story Image URL
+                    Story Image URL *
                 </label>
                 <input
                   type="text"
                   name="image"
                   value={image}
                   onChange={(e) => setImage(e.target.value)}
-                  className="w-full px-3 py-2 border dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border dark:border-gray-700 dark:bg-background rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter image URL"
               />
           </div>
@@ -203,6 +224,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           {/* Location image Input, rendered through api, seen the name of locaiton 
           can be used for maps later... */}
           <div>
+            {/* <FormField label="Location" value={locationImage} onChange={(e) => setLocationImage(e.target.value)} /> */}
           <label className="block text-sm font-medium dark:text-white text-black mb-2">
                 <Camera className="w-4 h-4 inline mr-1" />
                 Location Name
@@ -212,7 +234,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
               name="locationImage"
               value={locationImage}
                 onChange={(e) => setLocationImage(e.target.value)}
-              className="w-full px-3 py-2  dark:border-gray-700 border dark:bg-gray-700 rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border dark:border-gray-700 dark:bg-background rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter location URL"
               />
           </div>
@@ -235,14 +257,15 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
 
           {/* Description */}
           <div className="space-y-2 dark:text-white text-black">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Describe your story..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="min-h-[100px] dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300"
-              required
+            {/* <FormField label="Description *" value={description} onChange={(e) => setDescription(e.target.value)} /> */}
+            <Label htmlFor="description">Description *</Label>
+              <Textarea
+                id="description"
+                placeholder="Describe your story..."
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                className=" w-full px-3 py-2 border dark:border-gray-700 dark:bg-background rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
             />
           </div>
 
@@ -250,13 +273,13 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
           <div>
               <label className="block text-sm font-medium  mb-2 dark:text-white text-black">
                   <Trophy className="w-4 h-4 inline mr-1 " />
-                  Sport
+                  Sport *
               </label>
               <select
                   name="sport"
                   value={sport}
                   onChange={(e) => setSport(e.target.value)}
-                  className="w-full px-3 py-2 border  dark:border-gray-700 dark:bg-gray-900 rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className=" w-full px-3 py-2 border dark:border-gray-700 dark:bg-background rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
                   <option value="">Select a sport</option>
                   <option value="Cricket">Cricket</option>
@@ -269,39 +292,33 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
 
           {/* Location, for our backend api to pexel */}
           <div className="space-y-2 dark:text-white text-black">
-            <Label htmlFor="location">Location</Label>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-              <Input
+            <Label htmlFor="location">Location *</Label>
+              <Textarea
                 id="location"
-                placeholder="Enter location name"
-                value={location}
+                placeholder="Add location..."
+                value={description}
                 onChange={(e) => setLocation(e.target.value)}
-                className="pl-9  dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300"
+                className=" w-full px-3 py-2 border dark:border-gray-700 dark:bg-background rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
-              />
-            </div>
+            />
           </div>
 
           <div>
-              <label className="block text-sm font-medium text-black dark:text-white mb-2">
-                  <MapPin className="w-4 h-4 inline mr-1" />
-                  Stadium
-              </label>
-              <input
-                type="text"
-                name="stadium"
+            <Label htmlFor="stadium" className="dark:text-white text-black">Stadium *</Label>
+              <Textarea
+                id="stadium"
+                placeholder="Enter stadium name..."
                 value={stadium}
                 onChange={(e) => setStadium(e.target.value)}
-                className="w-full px-3 py-2 border  dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter stadium name"
-              />
+                className=" w-full px-3 py-2 border dark:border-gray-700 dark:bg-background rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                required
+            />
           </div>
 
           {/* Time Range */}
           <div className="grid grid-cols-2 gap-4 dark:text-white text-black">
             <div className="space-y-2">
-              <Label htmlFor="startTime">Start Time</Label>
+              <Label htmlFor="startTime">Start Time *</Label>
               <div className="relative">
                 <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -309,7 +326,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                   type="time"
                   value={activityStarted}
                   onChange={(e) => setActivityStarted(e.target.value)}
-                  className="pl-9  dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300"
+                  className="pl-9  dark:border-gray-700 dark:bg-background rounded-lg dark:text-gray-300"
                   required
                 />
               </div>
@@ -319,7 +336,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="endTime">End Time</Label>
+              <Label htmlFor="endTime">End Time *</Label>
               <div className="relative">
                 <Clock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -327,7 +344,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                   type="time"
                   value={activityEnded}
                   onChange={(e) => setActivityEnded(e.target.value)}
-                  className="pl-9  dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300"
+                  className="pl-9  dark:border-gray-700 dark:bg-background rounded-lg dark:text-gray-300"
                   required
                 />
               </div>
@@ -341,11 +358,12 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
               <Users className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
                 id="Participants"
-                type="text"
-                placeholder="Enter Event link"
+                type="number"
+                placeholder="Enter number of participants"
                 value={participants}
-                onChange={(e) => setParticipants(e.target.value)}
-                className="pl-9 dark:border-gray-700 dark:bg-gray-700 rounded-lg dark:text-gray-300"
+            //  onChange={(e) => setParticipants(parseInt(e.target.value))} //this would have given NAN
+                onChange={(e) => setParticipants(+e.target.value)} // this unsure value is a number
+                className="pl-9 dark:border-gray-700 dark:bg-background rounded-lg dark:text-gray-300"
                 min="1"
                 required
               />

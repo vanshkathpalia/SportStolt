@@ -15,12 +15,12 @@ export const Story = () => {
 
     const openCreateStoryModal = () => {
         setIsCreateStoryModalOpen(true);
-      };
+    };
     
       // Function to close the modal
-      const closeCreateStoryModal = () => {
+    const closeCreateStoryModal = () => {
         setIsCreateStoryModalOpen(false);
-      };
+    };
     // const handleStoryClick = (story: Story) => {
     //     if (story.isYourStory) {
     //       openCreateStoryModal()

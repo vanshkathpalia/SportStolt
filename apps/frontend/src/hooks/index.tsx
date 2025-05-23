@@ -292,11 +292,11 @@ export const useEvents = () => {
         //     })
         // }, []);
 
-        return {
-            loading,
-            events
-        }
+    return {
+        loading,
+        events
     }
+}
 
 // export const useImages = () => {
 //     const [loading, setLoading] = useState(true);

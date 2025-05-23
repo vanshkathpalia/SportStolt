@@ -22,11 +22,13 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
   const navigate = useNavigate()
   const { loading, posts } = usePosts()
   const { events } = useEvents()
-  const [storyDisplayType, setStoryDisplayType] = useState<"sport" | "location">("sport")
+  const [storyDisplayType, setStoryDisplayType] = useState<"location" | "sport">("location")
   const [postSortType, setPostSortType] = useState<"following" | "sport">("following")
   const [createStoryModalOpen, setCreateStoryModalOpen] = useState(false)
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const isMobile = useMediaQuery("(max-width: 768px)")
+
+  const reversedPosts = [...posts].reverse();
 
   // When user clicks back
   // useEffect(() => {
@@ -105,16 +107,6 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                 <div className="mt-2 md:mt-4 flex justify-between items-center">
                   <div className="flex space-x-2">
                     <button
-                      onClick={() => setStoryDisplayType("sport")}
-                      className={`px-3 py-1 text-sm rounded-full transition ${
-                        storyDisplayType === "sport"
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
-                      }`}
-                    >
-                      Sports
-                    </button>
-                    <button
                       onClick={() => setStoryDisplayType("location")}
                       className={`px-3 py-1 text-sm rounded-full transition ${
                         storyDisplayType === "location"
@@ -123,6 +115,16 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                       }`}
                     >
                       Locations
+                    </button>
+                    <button
+                      onClick={() => setStoryDisplayType("sport")}
+                      className={`px-3 py-1 text-sm rounded-full transition ${
+                        storyDisplayType === "sport"
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
+                      }`}
+                    >
+                      Sports
                     </button>
                   </div>
 
@@ -176,12 +178,12 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                     Array(3)
                       .fill(0)
                       .map((_, index) => <PostSkeleton key={index} />)
-                  ) : posts.length === 0 ? (
+                  ) : reversedPosts.length === 0 ? (
                     <p className="text-center text-gray-500 dark:text-gray-400 py-10">
                       No posts available right now
                     </p>
                   ) : (
-                    posts.map((post) => (
+                    reversedPosts.map((post) => (
                       <PostCard
                         key={post.id}
                         id={post.id}

@@ -8,6 +8,9 @@ interface EventHomeSidebarProps {
 }
 
 export const EventHomeSidebar = ({ events, onRegister }: EventHomeSidebarProps) => {
+  
+  const reversedEvents = [...events].reverse();
+
   return (
     <div className="p-10 sticky top-4 ">
       <div className="flex items-center mb-6">
@@ -17,29 +20,29 @@ export const EventHomeSidebar = ({ events, onRegister }: EventHomeSidebarProps) 
       
 
       
-      {events.length === 0 ? (
+      {reversedEvents.length === 0 ? (
         <p className="border border-border dark:text-slate-300 rounded-lg p-4">No events currently</p>
       ) : (
       <div className="space-y-4 max-h-[455px] overflow-auto pr-2">
-      {events.map((event) => (
-        <div key={event.id} className="border border-border rounded-lg p-4 hover:border-green-500 transition-colors">
+      {reversedEvents.map((event) => (
+        <div key={event.id} className="border border-border rounded-lg p-4 hover:border-gray-500 transition-colors">
             <h3 className="font-medium dark:text-gray-400 mb-2">{event.name}</h3>
             <div className="text-sm text-muted-foreground mb-2 space-y-1">
               <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-1 text-green-500" />
+                <Calendar className="h-4 w-4 mr-1 text-gray-500" />
                 <span>
                   {event.startTime}
                 </span>
               </div>
               <div className="flex items-center">
-                <MapPin className="h-4 w-4 mr-1 text-green-500" />
+                <MapPin className="h-4 w-4 mr-1 text-gray-500" />
                 <span>{event.location}</span>
               </div>
             </div>
 
             <div className="flex items-center justify-between mt-4">
               <div className="flex items-center">
-                <Users className="h-4 w-4 mr-1 text-green-500" />
+                <Users className="h-4 w-4 mr-1 text-gray-500" />
                 <span className="text-sm dark:text-slate-400">{event.author.name}</span>
               </div>
               <Button
@@ -60,7 +63,7 @@ export const EventHomeSidebar = ({ events, onRegister }: EventHomeSidebarProps) 
         ))}
       </div>
     )}
-      <hr />
+      <hr className="my-6 border-t border-border dark:border-gray-600"/>
     </div>
   )
 }
