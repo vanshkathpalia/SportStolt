@@ -20,6 +20,8 @@ export interface Post {
   id: number
   author: {
     name: string
+    image:string
+    username: string
     // avatar: string
   }
 //   imageUrl: string
@@ -36,7 +38,9 @@ interface PostCardProps {
     title: string;
     content: string;
     id: number;
-    author: string;
+    author: {
+      image: string; username:string; name: string
+    };
     expanded: boolean;
 }
 export const PostCard = ({
@@ -122,11 +126,11 @@ export const PostCard = ({
       {/* Post Header */}
       <div className="flex items-center justify-between p-3" onClick={handlePostClick}>
         <div className="flex dark:text-slate-200 items-center space-x-2">
-          <Avatar className="w-8 h-8">
-            <AvatarImage src={content} alt={title} />
+          <Avatar className="w-10 h-10">
+            <AvatarImage src={author.image} alt={title} />
             {/* <AvatarFallback>{authorInitials}</AvatarFallback> */}
           </Avatar>
-          <span className="font-medium dark:text-slate-200 text-sm">{author}</span>
+          <span className="font-medium dark:text-slate-200 text-sm">{author.username}</span>
         </div>
         <Button variant="ghost" size="icon" className="h-8 w-8 dark:text-slate-200">
           <MoreHorizontal className="h-5 w-5" />

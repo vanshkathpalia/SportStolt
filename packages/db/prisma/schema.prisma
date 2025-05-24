@@ -9,42 +9,80 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-
-
 model User {
   id                    Int               @id @default(autoincrement())
   email                 String            @unique
-  username              String?
+  username              String?           @unique
+  name                  String?
+  image                 String?           // Profile image
+  bio                   String?           // Short description
+  location              String?           // e.g. Delhi
+  university            String?           // e.g. XYZ University
+  achievements          String?           // e.g. TT Captain, Football Champion
+  legitimacy            String?           // e.g. "97%" (might calculate this from verified stories)
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
   password              String
+
   points                Int               @default(0)
-  image                 String?
-  resetToken            String?           
-  resetTokenExpiry      DateTime?   
-  // individualProfile   IndividualProfile? @relation(fields: [individualProfileId], references: [id])
-  // orgProfile   OrganizationProfile? @relation(fields: [orgProfileId], references: [id]) 
-  // individualProfile     IndividualProfile?
-  // orgProfile            OrganizationProfile?   
-  // type                  UserType 
-  badge                 Badge[]
-  comment               Comment[]
-  event                 Event[]
-  like                  Like[]
-  photo                 Photo[]
-  post                  Post[]
+  badgeLevel            String?           // e.g. "Gold", "Silver", etc.
+
+  post                  Post[]            // Posts user has made
+  savedPosts            Save[]            // Saved posts
+  likedPosts            Like[]            // Liked posts
   story                 Story[]
+  verifiedStories       Verification[]    // Verification-related stories
+  storyAttendance       StoryAttendance[]
   Storyimages           Storyimages[]
   tweet                 Tweet[]
-  verification          Verification[]
-  storyAttendance       StoryAttendance[]
   registration          Registration[]
+
+  comment               Comment[]
+  event                 Event[]           // Events participated (can be filtered later)
+
   sentNotifications     Notification[]    @relation("SentNotifications")
   receivedNotifications Notification[]    @relation("ReceivedNotifications")
   followers             Follow[]          @relation("Followers")
   following             Follow[]          @relation("Following")
-  savedPosts            Save[]
+
+  resetToken            String?           
+  resetTokenExpiry      DateTime?
 }
+
+// model User {
+//   id                    Int               @id @default(autoincrement())
+//   email                 String            @unique
+//   username              String?
+//   createdAt             DateTime          @default(now())
+//   updatedAt             DateTime          @updatedAt
+//   password              String
+//   points                Int               @default(0)
+//   image                 String?
+//   resetToken            String?           
+//   resetTokenExpiry      DateTime?   
+//   // individualProfile   IndividualProfile? @relation(fields: [individualProfileId], references: [id])
+//   // orgProfile   OrganizationProfile? @relation(fields: [orgProfileId], references: [id]) 
+//   // individualProfile     IndividualProfile?
+//   // orgProfile            OrganizationProfile?   
+//   // type                  UserType 
+//   badge                 Badge[]
+//   comment               Comment[]
+//   event                 Event[]
+//   like                  Like[]
+//   photo                 Photo[]
+//   post                  Post[]
+//   story                 Story[]
+//   Storyimages           Storyimages[]
+//   tweet                 Tweet[]
+//   verification          Verification[]
+//   storyAttendance       StoryAttendance[]
+//   registration          Registration[]
+//   sentNotifications     Notification[]    @relation("SentNotifications")
+//   receivedNotifications Notification[]    @relation("ReceivedNotifications")
+//   followers             Follow[]          @relation("Followers")
+//   following             Follow[]          @relation("Following")
+//   savedPosts            Save[]
+// }
 
 // model IndividualProfile {
 //   id       Int      @id @default(autoincrement())
@@ -112,15 +150,15 @@ model PostPhoto {
   Post   Post   @relation(fields: [postId], references: [id])
 }
 
-model Photo {
-  id        String   @id @default(uuid())
-  url       String
-  caption   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  userId    Int
-  User      User     @relation(fields: [userId], references: [id])
-}
+// model Photo {
+//   id        String   @id @default(uuid())
+//   url       String
+//   caption   String?
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+//   userId    Int
+//   User      User     @relation(fields: [userId], references: [id])
+// }
 //why this is here ??? what is the use of this model 
 
 model Comment {
@@ -299,13 +337,13 @@ enum NotificationType {
 
 
 
-model Badge {
-  id        String   @id @default(uuid())
-  name      String
-  userId    Int
-  createdAt DateTime @default(now())
-  User      User     @relation(fields: [userId], references: [id])
-}
+// model Badge {
+//   id        String   @id @default(uuid())
+//   name      String
+//   userId    Int
+//   createdAt DateTime @default(now())
+//   User      User     @relation(fields: [userId], references: [id])
+// }
 
 model Follow {
   id         Int  @id @default(autoincrement())

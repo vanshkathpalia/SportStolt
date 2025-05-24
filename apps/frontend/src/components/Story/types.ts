@@ -11,6 +11,7 @@ export interface StoryType {
     sport?: string;
     endTime: any;
     author: {
+        // name: string;
         username: string;
         image?: string;
         userId: string;

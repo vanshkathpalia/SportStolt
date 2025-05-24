@@ -31,7 +31,7 @@ export const EventHomeSidebar = ({ events, onRegister }: EventHomeSidebarProps) 
               <div className="flex items-center">
                 <Calendar className="h-4 w-4 mr-1 text-gray-500" />
                 <span>
-                  {event.startTime}
+                  {event.startDate} at {event.startTime}
                 </span>
               </div>
               <div className="flex items-center">

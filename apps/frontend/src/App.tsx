@@ -19,7 +19,7 @@ import { AppContextProvider } from "./context/AppContext"
 import { AddEvent } from "./pages/AddEvent"
 import { Search } from './pages/Search'
 import { EventsPage } from './pages/Events'
-import NotificationsPage from './pages/NotificationPage'
+import NotificationsPage from './pages/Notification'
 import { Training } from "./pages/Training"
 import { NewsPage} from "./pages/News"
 import { Profile } from './pages/Profile'

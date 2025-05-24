@@ -9,7 +9,7 @@ import { useState } from "react";
 export const Story = () => {
     const { loading, story } = usePosts();
 
-    const reversedStories = [...story].reverse();
+    // const reversedStories = [...story].reverse();
 
     const [isCreateStoryModalOpen, setIsCreateStoryModalOpen] = useState(false);
 
@@ -58,8 +58,11 @@ export const Story = () => {
                     />
 
                     {/* ✅ Show Stories if Available */}
-                    {reversedStories.length > 0 ? (
-                        reversedStories.map((story) => {
+                    {/* because now i have stories in acs order */}
+                    {/* {reversedStories.length > 0 ? (
+                        reversedStories.map((story) => { */}
+                    {story.length > 0 ? (
+                        story.map((story) => {
                             return (
                                 <StoryCard
                                     key={story.id}

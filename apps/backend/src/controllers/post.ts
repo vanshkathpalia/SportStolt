@@ -192,10 +192,13 @@ postRouter.get('/bulk', async (c) => {
             id: true,
             author: {
                 select: {
-                    name: true
+                    name: true,
+                    image: true, 
+                    username: true
                 }
             }
-        }
+        },
+        orderBy: { createdAt: 'desc' }, // because late time means it is the latest post
     });
     //for manipulating the size of the post image 
     // const posts = receivedposts.map(post => ({
@@ -225,7 +228,9 @@ postRouter.get('/:id', async (c) => {
                 id: true,
                 author: {
                     select: {
-                        name: true
+                        username: true,
+                        name: true,
+                        image: true,
                     }
                 }
             },

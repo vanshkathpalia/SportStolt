@@ -28,7 +28,7 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false)
   const isMobile = useMediaQuery("(max-width: 768px)")
 
-  const reversedPosts = [...posts].reverse();
+  // const reversedPosts = [...posts].reverse();
 
   // When user clicks back
   // useEffect(() => {
@@ -178,16 +178,18 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                     Array(3)
                       .fill(0)
                       .map((_, index) => <PostSkeleton key={index} />)
-                  ) : reversedPosts.length === 0 ? (
+                  // ) : reversedPosts.length === 0 ? (
+                  ) : posts.length === 0 ? (
                     <p className="text-center text-gray-500 dark:text-gray-400 py-10">
                       No posts available right now
                     </p>
                   ) : (
-                    reversedPosts.map((post) => (
+                    // reversedPosts.map((post) => (
+                    posts.map((post) => (
                       <PostCard
                         key={post.id}
                         id={post.id}
-                        author={post.author.name || "Anonymous"}
+                        author={post.author}
                         title={post.title}
                         content={post.content}
                         expanded={false}

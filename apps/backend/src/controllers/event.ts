@@ -5,6 +5,7 @@ import { verify } from 'hono/jwt'
 // import { createstoryInput, updatestoryInput } from '@vanshkathpalia/sportstolt-common'
 import { date, string, z } from "zod"
 import { authMiddleware } from '~/middleware/authMiddleware'
+import { auth } from 'googleapis/build/src/apis/abusiveexperiencereport'
 
 export const eventRouter = new Hono<{
     Bindings: {
@@ -131,7 +132,7 @@ eventRouter.post('/', async (c) => {
 
     console.log("Event created successfully:", event);
 
-    return c.json({ id: event.id });
+    return c.json({ id: event.id, authorId: event.authorId });
   } catch (error) {
     console.error("Unhandled error:", error);
     c.status(500);
@@ -167,16 +168,24 @@ eventRouter.get('/bulk', async (c) => {
         EndDate: true,
         StartTime: true,
         OrganisedBy: true,
+        registration: true,
+      },
+      orderBy: {
+        StartDate: 'asc', // Order by start date ascending
       },
     });
 
     const transformedEvents = events.map((event) => {
-      const startDate = new Date(event.StartDate).toLocaleDateString('en-GB');
-      const endDate = new Date(event.EndDate).toLocaleDateString('en-GB');
-      const startTime = new Date(event.StartTime).toLocaleTimeString('en-GB', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
+      const startDate = new Date(event.StartDate).toLocaleDateString('en-GB', {
+        day: '2-digit', month: 'long', year: 'numeric',
+      });
+
+      const endDate = new Date(event.EndDate).toLocaleDateString('en-GB', {
+        day: '2-digit', month: 'long', year: 'numeric',
+      });
+
+      const startTime = new Date(event.StartDate).toLocaleTimeString('en-GB', {
+        hour: '2-digit', minute: '2-digit', hour12: true,
       });
 
       return {
@@ -189,12 +198,15 @@ eventRouter.get('/bulk', async (c) => {
         name: event.name,
         state: event.state,
         country: event.country,
-        startDate: event.StartDate,
-        endDate: event.EndDate,
+        startDate,
+        startTime,
+        endDate,
+        // endDate: event.EndDate,
         organisedBy: event.OrganisedBy,
         city: event.city,
+        registrationCount: event.registration.length,
         location: `${event.city} - ${event.stadium}`,
-        startTime: `Starts: ${startDate} at ${startTime}`,
+        // startTime: `Starts: ${startDate} at ${startTime}`,
         stadium: event.stadium,
         timing: `Starts: ${startDate} at ${startTime}, Ends: ${endDate}`,
         likes: Math.floor(Math.random() * 100),

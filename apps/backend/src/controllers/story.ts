@@ -197,9 +197,10 @@ storyRouter.get('/bulk', async (c) => {
                 stadium: true,
                 swipeUpEnabled: true,
                 Storyimages: { select: { id: true, url: true, userId: true } },
-                author: { select: { id: true, name: true, image: true } }
+                author: { select: { id: true, username: true, image: true } }
             },
-            orderBy: [{ sport: 'asc' }, { location: 'asc' }] // Group by sport & location
+            // whichever activity started first will be shown first
+            orderBy: [{activityStarted: 'asc'}, { sport: 'asc' }, { location: 'asc' }] // Group by sport & location
         });
 
         return c.json({ stories });
@@ -546,7 +547,7 @@ storyRouter.delete('/', async (c) => {
 //     }
 // });
 
-
+// why do we have this post for viewing ???
 storyRouter.post('/view', async (c) => {
     const body = await c.req.json();
     const parsed = viewStoryInput.safeParse(body);

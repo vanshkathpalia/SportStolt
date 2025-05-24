@@ -9,7 +9,9 @@ export interface Post {
     "title": string;
     "id": number;
     "author": {
+        "username": string
         "name": string
+        "image": string
     }
 }
 
@@ -45,8 +47,16 @@ export interface Story {
 
 export interface EventInterface {
     id: number;
+    name: string;
+    // title: string;
+    // image: string;
+    // description: string;
+    // authorId: number;
+    // eventId: number;
+    // eventName: string;
+    // eventDescription: string; 
     author: {
-      username: string;
+      name: string;
       avatar: string;
     };
     imageUrl: string;
@@ -100,6 +110,8 @@ export const usePost = ({ id }: { id: string }) => {
                 setLoading(false);
             })
     }, [id])
+
+    // console.log(post);
 
     // useEffect(() => {
         
@@ -176,7 +188,7 @@ export const usePosts = () => {
 
             
     // }, []);
-    console.log(posts);
+    // console.log(posts);
     return {
         loading,
         posts,
@@ -198,7 +210,7 @@ export const useStory = (id: number) => {
                     }
                 });
                 setStory(response.data.story);
-                console.log(story);
+                // console.log(story);
             } catch (e) {
                 setError('Failed to fetch story');
                 console.error(e);
