@@ -158,7 +158,7 @@ const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
                         swipeUpEnabled: story.swipeUpEnabled,
                         Storyimages: images,
                         author: {
-                            username: story.author?.username || "Anonymous",
+                            username: story.author?.username || "hello",
                             image: story.author?.image,
                             userId: story.author?.userId || ""
                         }

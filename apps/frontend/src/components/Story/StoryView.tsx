@@ -134,7 +134,7 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
               {story.author.image ? (
                 <img
                   src={story.author.image || "/placeholder.svg"}
-                  alt={story.author.name}
+                  alt={story.author.username}
                   className="w-full h-full object-cover"
                 />
               ) : (
@@ -142,7 +142,7 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
               )}
             </div>
             <div className="text-white">
-              <p className="font-semibold">{story.author.name}</p>
+              <p className="font-semibold">{story.author.username}</p>
               <p className="text-sm opacity-80">{story.location}</p>
             </div>
           </div>

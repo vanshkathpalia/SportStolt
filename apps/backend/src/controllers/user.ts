@@ -7,9 +7,10 @@ import { verify } from "hono/jwt";
 import { signupInput, signinInput } from '@vanshkathpalia/sportstolt-common'
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import { z } from 'zod';
+import { z, ZodError } from 'zod';
 import nodemailer from 'nodemailer';
-import { authMiddleware } from "~/middleware/authMiddleware";
+import { authMiddleware } from "../middleware/authMiddleware";
+import { auth } from "googleapis/build/src/apis/abusiveexperiencereport";
 // import axios from "axios";
 
 // export const signupInput = z.object({
@@ -38,6 +39,15 @@ const UserUpdateInput = z.object({
   resetToken: z.string(),
   resetTokenExpiry: z.date(),
 });
+
+const UserEditInput = z.object({
+  bio: z.string().max(500).optional(),
+  location: z.string().max(100).optional(),
+  university: z.string().max(100).optional(),
+  achievements: z.string().max(1000).optional(),
+  image: z.string().url().optional(), // Assuming image is a URL for now, later is an image indeed
+});
+
 
 
 userRouter.post('/signup', async (c) => {
@@ -111,6 +121,242 @@ userRouter.post('/signin', async (c) => {
         return c.json({ error: "Internal server error during signin" });
     }
 });
+
+// Get All Users
+userRouter.get('/users', async (c) => {
+  const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+  try {
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        post: true,
+      },
+      orderBy: {
+        id: 'asc', // Order by username ascending
+      },
+    });
+
+    return c.json({ users });
+  } catch (e) {
+    c.status(500);
+    console.error(e);
+    return c.json({ error: "Failed to fetch users" });
+  }
+});
+
+// userRouter.get('/users', async (c) => {
+//   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+//   try {
+//     const users = await prisma.user.findMany({
+//       select: { id: true }, // only fetch user IDs
+//     });
+
+//     return c.json({ userIds: users.map(user => user.id) });
+//   } catch (e) {
+//     c.status(500);
+//     console.error(e);
+//     return c.json({ error: "Failed to fetch user IDs" });
+//   }
+// });
+
+
+
+// Get User Profile
+userRouter.get('/:id/profile', authMiddleware, async (c) => {
+  const userId = Number(c.req.param('id'));
+  if (isNaN(userId)) return c.json({ error: 'Invalid user ID' }, 400);
+
+  const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    include: {
+      post: true,
+      story: true,
+      verifiedStories: true,
+    },
+  });
+
+  if (!user) return c.json({ error: 'User not found' }, 404);
+
+  const profileData = {
+    name: user.name,
+    username: user.username,
+    profileImage: user.image,
+    postsCount: user.post.length,
+    storiesCount: user.story.length,
+    verifiedStoriesCount: user.verifiedStories.length,
+    legitimacy: `${user.verifiedStories.length && user.story.length
+      ? Math.floor((user.verifiedStories.length / user.story.length) * 100)
+      : 0}%`,
+    badge: user.badgeLevel,
+    achievements: user.achievements,
+    location: user.location,
+    university: user.university,
+    bio: user.bio,
+  };
+
+  return c.json(profileData);
+});
+
+// Editing bio achievement... patch request
+userRouter.patch('/:id/profile', authMiddleware, async (c) => {
+  const userId = Number(c.req.param('id'));
+  if (isNaN(userId)) return c.json({ error: 'Invalid user ID' }, 400);
+
+  // Parse and validate the input body
+  let updateData;
+  try {
+    updateData = UserEditInput.parse(await c.req.json());
+  } catch (e) {
+    if (e instanceof ZodError) {
+      return c.json({ error: 'Invalid input', details: e.errors }, 400);
+    }
+    return c.json({ error: 'Unexpected error' }, 500);
+  }
+
+  const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+  // Optional: check if authenticated user matches the userId in URL or has permission
+  const authUserId = c.get('userId'); // assuming authMiddleware sets this
+  if (!authUserId || authUserId !== userId) {
+    return c.json({ error: 'Unauthorized' }, 401);
+  }
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        image: updateData.image, // Assuming you might want to update the profile image too
+        bio: updateData.bio,
+        location: updateData.location,
+        university: updateData.university,
+        achievements: updateData.achievements,
+        updatedAt: new Date(),
+      },
+      select: {
+        id: true,
+        image: true,
+        bio: true,
+        location: true,
+        university: true,
+        achievements: true,
+        updatedAt: true,
+      },
+    });
+
+    return c.json({ message: 'Profile updated', user: updatedUser });
+  } catch (error) {
+    return c.json({ error: 'Failed to update profile' }, 500);
+  }
+});
+
+
+// Get User's Posts
+userRouter.get('/:id/posts', authMiddleware, async (c) => {
+  const userId = Number(c.req.param('id'));
+  if (isNaN(userId)) return c.json({ error: 'Invalid user ID' }, 400);
+
+  const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+  const posts = await prisma.post.findMany({
+    where: { authorId: userId }, // Note: You wrote userId in where but your model uses authorId
+    select: {
+      id: true,
+      content: true,   // Assuming you want content with image links here
+      title: true,
+      createdAt: true,
+      _count: {
+        select: {
+          likes: true,
+          Comment: true,
+        }
+      }
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+
+  return c.json(posts);
+});
+
+
+// Get User's Participated Events
+userRouter.get('/:id/events', authMiddleware, async (c) => {
+  const userId = Number(c.req.param('id'));
+  if (isNaN(userId)) return c.json({ error: 'Invalid user ID' }, 400);
+
+  const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+  const events = await prisma.event.findMany({
+    where: {
+      registration: {
+        some: {
+          userId: userId,
+        },
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      StartDate: true,
+      EndDate: true,
+      StartTime: true,
+      stadium: true,
+      OrganisedBy: true,
+      // description: true,  // your schema doesn't have description in Event, so either add or remove
+      city: true,
+      createdAt: true,
+    },
+    orderBy: {
+      StartDate: 'asc', // Order by start date ascending
+    },
+  });
+
+  const now = new Date();
+
+  const enrichedEvents = events.map(event => {
+    let status: "completed" | "ongoing" | "upcoming";
+    if (now > event.EndDate) {
+      status = "completed";
+    } else if (now >= event.StartDate && now <= event.EndDate) {
+      status = "ongoing";
+    } else {
+      status = "upcoming";
+    }
+    
+    const startDate = new Date(event.StartDate).toLocaleDateString('en-GB', {
+      day: '2-digit', month: 'long', year: 'numeric',
+    });
+
+    const endDate = new Date(event.EndDate).toLocaleDateString('en-GB', {
+      day: '2-digit', month: 'long', year: 'numeric',
+    });
+
+    const startTime = new Date(event.StartDate).toLocaleTimeString('en-GB', {
+      hour: '2-digit', minute: '2-digit', hour12: true,
+    });
+
+    return {
+      organisedBy: event.OrganisedBy,
+      startDate,
+      startTime,
+      endDate,
+      timing: `Starts: ${startDate} at ${startTime}`,
+      ...event,
+      status,
+    };
+
+  });
+
+  return c.json(enrichedEvents);
+});
+
+
+
 
 
 // // User Signup Route (Without Mailer Logic)

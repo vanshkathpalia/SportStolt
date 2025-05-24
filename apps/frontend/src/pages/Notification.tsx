@@ -11,7 +11,7 @@ import { Button } from "../components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 
 // Mock data
-import { NOTIFICATIONS } from "../mockData/Notification"
+import { NOTIFICATIONS } from "../mockData/NotificationData"
 import axios from "axios"
 import { BACKEND_URL } from "../config"
 // import axios from "axios"

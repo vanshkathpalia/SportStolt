@@ -39,6 +39,9 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
             {event.name} at
             <br />
             <span>{event.stadium}</span>
+            <br/>
+            <span>{event.city}</span>
+            {/* <span>, {event.city}</span> */}
           </h3>
           <span className="bg-blue-100 text-green-800 text-sm font-medium px-3 py-1 rounded-full">
             {new Date(event.publishedDate).toLocaleDateString()}
@@ -47,8 +50,9 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
 
         <div className="space-y-3 mb-6 p-2 rounded-lg">
           <div className="flex items-center gap-2 text-gray-600 dark:text-gray-400">
-            <Calendar className="w-8 h-8" />
-            <span>{event.timing}</span>  
+            <Calendar />
+            <span>Event, Starts on {event.startDate} at {event.startTime}</span>  
+            
             {/* Contains start and end info*
             this date and time will not work bc in interface be expect string... not date/}
             {/* <span>
@@ -56,6 +60,11 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
             </span> */}
 
           </div>
+          <p className="text-md pl-6 text-gray-600 dark:text-gray-400 mb-2">
+            Ends on {new Date(event.endDate).toLocaleDateString('en-GB', {
+              day: '2-digit', month: 'long', year: 'numeric',
+            })}
+          </p>
           <div className="flex items-center gap-2  text-gray-600 dark:text-gray-400">
             <Users className="w-5 h-5" />
             <span>Organized by: {event.organisedBy}</span>

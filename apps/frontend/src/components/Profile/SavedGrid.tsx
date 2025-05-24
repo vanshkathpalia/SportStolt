@@ -1,35 +1,34 @@
-import { PostType } from "../../hooks/types";
-import { FullView } from "./FullView";
+// import { PostType } from "../../hooks/types";
+// import { FullView } from "./FullView";
 
-interface ProfileGridProps {
-  isLoading?: boolean;
-  posts?: PostType[];
-}
+// interface ProfileGridProps {
+//   isLoading?: boolean;
+//   posts?: PostType[];
+// }
 
-export const ProfileGrid: React.FC<ProfileGridProps> = ({ isLoading, posts }) => {
-  
-  if ( isLoading) {
-    return (
-      <div className="grid grid-cols-3 gap-4">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className="aspect-square bg-gray-200 animate-pulse" />
-        ))}
-      </div>
-    );
-  }
+// export const ProfileGrid: React.FC<ProfileGridProps> = ({ isLoading, posts }) => {
+//   if (isLoading) {
+//     return (
+//       <div className="grid grid-cols-3 gap-2">
+//         {[...Array(6)].map((_, i) => (
+//           <div key={i} className="aspect-square bg-gray-200 animate-pulse" />
+//         ))}
+//       </div>
+//     );
+//   }
 
-  if (!posts || posts.length === 0) {
-    return <p className="text-center text-gray-400 pt-20">No posts found.</p>;
-  }
+//   if (!posts || posts.length === 0) {
+//     return <p className="text-center text-gray-500">No posts found.</p>;
+//   }
 
-  return (
-    <div className="grid grid-cols-3 gap-4">
-      {posts.map((post) => (
-        <FullView post={post} index={post.id} />
-      ))}     
-    </div>     
-  );
-};
+//   return (
+//     <div className="grid grid-cols-3 gap-1">
+//       {posts.map((post) => (
+//         <FullView post={post.content} index={post.id} />
+//       ))}     
+//     </div>     
+//   );
+// };
 
 
 // import { FullView } from "./FullView";

@@ -63,8 +63,8 @@ export const FullPost = ({ post }: {post: Post}) => {
                 <div className="divide-y-2 divide-solid items-center grid grid-cols-1">
                     <div className="flex min-w-full w-fit pb-3">
                         <div className="flex flex-col items-center justify-center">
-                            {/* <div><Avatar name={post.author.name} size="big"/></div> */}
-                            <div className="font-bold">{post.author.name || "Anonymous"} </div> 
+                            {/* <div><Avatar name={post.author.username} size="small"/></div> */}
+                            <div className="font-bold">{post.author.username || "Anonymous"} </div> 
                             <div className="p-2 text-slate-500">
                                 <CaptionLimit caption={"porem ipsum dolor sit amet consectetur adipisicing elit. Animi ratione ullam quisquam rem provident fuga cumque fugit quidem voluptatum minus, ducimus expedita obcaecati deleniti perspiciatis reprehenderit nisi veniam, eveniet soluta"} />
                             </div>
