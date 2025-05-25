@@ -27,13 +27,22 @@ const app = new Hono<{
   }
 }>();
 
+// app.use('*', async (c, next) => {
+//   c.header('Access-Control-Allow-Origin', '*'); // or specify origin
+//   c.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+//   c.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//   if (c.req.method === 'OPTIONS') return new Response(null, { status: 204 });
+//   await next();
+// });
+
 app.use('/*', cors())
+
 app.route("/api/v1/user", userRouter);
 app.route("/api/v1/post", postRouter);
-app.route("api/v1/story", storyRouter);
-app.route("api/v1/apiPost", apiPostRouter);
-app.route("api/v1/event", eventRouter);
-app.route("api/v1/search", searchRouter);
+app.route("/api/v1/story", storyRouter);
+app.route("/api/v1/apiPost", apiPostRouter);
+app.route("/api/v1/event", eventRouter);
+app.route("/api/v1/search", searchRouter);
 app.route("/api/v1/notificaiton", notificationRouter);
 app.route("/api/v1/training", trainingRouter)
 

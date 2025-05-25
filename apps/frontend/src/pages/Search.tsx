@@ -16,7 +16,13 @@ export const Search = ({openCreateModal}: {openCreateModal: () => void}) => {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const response = await axios.get(`${BACKEND_URL}/api/v1/search/images`);
+        
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`${BACKEND_URL}/api/v1/search/images`, { 
+          method: "GET",
+          headers: { Authorization: token } 
+        });
+        
         console.log('Fetched images:', response.data.images); // Debugging
         setPosts(response.data.images);
       } catch (error) {

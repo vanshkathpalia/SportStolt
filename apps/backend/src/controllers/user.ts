@@ -10,7 +10,9 @@ import crypto from 'crypto';
 import { z, ZodError } from 'zod';
 import nodemailer from 'nodemailer';
 import { authMiddleware } from "../middleware/authMiddleware";
+
 import { auth } from "googleapis/build/src/apis/abusiveexperiencereport";
+import { set } from "date-fns";
 // import axios from "axios";
 
 // export const signupInput = z.object({
@@ -40,25 +42,43 @@ const UserUpdateInput = z.object({
   resetTokenExpiry: z.date(),
 });
 
-const UserEditInput = z.object({
-  bio: z.string().max(500).optional(),
-  location: z.string().max(100).optional(),
-  university: z.string().max(100).optional(),
-  achievements: z.string().max(1000).optional(),
-  image: z.string().url().optional(), // Assuming image is a URL for now, later is an image indeed
+// const UserEditInput = z.object({
+//   bio: z.string().max(500).optional(),
+//   location: z.string().max(100).optional(),
+//   university: z.string().max(100).optional(),
+//   achievements: z.string().max(1000).optional(),
+//   image: z.string().url().optional(), // Assuming image is a URL for now, later is an image indeed
+// });
+
+export const UserEditInput = z.object({
+  image: z.string().url().optional(),
+  bio: z.string()
+    .max(500, "Bio is too long") // character fallback
+    .refine(val => val.trim().split(/\s+/).length <= 25, {
+      message: "Bio must be 25 words or fewer"
+    }),
+  location: z.string().optional(),
+  university: z.string().optional(),
+  achievements: z.string()
+    .max(300, "Achievements is too long")
+    .refine(val => val.trim().split(/\s+/).length <= 10, {
+      message: "Achievements must be 10 words or fewer"
+    }),
 });
-
-
 
 userRouter.post('/signup', async (c) => {
     const body = await c.req.json();
+    
+
     const result = signupInput.safeParse(body);
     if (!result.success) {
         c.status(400);
         return c.json({ error: "Invalid input", details: result.error });
     }
 
-    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+    const prisma = new PrismaClient({ 
+      datasourceUrl: c.env.DATABASE_URL 
+    }).$extends(withAccelerate());
 
     try {
         const existingUser = await prisma.user.findUnique({ where: { email: body.email } });
@@ -77,12 +97,49 @@ userRouter.post('/signup', async (c) => {
             }
         });
 
+        await prisma.follow.create({
+          data: {
+            followerId: user.id,
+            followingId: user.id
+          }
+        });
+        
+        // await prisma.follow.upsert({
+        //   where: {
+        //     followerId_followingId: {
+        //       followerId: user.id,
+        //       followingId: user.id
+        //     }
+        //   },
+        //   create: {
+        //     followerId: user.id,
+        //     followingId: user.id
+        //   },
+        //   update: {}
+        // });
+
         const jwt = await sign(
             { id: user.id, username: user.username, timestamp: Date.now() },
             c.env.JWT_SECRET
         );
 
-        return c.json({ token: jwt });
+        localStorage.setItem('token', jwt);
+        localStorage.setItem('user', JSON.stringify(user));
+        console.log('Setting token:', jwt);
+        console.log('Setting user:', user);
+        return c.json({
+          token: jwt,
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+          },
+        });
+
+        // const { id, username, email } = user;
+        // return c.json({ token: jwt, user: { id, username, email } });
+        // return c.json({ token: jwt });
+
     } catch (e) {
         c.status(500);
         console.error(e);
@@ -92,7 +149,8 @@ userRouter.post('/signup', async (c) => {
 
 // User Signin Route (Without Mailer Logic)
 userRouter.post('/signin', async (c) => {
-    const body = await c.req.json();
+    const body = await c.req.json(); 
+
     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
 
     try {
@@ -114,7 +172,24 @@ userRouter.post('/signin', async (c) => {
         );
 
         c.status(200);
-        return c.json({ token: jwt });
+        
+        // localStorage.setItem('token', jwt);
+        // localStorage.setItem('user', JSON.stringify(user));
+        // console.log('Setting token:', jwt);
+        // console.log('Setting user:', user);
+        return c.json({
+          token: jwt,
+          user: {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+          },
+        });
+
+        // const { id, username, email } = user;
+        // return c.json({ token: jwt, user: { id, username, email } });
+        // return c.json({ token: jwt });
+
     } catch (e) {
         console.error(e);
         c.status(500);
@@ -163,6 +238,42 @@ userRouter.get('/users', async (c) => {
 //   }
 // });
 
+// Get Current User
+userRouter.get('/me', authMiddleware, async (c) => {
+  const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+  
+  const userId = c.get('userId');
+  if (!userId) {
+    return c.json({ error: 'Unauthorized' }, 401);
+  }
+
+  try {
+    // Fetch user from DB by id, exclude password
+    const user = await prisma.user.findUnique({
+      where: { id: Number(userId) },
+      select: {
+        id: true,
+        username: true,
+        email: true,
+        // bio: true,
+        // location: true,
+        // university: true,
+        // achievements: true,
+        // image: true,
+        // any other public user fields
+      },
+    });
+
+    if (!user) {
+      return c.json({ error: 'User not found' }, 404);
+    }
+
+    return c.json(user);
+  } catch (err) {
+    console.error('Error fetching user:', err);
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+});
 
 
 // Get User Profile
@@ -240,7 +351,7 @@ userRouter.patch('/:id/profile', authMiddleware, async (c) => {
       },
       select: {
         id: true,
-        image: true,
+        image: true,  
         bio: true,
         location: true,
         university: true,
@@ -254,7 +365,6 @@ userRouter.patch('/:id/profile', authMiddleware, async (c) => {
     return c.json({ error: 'Failed to update profile' }, 500);
   }
 });
-
 
 // Get User's Posts
 userRouter.get('/:id/posts', authMiddleware, async (c) => {
@@ -282,7 +392,6 @@ userRouter.get('/:id/posts', authMiddleware, async (c) => {
 
   return c.json(posts);
 });
-
 
 // Get User's Participated Events
 userRouter.get('/:id/events', authMiddleware, async (c) => {
@@ -353,6 +462,21 @@ userRouter.get('/:id/events', authMiddleware, async (c) => {
   });
 
   return c.json(enrichedEvents);
+});
+
+// GET /api/user/id/:username
+userRouter.get('/id/:username', async (c) => {
+  const { username } = c.req.param();
+  const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+  const user = await prisma.user.findUnique({ where: { username } });
+
+  if (!user) {
+    c.status(404);
+    return c.json({ error: "User not found" });
+  }
+
+  return c.json({ id: user.id });
 });
 
 
@@ -1074,6 +1198,7 @@ userRouter.post('/reset-password', async (c) => {
 //       return c.json({ error: "Internal server error during signup" });
 //   }
 // });
+
 // const sendLoginConfirmationEmail = async (username: string, name: string, ipAddress: string, location: string) => {
 //   const transporter = nodemailer.createTransport({
 //     host: 'smtp.gmail.com',
