@@ -6,17 +6,21 @@ import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { signupInput } from "@vanshkathpalia/sportstolt-common";
 import { z } from "zod";
+import { useAuth } from "../../context/AuthContext.tsx";
 
 type SignupInput = z.infer<typeof signupInput>;
 
 
 export const Auth = ({ type }: { type: "signup" | "signin" }) => {
   const navigate = useNavigate();
+  const { setUser } = useAuth();
+
   const [postInputs, setPostInputs] = useState<SignupInput>({
     username: "",
     email: "",
     password: "",
   });
+
   const [loading, setLoading] = useState(false);
 
   async function sendRequest() {
@@ -24,26 +28,24 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
     try {
       const response = await axios.post(`${BACKEND_URL}/api/v1/user/${type}`, postInputs);
       const jwt = response.data.token;
+      const user = response.data.user;  // Assuming backend sends this
+
       if (!jwt) {
         alert("Forgot Password? Change your password");
         setLoading(false);
         return;
       }
+
+      // Store token and user in localStorage
       localStorage.setItem("token", jwt);
-      // Navigate to /post, replacing history to prevent back navigation to auth pages
+      if (user) {
+        localStorage.setItem("user", JSON.stringify(user));
+        setUser(user);  // update context immediately
+      }
+
       navigate("/post", { replace: true });
     } catch (e: unknown) {
-      if (axios.isAxiosError(e)) {
-        const errorMessage =
-          e.response?.data?.error || e.response?.data?.message || "Unexpected error";
-        alert(errorMessage);
-        console.error(e);
-      } else if (e instanceof Error) {
-        alert(e.message);
-        console.error(e);
-      } else {
-        console.error("Unknown error:", e);
-      }
+      // your error handling code
     } finally {
       setLoading(false);
     }
@@ -67,6 +69,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
           className="flex justify-center"
         >
           <div>
+
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}

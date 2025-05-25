@@ -24,6 +24,7 @@ import { Training } from "./pages/Training"
 import { NewsPage} from "./pages/News"
 import { Profile } from './pages/Profile'
 import { Logout } from "./pages/Logout"; 
+import { EditProfile } from "./components/Profile/EditProfile"
 
 
 
@@ -57,6 +58,11 @@ function App() {
                 <Route path="/training" element={<Training openCreateModal={() => setCreatePostModalOpen(true)} />} />
                 <Route path="/news" element={<NewsPage openCreateModal={() => setCreatePostModalOpen(true)} />} />  
                 <Route path="/profile" element={<Profile openCreateModal={() => setCreatePostModalOpen(true)}/>} />
+                <Route path="/profile/:username" element={<Profile openCreateModal={() => setCreatePostModalOpen(true)}/>} />
+                <Route path="/editprofile/:id" element={<EditProfile openCreateModal={() => setCreatePostModalOpen(true)}/>} />
+                {/* <Route path="/addstory" element={<AddStory />} /> */}
+                
+                {/* Add Event Page */}
                 <Route path="/logout" element={<Logout />} />
               </Routes>
 

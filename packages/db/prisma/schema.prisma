@@ -1,5 +1,7 @@
 generator client {
   provider = "prisma-client-js"
+  // previewFeatures = ["accelerate"]
+  // previewFeatures = ["dataProxy"]
   // output   = "./node_modules/@prisma/client"
   // output   = "./../../node_modules/@prisma/client"
 }
@@ -14,7 +16,7 @@ model User {
   email                 String            @unique
   username              String?           @unique
   name                  String?
-  image                 String?           // Profile image
+  image                 String?           // Profile image , image under author
   bio                   String?           // Short description
   location              String?           // e.g. Delhi
   university            String?           // e.g. XYZ University
@@ -44,6 +46,7 @@ model User {
   receivedNotifications Notification[]    @relation("ReceivedNotifications")
   followers             Follow[]          @relation("Followers")
   following             Follow[]          @relation("Following")
+  followedTags          Tag[]             @relation("TagFollowers")
 
   resetToken            String?           
   resetTokenExpiry      DateTime?
@@ -129,11 +132,21 @@ model User {
 // }
 
 
+model Tag {
+  id        Int     @id @default(autoincrement())
+  name      String  @unique
+  posts     Post[]  @relation("PostTags")
+  followers User[] @relation("TagFollowers")
+}
+
+
 model Post {
   id       Int      @id @default(autoincrement())
   title    String
   content  String
   authorId Int
+  tagSting   String[] 
+  tags     Tag[]    @relation("PostTags") // assuming a relation
   createdAt DateTime @default(now())
   author   User     @relation(fields: [authorId], references: [id])
   likes    Like[]
@@ -267,6 +280,7 @@ model StoryAttendance {
 
 
 
+
 model Event {
   id          Int       @id @default(autoincrement())
   image       String
@@ -346,23 +360,25 @@ enum NotificationType {
 // }
 
 model Follow {
-  id         Int  @id @default(autoincrement())
-  followerId Int
-  follower   User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  id          Int       @id @default(autoincrement())
+  followerId  Int
+  follower    User      @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
 
   followingId Int
-  following   User @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+  following   User      @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
 
-  createdAt     DateTime       @default(now())
+  createdAt   DateTime  @default(now())
   notifications Notification[]
 
-  @@unique([followerId, followingId]) // Prevent duplicate follows
+  @@unique([followerId, followingId], name: "followerId_followingId")
 }
+
 
 model Tweet {
   id        String   @id @default(uuid())
   content   String
   createdAt DateTime @default(now())
+  authorId  Int
   updatedAt DateTime @updatedAt
   userId    Int
   author    User     @relation(fields: [userId], references: [id])

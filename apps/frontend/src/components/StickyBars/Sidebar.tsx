@@ -2,6 +2,7 @@ import { Home, Search, PlusSquare, Trophy, User, Bell, Activity, Menu, DollarSig
 import { cn } from "../lib/utils";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "../../context/AuthContext";
 
 interface SidebarItemProps {
   icon: React.ElementType;
@@ -44,12 +45,14 @@ interface SidebarProps {
 }
 
 export function Sidebar({ openCreateModal }: SidebarProps) {
-  const location = useLocation();
-  const pathname = location.pathname;
+  const { user } = useAuth(); // get current user
+
   const navigate = useNavigate();
   const [moreOpen, setMoreOpen] = useState(false);
+  const location = useLocation();
+  const pathname = location.pathname;
 
-    const handleLogout = () => {
+  const handleLogout = () => {
     // Optional: Add back-button handling logic
     window.history.pushState(null, "", window.location.href);
 
@@ -84,7 +87,9 @@ export function Sidebar({ openCreateModal }: SidebarProps) {
     { icon: Activity, label: "Training", href: "/training" },
     { icon: Newspaper, label: "News", href: "/news" },  // <-- Added News
     { icon: PlusSquare, label: "Create", href: "#", onClick: openCreateModal },
-    { icon: User, label: "Profile", href: "/profile" },
+    {
+      icon: User, label: "Profile", href: user ? `/profile/${user.username}` : '/profile', // fallback to '/profile' if no user yet
+    },
   ];
 
 
@@ -130,6 +135,177 @@ export function Sidebar({ openCreateModal }: SidebarProps) {
     </div>
   );
 }
+
+
+// import React, { useEffect, useState } from "react";
+// import { Home, Search, PlusSquare, Trophy, User, Bell, Activity, Menu, DollarSign, Settings, LogOut, Newspaper } from "lucide-react";
+// import { cn } from "../lib/utils";
+// import { Link, useLocation, useNavigate } from "react-router-dom";
+// import { useAuth } from "../../context/AuthContext";
+// import { BACKEND_URL } from "../../config";
+
+// interface SidebarItemProps {
+//   icon: React.ElementType;
+//   label: string;
+//   href: string;
+//   active?: boolean;
+//   onClick?: () => void;
+// // }
+
+// const SidebarItem = ({ icon: Icon, label, href, active, onClick }: SidebarItemProps) => {
+//   const navigate = useNavigate();
+
+//   const handleClick = (e: React.MouseEvent) => {
+//     e.preventDefault();
+//     if (onClick) {
+//       onClick();
+//     } else if (href) {
+//       navigate(href);
+//     }
+//   };
+
+//   return (
+//     <a
+//       href={href}
+//       onClick={handleClick}
+//       className={cn(
+//         "flex items-center gap-4 px-4 py-3 rounded-md transition-colors",
+//         "hover:bg-accent dark:hover:bg-gray-700",
+//         active && "font-semibold text-green-500"
+//       )}
+//     >
+//       <Icon className={cn("h-6 w-6", active ? "text-green-500" : "text-gray-600 dark:text-gray-300")} />
+//       <span className="hidden xl:block text-gray-800 dark:text-gray-200">{label}</span>
+//     </a>
+//   );
+// };
+
+// interface SidebarProps {
+//   openCreateModal: () => void;
+// }
+
+// export function Sidebar({ openCreateModal }: SidebarProps) {
+//   const { user, setUser } = useAuth(); // assume your auth context exposes setUser
+//   const [loadingUser, setLoadingUser] = useState(false);
+
+//   if (loadingUser) {
+//     return <div>Loading user...</div>;
+//   }
+
+//   const navigate = useNavigate();
+//   const [moreOpen, setMoreOpen] = useState(false);
+//   const location = useLocation();
+//   const pathname = location.pathname;
+
+//   useEffect(() => {
+//     async function fetchUser() {
+//       const token = localStorage.getItem("token");
+//       if (!token) return;
+
+//       setLoadingUser(true);
+//       try {
+//         const res = await fetch(`${BACKEND_URL}/api/v1/user/me`, {
+//           headers: {
+//             Authorization: `Bearer ${token}`,
+//           },
+//         });
+//         if (res.ok) {
+//           const data = await res.json();
+//           setUser(data); // update user in context
+//         } else {
+//           // handle unauthorized or errors
+//           setUser(null);
+//         }
+//       } catch (error) {
+//         console.error("Failed to fetch user:", error);
+//         setUser(null);
+//       } finally {
+//         setLoadingUser(false);
+//       }
+//     }
+
+//     if (!user) {
+//       fetchUser();
+//     }
+//   }, [setUser, user]);
+
+//   const handleLogout = () => {
+//     window.history.pushState(null, "", window.location.href);
+//     const onPopState = () => {
+//       const leave = window.confirm("Do you want to close this page?");
+//       if (leave) {
+//         window.close();
+//       } else {
+//         window.history.pushState(null, "", window.location.href);
+//       }
+//     };
+//     window.addEventListener("popstate", onPopState);
+//     setTimeout(() => {
+//       window.removeEventListener("popstate", onPopState);
+//     }, 1000);
+
+//     localStorage.removeItem("token");
+//     setUser(null);
+//     navigate("/signin");
+//   };
+
+//   const navItems = [
+//     { icon: Home, label: "Home", href: "/post" },
+//     { icon: Search, label: "Search", href: "/search" },
+//     { icon: Trophy, label: "Events", href: "/events" },
+//     { icon: Bell, label: "Notifications", href: "/notifications" },
+//     { icon: Activity, label: "Training", href: "/training" },
+//     { icon: Newspaper, label: "News", href: "/news" },
+//     { icon: PlusSquare, label: "Create", href: "#", onClick: openCreateModal },
+//     {
+//       icon: User,
+//       label: "Profile",
+//       href: user && user.username ? `/profile/${user.username}` : "/profile",
+//     },
+//   ];
+
+//   return (
+//     <div className="h-full flex flex-col py-4 bg-backgroundtransition-colors">
+//       {/* Logo */}
+//       <div className="px-2 mb-8">
+//         <div className="flex flex-col items-center gap-2">
+//           <Link to="/post" className="flex items-center px-6 cursor-pointer">
+//             <h1 className="text-xl font-bold hidden xl:block text-green-500">SportStolt</h1>
+//             <div className="hidden md:block xl:hidden">
+//               <Trophy className="h-7 w-8 text-green-500" />
+//             </div>
+//           </Link>
+//         </div>
+//       </div>
+
+//       {/* Nav Items */}
+//       <nav className="flex-1 space-y-1">
+//         {navItems.map((item) => (
+//           <SidebarItem
+//             key={item.href}
+//             icon={item.icon}
+//             label={item.label}
+//             href={item.href}
+//             active={pathname === item.href}
+//             onClick={item.onClick}
+//           />
+//         ))}
+//       </nav>
+
+//       {/* More Dropdown */}
+//       <div className="mt-auto relative">
+//         <SidebarItem icon={Menu} label="More" href="#" onClick={() => setMoreOpen(!moreOpen)} />
+//         {moreOpen && (
+//           <div className="absolute bottom-12 left-0 w-full bg-white dark:bg-gray-800 shadow-lg rounded-lg ml-1 z-50">
+//             <SidebarItem icon={Settings} label="Settings" href="/settings" />
+//             <SidebarItem icon={DollarSign} label="Be an Earner" href="/earn" />
+//             <SidebarItem icon={LogOut} label="Logout" href="#" onClick={handleLogout} />
+//           </div>
+//         )}
+//       </div>
+//     </div>
+//   );
+// }
 
 
 

@@ -10,16 +10,21 @@ export const authMiddleware: MiddlewareHandler<{
     userId: number;
   }
 }> = async (c, next) => {
+  
   const authHeader = c.req.header("authorization") || "";
   
   // Ensure the token has the "Bearer " prefix
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : authHeader;
-  
+  if (!authHeader) {
+    return c.json({ error: "Missing token" }, 401);
+  }
+
   try {
     const user = await verify(token, c.env.JWT_SECRET);
 
     if (user && typeof user.id === "number") {
       c.set("userId", user.id);
+      console.log('Token User ID:', c.get('userId'));
       return await next();
     } else {
       console.error("Invalid token structure:", user);

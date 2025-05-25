@@ -32,7 +32,7 @@ export const Training = ({ openCreateModal }: { openCreateModal: () => void }) =
                     <Sidebar openCreateModal={openCreateModal} />
                 </div>
 
-                <main className="flex-1 md:ml-16 xl:ml-52 p-8">
+                <main className="flex-1 md:ml-16 xl:ml-52 p-8 mb-16">
                     <form
                         onSubmit={handleSubmit}
                         className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-8 max-w-lg mx-auto transition-colors duration-300"

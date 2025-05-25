@@ -18,7 +18,7 @@ export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void })
     event.location.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const reversedEvents = [...filteredEvents].reverse();
+  // const reversedEvents = [...filteredEvents].reverse();
 
   const [isCreateStoryModalOpen, setIsCreateStoryModalOpen] = useState(false);
 
@@ -41,7 +41,7 @@ export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void })
         </div>
 
         {/* Main Content */}
-        <main className="flex-1 md:ml-16 xl:ml-56">
+        <main className="flex-1 md:ml-16 xl:ml-56 mr-5 ml-5 sm:mr-0 sm:ml-0 pb-16 md:pb-8">
           {/* Fixed Header */}
           <div className="fixed md:top-0 left-0 right-0 md:left-16 xl:left-56 z-50 bg-background pb-2">
             <div className="max-w-screen-lg mx-auto px-4 py-4">
@@ -84,13 +84,15 @@ export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void })
                   <div key={i} className="h-64 bg-gray-200 rounded-lg animate-pulse dark:opacity-10 opacity-80" />
                 ))}
               </div>
-            ) : reversedEvents.length === 0 ? (
+            // ) : reversedEvents.length === 0 ? (
+              ) : filteredEvents.length === 0 ? (
               <div className="text-center text-gray-500 dark:text-slate-300 text-lg mt-8">
                 No events currently.
               </div>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {reversedEvents.map((event) => (
+                {/* {reversedEvents.map((event) => ( */}
+                {filteredEvents.map((event) => (
                   <EventCard key={event.id} event={event} />
                 ))}
               </div>

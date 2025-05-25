@@ -5,7 +5,7 @@ import { PostType, EventType  } from "./types";
 
 type Tab = "posts" | "events" | "saved";
 
-export const useProfileContent = (userId: number, activeTab: Tab) => {
+export const useProfileContent = (userId: number | undefined, activeTab: Tab) => {
   const [loading, setLoading] = useState(true);
 
   // Use union type or optional depending on your rendering logic

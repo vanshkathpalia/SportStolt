@@ -11,7 +11,7 @@ export const EventGrid: React.FC<EventGridProps> = ({ isLoading, events }) => {
     return (
       // 
       <div className="grid grid-cols-3 gap-4">
-        {[...Array(6)].map((_, i) => (
+        {[...Array(9)].map((_, i) => (
           <div key={i} className="h-[180px] w-full bg-gray-200 animate-pulse rounded-lg" />
         ))}
       </div>

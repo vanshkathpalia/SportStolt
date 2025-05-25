@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App.tsx'
 import "./index.css"
 import { ThemeProvider } from './context/ThemeProvider.tsx'
+import { AuthProvider } from './context/AuthContext';
 // import { applyThemeFromPreference } from './utils/theme';
 
 // applyThemeFromPreference(); 
@@ -10,7 +11,11 @@ import { ThemeProvider } from './context/ThemeProvider.tsx'
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <ThemeProvider>
-      <App />
+      <AuthProvider>
+        {/* <BrowserRouter> */}
+          <App />
+        {/* </BrowserRouter> */}
+      </AuthProvider>
     </ThemeProvider>
   </StrictMode>
 )

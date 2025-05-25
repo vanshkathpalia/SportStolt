@@ -51,7 +51,7 @@ export const NewsPage = ({ openCreateModal }: NewsPageProps) => {
 
   const fetchSportsNews = async () => {
     try {
-      const response = await axios.get("http://api.mediastack.com/v1/news", {
+      const response = await axios.get("https://api.mediastack.com/v1/news", {
         params: {
           access_key: "6be479e11e6d979d68b88363982ddd4c",
           categories: "sports",

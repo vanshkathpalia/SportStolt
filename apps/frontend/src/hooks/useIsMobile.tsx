@@ -1,19 +1,19 @@
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
 
-const useIsMobile = (breakpoint = 640) => {
-  const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
+// const useIsMobile = (breakpoint = 640) => {
+//   const [isMobile, setIsMobile] = useState(window.innerWidth < breakpoint);
 
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < breakpoint);
+//   useEffect(() => {
+//     const handleResize = () => setIsMobile(window.innerWidth < breakpoint);
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [breakpoint]);
+//     window.addEventListener("resize", handleResize);
+//     return () => window.removeEventListener("resize", handleResize);
+//   }, [breakpoint]);
 
-  return isMobile;
-};
+//   return isMobile;
+// };
 
-export default useIsMobile;
+// export default useIsMobile;
 
 
-// .catch((error: any) => console.error('Prisma connection error:', error));
+// // .catch((error: any) => console.error('Prisma connection error:', error));
