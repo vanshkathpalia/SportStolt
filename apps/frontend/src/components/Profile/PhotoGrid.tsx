@@ -6,53 +6,34 @@ interface ProfileGridProps {
   isLoading?: boolean;
   posts?: PostType[];
 }
+
 export const ProfileGrid: React.FC<ProfileGridProps> = ({ isLoading, posts }) => {
-  const [showNoPostsMessage, setShowNoPostsMessage] = useState(false);
+  const [delayed, setDelayed] = useState(true);
 
   useEffect(() => {
-    let timer: NodeJS.Timeout | null = null;
+    const timer = setTimeout(() => {
+      setDelayed(false);
+    }, 2000); // 3 seconds delay
 
-    if (isLoading) {
-      setShowNoPostsMessage(false);
-      timer = setTimeout(() => {
-        setShowNoPostsMessage(true);
-      }, 5000);
-    } else {
-      if (timer) clearTimeout(timer);
-      setShowNoPostsMessage(false);
-    }
+    return () => clearTimeout(timer);
+  }, []);
 
-    return () => {
-      if (timer) clearTimeout(timer);
-    };
-  }, [isLoading]);
-
-  if (isLoading) {
-    return (
-        <div className="grid grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <div key={i} className="aspect-square bg-gray-200 animate-pulse" />
-          ))}
-        </div>
-    );
-  }
-
-  if ((!posts || posts.length === 0) && showNoPostsMessage) {
-    return <p className="text-center text-gray-400 pt-20">No posts found.</p>;
-  }
-
-  // If posts is empty but timer not elapsed yet, keep showing "loading images" message
-  if (!posts || posts.length === 0) {
+  if (isLoading || (posts?.length === 0 && delayed)) {
     return (
       <div className="grid grid-cols-3 gap-4">
-         {[...Array(6)].map((_, i) => (
-           <div key={i} className="aspect-square bg-gray-200 animate-pulse" />
-         ))}
-       </div>
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="aspect-square bg-gray-200 animate-pulse" />
+        ))}
+      </div>
     );
   }
 
-  // Otherwise render posts
+  if (!posts || posts.length === 0) {
+    return (
+      <p className="text-center text-gray-400 pt-20">No posts found.</p>
+    );
+  }
+
   return (
     <div className="grid grid-cols-3 gap-4">
       {posts.map((post) => (
@@ -61,6 +42,88 @@ export const ProfileGrid: React.FC<ProfileGridProps> = ({ isLoading, posts }) =>
     </div>
   );
 };
+
+// export const ProfileGrid: React.FC<ProfileGridProps> = ({ isLoading, posts }) => {
+//   if (isLoading) {
+//     return (
+//       <div className="grid grid-cols-3 gap-4">
+//         {[...Array(6)].map((_, i) => (
+//           <div key={i} className="aspect-square bg-gray-200 animate-pulse" />
+//         ))}
+//       </div>
+//     );
+//   }
+
+//   if (!posts || posts.length === 0) {
+//     return (
+//       <p className="text-center text-gray-400 pt-20">No posts found.</p>
+//     );
+//   }
+
+//   return (
+//     <div className="grid grid-cols-3 gap-4">
+//       {posts.map((post) => (
+//         <FullView key={post.id} post={post} index={post.id} />
+//       ))}
+//     </div>
+//   );
+// };
+
+// export const ProfileGrid: React.FC<ProfileGridProps> = ({ isLoading, posts }) => {
+//   const [showNoPostsMessage, setShowNoPostsMessage] = useState(false);
+
+//   useEffect(() => {
+//     let timer: NodeJS.Timeout | null = null;
+
+//     if (isLoading) {
+//       setShowNoPostsMessage(false);
+//       timer = setTimeout(() => {
+//         setShowNoPostsMessage(true);
+//       }, 5000);
+//     } else {
+//       if (timer) clearTimeout(timer);
+//       setShowNoPostsMessage(false);
+//     }
+
+//     return () => {
+//       if (timer) clearTimeout(timer);
+//     };
+//   }, [isLoading]);
+
+//   if (isLoading) {
+//     return (
+//         <div className="grid grid-cols-3 gap-4">
+//           {[...Array(6)].map((_, i) => (
+//             <div key={i} className="aspect-square bg-gray-200 animate-pulse" />
+//           ))}
+//         </div>
+//     );
+//   }
+
+//   // If posts is empty but timer not elapsed yet, keep showing "loading images" message
+//   if (!posts || posts.length === 0) {
+//     return (
+//       <div className="grid grid-cols-3 gap-4">
+//          {[...Array(6)].map((_, i) => (
+//            <div key={i} className="aspect-square bg-gray-200 animate-pulse" />
+//          ))}
+//        </div>
+//     );
+//   }
+
+//   if ((!posts || posts.length === 0) && showNoPostsMessage) {
+//     return <p className="text-center text-gray-400 pt-20">No posts found.</p>;
+//   }
+
+//   // Otherwise render posts
+//   return (
+//     <div className="grid grid-cols-3 gap-4">
+//       {posts.map((post) => (
+//         <FullView key={post.id} post={post} index={post.id} />
+//       ))}
+//     </div>
+//   );
+// };
 
 // import { PostType } from "../../hooks/types";
 // import { FullView } from "./FullView";

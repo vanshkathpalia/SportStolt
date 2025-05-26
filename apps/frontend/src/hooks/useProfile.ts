@@ -12,6 +12,8 @@ export interface ProfileData {
   verifiedStoriesCount: number;
   legitimacy: string;
   badge: string;
+  // followersCount: number;
+  followingCount: number;
   achievements: string;
   location: string;
   university: string;
