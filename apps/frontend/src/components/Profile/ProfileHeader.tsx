@@ -123,8 +123,9 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ userId }) => {
         {/* Bio / Location / University */}
         <div className="text-sm mb-3">
           <p className="font-semibold">{profile.name}</p>
-          <p className="text-gray-600 dark:text-gray-400">{profile.location} | {profile.university}</p>
-          <p className="text-gray-700 dark:text-gray-300 mt-1">{profile.bio}</p>
+          <p className="text-gray-600 dark:text-gray-300">{profile.location}</p>
+          <p className="text-gray-600 dark:text-gray-300">{profile.university}</p>
+          <p className="text-gray-700 dark:text-gray-200 mt-1">{profile.bio}</p>
         </div>
 
         {/* Badges / Achievements */}
@@ -132,14 +133,19 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ userId }) => {
           <span className="px-3 py-1 text-xs rounded-full bg-gray-400 text-white font-semibold">
             {profile.badge} Badge
           </span>
-          <Tooltip content={0 + ' | ' + 0}>
+          <Tooltip content={0}>
             <span className="text-gray-500 dark:text-gray-400 text-xs hover:underline cursor-pointer">
-              Followers | Following
+              Followers 
+            </span>
+          </Tooltip>
+          <Tooltip content={profile.followingCount}>
+            <span className="text-gray-500 dark:text-gray-400 text-xs hover:underline cursor-pointer">
+              Following
             </span>
           </Tooltip>
           <Tooltip content={profile.achievements}>
             <span className="text-gray-500 dark:text-gray-400 text-xs hover:underline cursor-pointer">
-              View Achievements
+              Achievements
             </span>
           </Tooltip>
         </div>

@@ -85,6 +85,7 @@ userRouter.post('/signup', async (c) => {
 
         if (existingUser) {
             c.status(409); // Conflict
+            console.log(Error)
             return c.json({ error: "User already exists. Try signing in." });
         }
 
@@ -123,10 +124,10 @@ userRouter.post('/signup', async (c) => {
             c.env.JWT_SECRET
         );
 
-        localStorage.setItem('token', jwt);
-        localStorage.setItem('user', JSON.stringify(user));
-        console.log('Setting token:', jwt);
-        console.log('Setting user:', user);
+        // localStorage.setItem('token', jwt);
+        // localStorage.setItem('user', JSON.stringify(user));
+        // console.log('Setting token:', jwt);
+        // console.log('Setting user:', user);
         return c.json({
           token: jwt,
           user: {
@@ -288,6 +289,8 @@ userRouter.get('/:id/profile', authMiddleware, async (c) => {
     include: {
       post: true,
       story: true,
+      following: true,
+      // followedTags: true,
       verifiedStories: true,
     },
   });
@@ -305,6 +308,8 @@ userRouter.get('/:id/profile', authMiddleware, async (c) => {
       ? Math.floor((user.verifiedStories.length / user.story.length) * 100)
       : 0}%`,
     badge: user.badgeLevel,
+    followingCount: user.following.length,
+    // followedTagsCount: user.followedTags.length,
     achievements: user.achievements,
     location: user.location,
     university: user.university,

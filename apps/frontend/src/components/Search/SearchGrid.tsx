@@ -96,10 +96,14 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
   // }, [query]);
 
   useEffect(() => {
+    console.log("useEffect triggered with query:", query);
     const delayDebounceFn = setTimeout(async () => {
       if (query.trim().length > 0) {
         try {
+          console.log("Entered try block");
           const token = localStorage.getItem("token");
+          console.log(localStorage.getItem("token"));
+          console.log('Backend URL:', BACKEND_URL);
 
           const [searchRes, followRes] = await Promise.all([
             axios.get(`${BACKEND_URL}/api/v1/search?q=${encodeURIComponent(query)}`, {
@@ -114,6 +118,7 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
           setFollowedUsers(followRes.data.followedUsers);
           setFollowedTags(followRes.data.followedTags);
         } catch (err) {
+          console.error("Outer catch error:", err);
           console.error(err);
         }
       } else {
@@ -155,7 +160,7 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
       {/* Sticky Search Bar */}
       <div className="sticky top-14 md:top-0 z-20 bg-background md:p-4 border-gray-300">
         <div className="max-w-screen-xl mx-auto px-4 py-4">
-          <form className="max-w-md mx-auto">
+          <form onSubmit={(e) => e.preventDefault()}  className="max-w-md mx-auto">
             <label htmlFor="default-search" className="sr-only">Search</label>
             <div className="relative">
               <div className="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -189,6 +194,7 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
                     >
                       <span>👤 {user.username}</span>
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleFollowUser(user.username);
@@ -208,6 +214,7 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
                     >
                       <span>🏷️ #{tag}</span>
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleFollowTag(tag);

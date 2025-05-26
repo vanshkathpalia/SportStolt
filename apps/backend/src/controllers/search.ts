@@ -219,6 +219,16 @@ searchRouter.post('/follow/user/:id', authMiddleware, async (c) => {
     datasources: { db: { url: c.env.DATABASE_URL } },
   });
 
+  const existingFollow = await prisma.follow.findFirst({
+    where: {
+      followerId,
+      followingId
+    }
+  });
+
+  if (existingFollow) {
+    return c.json({ message: 'Already following this user' }, 200);
+  }
 
   try {
     console.log('Trying to follow user', { followerId, followingId });
@@ -230,15 +240,16 @@ searchRouter.post('/follow/user/:id', authMiddleware, async (c) => {
       },
     });
     console.log('Follow request - followerId:', followerId, 'followingId:', followingId);
-    return c.json({ success: true });
+    return c.json({ message: 'User followed successfully' });
+    // return c.json({ success: true });
   } catch (err) {
     const error = err as { code?: string };
 
     if (error?.code === 'P2002') {
       return c.json({ error: 'Already following' }, 400);
     }
-    
-    console.error('Error in follow route:', JSON.stringify(err, null, 2));
+
+    // console.error('Error in follow route:', JSON.stringify(err, null, 2));
 
     console.error('Follow error:', err);
     return c.json({ error: 'Failed to follow' }, 500);
@@ -252,6 +263,10 @@ searchRouter.post('/follow/user/:id', authMiddleware, async (c) => {
 searchRouter.delete('/follow/user/:id', authMiddleware, async (c) => {
   const followingId = parseInt(c.req.param('id'));
   const followerId = c.get('userId');
+
+  if (!followerId || isNaN(followingId)) {
+    return c.json({ error: 'Invalid request' }, 400);
+  }
   // const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL });
   const prisma = new PrismaClient({
     datasources: { db: { url: c.env.DATABASE_URL } },
@@ -267,7 +282,7 @@ searchRouter.delete('/follow/user/:id', authMiddleware, async (c) => {
       },
     });
 
-    return c.json({ success: true });
+    return c.json({ message: "user unfollowed successfully" });
   } catch (error) {
     console.error('Unfollow error:', error);
     return c.json({ error: 'Failed to unfollow' }, 500);
@@ -281,11 +296,30 @@ searchRouter.post('/follow/tag/:id', authMiddleware, async (c) => {
   const tagId = parseInt(c.req.param('id'));
   const userId = c.get('userId');
 
+  if (!userId || isNaN(tagId)) {
+    return c.json({ error: 'Invalid request' }, 400);
+  }
+
   const prisma = new PrismaClient({
     datasources: { db: { url: c.env.DATABASE_URL } },
   });
 
   try {
+    // Check if already following the tag
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        followedTags: {
+          where: { id: tagId }
+        }
+      }
+    });
+
+    // add some other logic for this
+    // if (user?.followedTags?.length > 0) {
+    //   return c.json({ message: 'Already following this tag' }, 200);
+    // }
+
     await prisma.user.update({
       where: { id: userId },
       data: {
@@ -294,16 +328,10 @@ searchRouter.post('/follow/tag/:id', authMiddleware, async (c) => {
         },
       },
     });
-    
-    return c.json({ success: true });
+
+    return c.json({ message: 'Tag followed successfully' });
 
   } catch (err) {
-    const error = err as { code?: string };
-
-    if (error?.code === 'P2002') {
-      return c.json({ error: 'Already following tag' }, 400);
-    }
-
     console.error('Follow tag error:', err);
     return c.json({ error: 'Failed to follow tag' }, 500);
   } finally {
@@ -311,10 +339,16 @@ searchRouter.post('/follow/tag/:id', authMiddleware, async (c) => {
   }
 });
 
+
 // to unfollow a tag
 searchRouter.delete('/follow/tag/:id', authMiddleware, async (c) => {
   const tagId = parseInt(c.req.param('id'));
   const userId = c.get('userId');
+
+  if (!userId || isNaN(tagId)) {
+    return c.json({ error: 'Invalid request' }, 400);
+  }
+
   const prisma = new PrismaClient({
     datasources: { db: { url: c.env.DATABASE_URL } },
   });
@@ -328,14 +362,17 @@ searchRouter.delete('/follow/tag/:id', authMiddleware, async (c) => {
         },
       },
     });
-    return c.json({ success: true });
+
+    return c.json({ message: 'Tag unfollowed successfully' });
+
   } catch (error) {
-    console.error(error);
+    console.error('Unfollow tag error:', error);
     return c.json({ error: 'Failed to unfollow tag' }, 500);
   } finally {
     await prisma.$disconnect();
   }
 });
+
 
 
 searchRouter.get('/images', authMiddleware, async (c: any) => {

@@ -27,15 +27,24 @@ const app = new Hono<{
   }
 }>();
 
+app.use('*', cors({
+  origin: '*', // or restrict to your domain -> with vercel deployed domail 
+  allowHeaders: ['Content-Type', 'Authorization'],
+  allowMethods: ['GET', 'POST', 'DELETE', 'PATCH', 'PUT', 'OPTIONS'],
+  }), async (c, next) => {
+    if (c.req.method === 'OPTIONS') {
+      return new Response(null, { status: 204 }); 
+    }
+    await next();
+  }
+);
+
 // app.use('*', async (c, next) => {
 //   c.header('Access-Control-Allow-Origin', '*'); // or specify origin
 //   c.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
 //   c.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-//   if (c.req.method === 'OPTIONS') return new Response(null, { status: 204 });
-//   await next();
+  
 // });
-
-app.use('/*', cors())
 
 app.route("/api/v1/user", userRouter);
 app.route("/api/v1/post", postRouter);
