@@ -1,14 +1,9 @@
-// require('events').EventEmitter.defaultMaxListeners = 50; // Set the number of listeners based on your needs
-// in case of dev. environment
 
-if (process.env.NODE_ENV === 'development') {
-  require('events').EventEmitter.defaultMaxListeners = 50;
-  console.log("EventEmitter defaultMaxListeners set to 50 in development mode");
-}
-// in case of production environment
 
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
+import { PrismaClient } from '@prisma/client/edge'
+import { withAccelerate } from '@prisma/extension-accelerate';
 import { apiPostRouter } from '~/controllers/apiPost';
 import { eventRouter } from '~/controllers/event';
 import { notificationRouter } from '~/controllers/notification';
@@ -19,6 +14,7 @@ import { userRouter } from '~/controllers/user';
 // import { PrismaClient } from '@prisma/client/edge'
 // import { withAccelerate } from '@prisma/extension-accelerate'
 import { trainingRouter } from '~/controllers/mailer';
+
 
 const app = new Hono<{
   Bindings: {
@@ -55,11 +51,16 @@ app.route("/api/v1/search", searchRouter);
 app.route("/api/v1/notificaiton", notificationRouter);
 app.route("/api/v1/training", trainingRouter)
 
-// let cleanupInterval: NodeJS.Timeout | null = null; //what is the use of this ?
+export default app
+
+
+// let cleanupInterval: NodeJS.Timeout | null = null;
+
+// const prisma = new PrismaClient({
+//   datasourceUrl: process.env.DATABASE_URL
+// }).$extends(withAccelerate());
 
 // const cleanupExpiredStories = async () => {
-//   const prisma = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL });
-
 //   try {
 //     const deletedStories = await prisma.story.deleteMany({
 //       where: { endTime: { lt: new Date() } },
@@ -70,19 +71,15 @@ app.route("/api/v1/training", trainingRouter)
 //     }
 //   } catch (error) {
 //     console.error("Error deleting expired stories:", error);
-//   } finally {
-//     await prisma.$disconnect();
 //   }
 // };
 
-// // Start the interval when the server starts
 // const startCleanupInterval = () => {
 //   if (cleanupInterval === null) {
-//     cleanupInterval = setInterval(cleanupExpiredStories, 60 * 1000); // Run every minute
+//     cleanupInterval = setInterval(cleanupExpiredStories, 10 * 60 * 1000); // Every 10 mins
 //   }
 // };
 
-// // Stop the interval when the server shuts down
 // const stopCleanupInterval = () => {
 //   if (cleanupInterval !== null) {
 //     clearInterval(cleanupInterval);
@@ -90,8 +87,17 @@ app.route("/api/v1/training", trainingRouter)
 //   }
 // };
 
-// startCleanupInterval();
+// // ✅ Now safe to call this below
+// if (process.env.NODE_ENV === 'development') {
+//   require('events').EventEmitter.defaultMaxListeners = 50;
+//   console.log("EventEmitter defaultMaxListeners set to 50 in development mode");
 
-// // You can also call `stopCleanupInterval()` at server shutdown to clear the interval
+//   startCleanupInterval();
+// }
+// // // require('events').EventEmitter.defaultMaxListeners = 50; // Set the number of listeners based on your needs
+// // // in case of dev. environment
 
-export default app
+// // if (process.env.NODE_ENV === 'development') {
+// //   require('events').EventEmitter.defaultMaxListeners = 50;
+// //   console.log("EventEmitter defaultMaxListeners set to 50 in development mode");
+// // }

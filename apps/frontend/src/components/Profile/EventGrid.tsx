@@ -1,5 +1,5 @@
 import React from 'react';
-import { EventType } from '../../hooks/types'; // Make sure this path is correct
+import { EventType } from '../../hooks/profileTypes'; // Make sure this path is correct
 
 interface EventGridProps {
   isLoading?: boolean;

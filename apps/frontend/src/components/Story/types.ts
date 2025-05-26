@@ -18,8 +18,8 @@ export interface StoryType {
     };
     Storyimages: {
         id: number;
-        url?: string;
         userId: string;
+        url?: string;
     }[];
     swipeUpEnabled?: boolean;
     authenticityStatus?: string;

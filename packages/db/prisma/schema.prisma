@@ -36,6 +36,7 @@ model User {
   verifiedStories       Verification[]    // Verification-related stories
   storyAttendance       StoryAttendance[]
   Storyimages           Storyimages[]
+  StoryView             StoryView[]
   tweet                 Tweet[]
   registration          Registration[]
 
@@ -209,9 +210,11 @@ model Save {
 
 
 
+
 model Story {
   id                 Int               @id @default(autoincrement())
   Storyimages        Storyimages[]
+  StoryView          StoryView[] 
   attendees          StoryAttendance[]
   location           String
   locationImage      String? // New field for storing location image
@@ -253,6 +256,19 @@ model Storyimages {
   attendance          StoryAttendance[]
   notifications       Notification[]
 }
+
+model StoryView {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  storyId   Int
+  viewedAt  DateTime @default(now())
+  
+  story     Story    @relation(fields: [storyId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, storyId])
+}
+
 
 model Verification {
   id             Int         @id @default(autoincrement())

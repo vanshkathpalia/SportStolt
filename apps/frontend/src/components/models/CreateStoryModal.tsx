@@ -143,6 +143,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
       onClose();
     } catch (error) {
       console.error("Error submitting story:", error);
+      alert("Failed to submit story. Please try again.");
       // Handle error (e.g., show a message to the user)
     } finally {
       setIsLoading(false);

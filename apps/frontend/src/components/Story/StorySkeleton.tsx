@@ -1,7 +1,17 @@
 export const StorySkeleton = () => {
   return (
     <div role="status" className="animate-pulse">
-      <div className="bg-background gap-4 rounded-lg shadow-sm p-2 mb-4">
+      <div className="bg-background gap-4 rounded-lg shadow-sm p-2 mb-1">
+        {/* toggle shadow*/}
+        <div className="fles space-x-2 mb-4">
+          <button className="px-3 py-1 text-sm rounded-full transition bg-blue-500 text-white">
+                  Locations
+          </button>
+          <button className="px-3 py-1 text-sm rounded-full transitionbg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+                  Sports
+          </button>
+        </div>
+        
         <div className="flex gap-4 scroll-pr-24 overflow-x-auto pb-2">
           {Array.from({ length: 12 }).map((_, index) => (
             <div key={index} className="flex flex-col items-center">

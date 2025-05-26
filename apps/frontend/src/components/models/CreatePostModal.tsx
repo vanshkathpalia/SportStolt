@@ -5,7 +5,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
 import { Button } from "../ui/button"
 // import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs"
-import { MapPin, Camera } from "lucide-react"
+import { Camera, Tag } from "lucide-react"
 import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 import { Textarea } from "../ui/textarea"
@@ -23,7 +23,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
   // const [activeTab, setActiveTab] = useState("photo")
   const [content, setContent] = useState("")
   const [title, setTitle] = useState("")
-  // const [tags, setTags] = useState("")
+  const [tags, setTags] = useState<string>("")
   // const [selectedFile, setSelectedFile] = useState<File | null>(null)
   // const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -76,6 +76,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
         // type: activeTab,
         content,
         title,
+        tagNames: tags.split(",").map(tag => tag.trim()).filter(Boolean),
         // tags: tags.split(',').map(tag => tag.trim()),
         // file: selectedFile,
         // imageUrl: previewUrl,
@@ -266,8 +267,26 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
             />
           </div>
 
-          {/* Image URL */}
+          {/* Tags */}
           <div className="space-y-2 test-black dark:text-white">
+            <Label htmlFor="tags">Add Sports Tags</Label>
+            <div className="relative">
+              <Tag className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="tags"
+                placeholder="Add sports tags (comma-separated)"
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                className="pl-9 dark:border-gray-700 dark:bg-background dark:text-white"
+              />
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Example: football, cricket, badminton
+            </p>
+          </div>
+
+          {/* Image URL */}
+          {/* <div className="space-y-2 test-black dark:text-white">
             <Label htmlFor="location">Add Image URL</Label>
             <div className="relative">
               <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -279,7 +298,7 @@ export function CreatePostModal({ isOpen, onClose }: CreatePostModalProps) {
                 className="pl-9 dark:border-gray-700 dark:bg-background dark:text-white"
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Tags */}
           {/* <div className="space-y-2">

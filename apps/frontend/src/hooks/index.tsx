@@ -13,6 +13,7 @@ export interface Post {
         "name": string
         "image": string
     }
+    "createdAt": string
 }
 
 export interface Story {
@@ -40,7 +41,7 @@ export interface Story {
     Storyimages?: {
         id: number;
         userId: number;
-        url: string;
+        url?: string;
         // authenticityChecked: boolean;
     }[];
 }
@@ -76,7 +77,7 @@ export interface EventInterface {
     comments: any[];
     publishedDate: string;
     isRegistered?: boolean;
-  }
+}
 
   
 // export interface EventInterface {
@@ -99,6 +100,8 @@ export const usePost = ({ id }: { id: string }) => {
     const [loading, setLoading] = useState(true);
     const [post, setPost] = useState<Post>();
 
+    console.log(id);
+
     useEffect(() => {
         axios.get(`${BACKEND_URL}/api/v1/post/${id}`, {
             headers: {
@@ -106,9 +109,13 @@ export const usePost = ({ id }: { id: string }) => {
             }
         })
         .then(response => {
+            try {
                 setPost(response.data.post);
                 setLoading(false);
-            })
+            } catch(e) {
+                console.log(e);
+            }
+        })   
     }, [id])
 
     // console.log(post);
@@ -136,63 +143,6 @@ export const usePost = ({ id }: { id: string }) => {
     return {
         loading,
         post
-    }
-}
-
-export const usePosts = () => {
-    const [loading, setLoading] = useState(true);
-    const [story, setStory] = useState<Story[]>([]);
-    const [posts, setPosts] = useState<Post[]>([]); //returning the array post[]
-
-    useEffect(() => {
-        const token = localStorage.getItem("token");
-    
-        Promise.all([
-        axios.get(`${BACKEND_URL}/api/v1/story/bulk`, { headers: { Authorization: token } }),
-        axios.get(`${BACKEND_URL}/api/v1/post/bulk`, { headers: { Authorization: token } }),
-        ])
-        .then(([storyRes, postRes]) => {
-            setStory(storyRes.data.stories);
-            setPosts(postRes.data.posts);
-        })
-        .catch((err) => {
-            console.error("Failed to fetch posts or stories:", err);
-        })
-        .finally(() => {
-            setLoading(false);
-        });
-    }, []);
-      
-    // useEffect(() => {
-    //     axios
-    //         .get(`${BACKEND_URL}/api/v1/story/bulk`, {
-    //             headers: {
-    //                 Authorization: `Bearer ${localStorage.getItem("token")}`,
-    //             }
-    //         })
-    //         .then(response => {
-    //                 setStory(response.data.stories);
-    //         })
-            
-    //     axios
-    //         .get(`${BACKEND_URL}/api/v1/post/bulk`, {
-    //             headers: {
-    //                 Authorization: `Bearer ${localStorage.getItem("token")}`,,
-    //             },
-    //         })
-    //         .then((response) => {
-                
-    //             setPosts(response.data.posts);
-    //             setLoading(false);
-    //         })
-
-            
-    // }, []);
-    // console.log(posts);
-    return {
-        loading,
-        posts,
-        story
     }
 }
 
@@ -226,34 +176,62 @@ export const useStory = (id: number) => {
     return { loading, story, error };
 };
 
-export const useStories = () => {
-    const [loading, setLoading] = useState(true);
-    const [story, setStories] = useState<Story[]>([]);
-    const [error, setError] = useState<string>();
+// export const usePosts = () => {
+//     const [loading, setLoading] = useState(true);
+//     const [story, setStory] = useState<Story[]>([]);
+//     const [posts, setPosts] = useState<Post[]>([]); //returning the array post[]
 
-    useEffect(() => {
-        const fetchStories = async () => {
-            try {
-                const response = await axios.get(`${BACKEND_URL}/api/v1/story/bulk`, {
-                    headers: {
-                        'Authorization': localStorage.getItem('token')
-                    }
-                });
-                setStories(response.data.story);
-                // setStories(response.data.stories); // if story is an array and returing stories, but i used story for stories (many)
-                // console.log(story); 
-            } catch (e) {
-                setError('Failed to fetch stories');
-                console.error(e);
-            } finally {
-                setLoading(false);
-            }
-        };
+//     useEffect(() => {
+//         const token = localStorage.getItem("token");
+    
+//         Promise.all([
+//         axios.get(`${BACKEND_URL}/api/v1/story/bulk`, { headers: { Authorization: token } }),
+//         axios.get(`${BACKEND_URL}/api/v1/post/bulk`, { headers: { Authorization: token } }),
+//         ])
+//         .then(([storyRes, postRes]) => {
+//             setStory(storyRes.data.stories);
+//             setPosts(postRes.data.posts);
+//         })
+//         .catch((err) => {
+//             console.error("Failed to fetch posts or stories:", err);
+//         })
+//         .finally(() => {
+//             setLoading(false);
+//         });
+//     }, []);
+      
+//     // useEffect(() => {
+//     //     axios
+//     //         .get(`${BACKEND_URL}/api/v1/story/bulk`, {
+//     //             headers: {
+//     //                 Authorization: `Bearer ${localStorage.getItem("token")}`,
+//     //             }
+//     //         })
+//     //         .then(response => {
+//     //                 setStory(response.data.stories);
+//     //         })
+            
+//     //     axios
+//     //         .get(`${BACKEND_URL}/api/v1/post/bulk`, {
+//     //             headers: {
+//     //                 Authorization: `Bearer ${localStorage.getItem("token")}`,,
+//     //             },
+//     //         })
+//     //         .then((response) => {
+                
+//     //             setPosts(response.data.posts);
+//     //             setLoading(false);
+//     //         })
 
-        fetchStories();
-    }, []);
-    return { loading, story, error };
-};
+            
+//     // }, []);
+//     // console.log(posts);
+//     return {
+//         loading,
+//         posts,
+//         story
+//     }
+// }
 
 export const useEvents = () => {
     const [loading, setLoading] = useState(true);
@@ -309,41 +287,3 @@ export const useEvents = () => {
         events
     }
 }
-
-// export const useImages = () => {
-//     const [loading, setLoading] = useState(true);
-//     const [images, setImages] = useState<string[]>([]);
-//     const [error, setError] = useState<string | null>(null);
-
-//     useEffect(() => {
-//         const fetchImages = async () => {
-//             setLoading(true);
-//             setError(null);
-
-//             try {
-//                 const imagePromises = Array.from({ length: 12 }, () =>
-//                     axios.get('https://api.api-ninjas.com/v1/randomimage?category=nature', {
-//                         headers: { 'X-Api-Key': 'YOUR_API_KEY' }, // Replace with your API key
-//                         responseType: 'arraybuffer', // Fetching binary data as an image
-//                     })
-//                 );
-
-//                 const responses = await Promise.all(imagePromises);
-
-//                 const fetchedImages = responses.map((response) =>
-//                     URL.createObjectURL(new Blob([response.data], { type: 'image/jpeg' })) // Convert binary data to object URL
-//                 );
-
-//                 setImages(fetchedImages);
-//             } catch (err) {
-//                 setError(err instanceof Error ? err.message : "An error occurred");
-//             } finally {
-//                 setLoading(false);
-//             }
-//         };
-
-//         fetchImages();
-//     }, []);
-
-//     return { loading, images, error };
-// };

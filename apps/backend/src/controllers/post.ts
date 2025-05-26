@@ -25,69 +25,123 @@ export const postRouter = new Hono<{
 postRouter.use('/*', authMiddleware);
 
  
+// postRouter.post('/', async (c) => {
+//     // console.log('Incoming request:', c.req.method, c.req.url);
+//     try {
+//         const body = await c.req.json();
+//         console.log('Request body:', body);
+//         // console.log('createPostInput:', createPostsInput);
+
+//         const { success } = createPostsInput.safeParse(body);
+//         if (!success) {
+//             c.status(411);
+//             return c.json({ message: "invalid" });
+//         }
+
+//         // const result = createPostsInput.safeParse(body);
+//         // if (!result.success) {
+//         //     console.error("Validation error:", result.error);
+//         //     c.status(411);
+//         //     c.json({ message: "Invalid input" });
+//         //     return;
+//         // }
+
+//         const authorId = c.get("userId");
+//         if (!authorId) {
+//             c.status(403);
+//             c.json({ message: "User not authenticated" });
+//             return;
+//         }
+
+//         if (!c.env.DATABASE_URL) {
+//             c.status(500);
+//             c.json({ message: "DATABASE_URL is not set" });
+//             return;
+//         }
+//         // const prisma = new PrismaClient({
+//         //     datasourceUrl: c.env.DATABASE_URL,
+//         // }).$extends(withAccelerate());
+//         const prisma = new PrismaClient({
+//             datasources: {
+//                 db: { url: c.env.DATABASE_URL },
+//             },
+//         });
+//         prisma.$connect()
+//         .then(() => console.log('Prisma connected'))
+//         .catch((error: unknown) => console.error('Prisma connection error:', error));
+
+
+//         const post = await prisma.post.create({
+//             data: {
+//                 title: body.title,
+//                 content: body.content,
+//                 authorId: Number(authorId)
+//             }
+//         });
+
+//         return c.json({
+//             id: post.id
+//         });
+//     } catch(error) {
+//         console.error("Unhandled error:", error);
+//         c.status(500);
+//         c.json({ message: "Internal server error" });
+//     }
+// })
 postRouter.post('/', async (c) => {
-    // console.log('Incoming request:', c.req.method, c.req.url);
     try {
         const body = await c.req.json();
-        console.log('Request body:', body);
-        // console.log('createPostInput:', createPostsInput);
-
         const { success } = createPostsInput.safeParse(body);
         if (!success) {
             c.status(411);
-            return c.json({ message: "invalid" });
+            return c.json({ message: "Invalid input" });
         }
-
-        // const result = createPostsInput.safeParse(body);
-        // if (!result.success) {
-        //     console.error("Validation error:", result.error);
-        //     c.status(411);
-        //     c.json({ message: "Invalid input" });
-        //     return;
-        // }
 
         const authorId = c.get("userId");
         if (!authorId) {
             c.status(403);
-            c.json({ message: "User not authenticated" });
-            return;
+            return c.json({ message: "User not authenticated" });
         }
 
-        if (!c.env.DATABASE_URL) {
-            c.status(500);
-            c.json({ message: "DATABASE_URL is not set" });
-            return;
-        }
-        // const prisma = new PrismaClient({
-        //     datasourceUrl: c.env.DATABASE_URL,
-        // }).$extends(withAccelerate());
         const prisma = new PrismaClient({
             datasources: {
                 db: { url: c.env.DATABASE_URL },
             },
         });
-        prisma.$connect()
-        .then(() => console.log('Prisma connected'))
-        .catch((error: unknown) => console.error('Prisma connection error:', error));
 
+        await prisma.$connect();
 
+        // 1. Normalize tag names (trim + lowercase, or however you define uniqueness)
+        const tagNames = body.tagNames?.map((t: string) => t.trim().toLowerCase()) ?? [];
+
+        // 2. Upsert tags (create if they don’t exist)
+        const tagConnectOrCreate = tagNames.map((tag: string) => ({
+            where: { name: tag },
+            create: { name: tag }
+        }));
+
+        // 3. Create post with tags
         const post = await prisma.post.create({
             data: {
                 title: body.title,
                 content: body.content,
-                authorId: Number(authorId)
+                authorId: Number(authorId),
+                tags: {
+                    connectOrCreate: tagConnectOrCreate
+                }
+            },
+            include: {
+                tags: true
             }
         });
 
-        return c.json({
-            id: post.id
-        });
-    } catch(error) {
-        console.error("Unhandled error:", error);
+        return c.json({ id: post.id, tags: post.tags });
+    } catch (error) {
+        console.error("Error creating post:", error);
         c.status(500);
-        c.json({ message: "Internal server error" });
+        return c.json({ message: "Internal server error" });
     }
-})
+});
   
   
 postRouter.put('/', async (c) => {
@@ -129,6 +183,75 @@ postRouter.put('/', async (c) => {
     return c.json({ id: updatedPost.id });
 });
 
+postRouter.get('/bulk', async (c) => {
+    const prisma = new PrismaClient({
+        datasourceUrl: c.env.DATABASE_URL,
+    }).$extends(withAccelerate());
+
+    const groupBy = c.req.query('groupBy') || 'default';
+
+    let posts;
+
+    if (groupBy === 'user') {
+        posts = await prisma.post.findMany({
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                createdAt: true,
+                author: {
+                    select: {
+                        name: true,
+                        image: true,
+                        username: true
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+    } else if (groupBy === 'tag') {
+        posts = await prisma.post.findMany({
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                createdAt: true,
+                author: {
+                    select: {
+                        name: true,
+                        image: true,
+                        username: true
+                    }
+                },
+                tags: {
+                    select: {
+                        name: true
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+    } else {
+        posts = await prisma.post.findMany({
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                createdAt: true,
+                author: {
+                    select: {
+                        name: true,
+                        image: true,
+                        username: true
+                    }
+                }
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+    }
+
+    return c.json({ posts });
+});
 
 // Showing all posts by all users with pagination
 // postRouter.get('/bulk', async (c) => {
@@ -179,36 +302,36 @@ postRouter.put('/', async (c) => {
 
 //add pagination at this 
 //showing all the posts by all the user 
-postRouter.get('/bulk', async (c) => {
-    const prisma = new PrismaClient({
-        datasourceUrl: c.env.DATABASE_URL,
-      }).$extends(withAccelerate())
-    const authorId = c.get("userId")
+// postRouter.get('/bulk', async (c) => {
+//     const prisma = new PrismaClient({
+//         datasourceUrl: c.env.DATABASE_URL,
+//       }).$extends(withAccelerate())
+//     const authorId = c.get("userId")
 
-    const posts = await prisma.post.findMany({
-        select: {
-            content: true,
-            title: true,
-            id: true,
-            author: {
-                select: {
-                    name: true,
-                    image: true, 
-                    username: true
-                }
-            }
-        },
-        orderBy: { createdAt: 'desc' }, // because late time means it is the latest post
-    });
-    //for manipulating the size of the post image 
-    // const posts = receivedposts.map(post => ({
-    //     ...post,
-    //     content: `${post.content}?w=600&h=600&fit=crop`,
-    // }));
-    return c.json({
-        posts,
-    })
-})
+//     const posts = await prisma.post.findMany({
+//         select: {
+//             content: true,
+//             title: true,
+//             id: true,
+//             author: {
+//                 select: {
+//                     name: true,
+//                     image: true, 
+//                     username: true
+//                 }
+//             }
+//         },
+//         orderBy: { createdAt: 'desc' }, // because late time means it is the latest post
+//     });
+//     //for manipulating the size of the post image 
+//     // const posts = receivedposts.map(post => ({
+//     //     ...post,
+//     //     content: `${post.content}?w=600&h=600&fit=crop`,
+//     // }));
+//     return c.json({
+//         posts,
+//     })
+// })
 
 //to get into the depth of a particular post
 //this will handle the stories data too
