@@ -7,6 +7,7 @@ import { Avatar, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
 import { MessageCircle, Send, MoreHorizontal, Heart, Bookmark } from "lucide-react"
 import { cn } from "../../lib/utils"
+import { Post } from "../../hooks/usePost"
 import axios from "axios"
 import { BACKEND_URL } from '../../config';
 
@@ -16,40 +17,56 @@ import { BACKEND_URL } from '../../config';
 //   content: string
 // }
 
-export interface Post {
-  id: number
-  author: {
-    name: string
-    image:string
-    username: string
-    // avatar: string
-  }
-//   imageUrl: string
-  title: string
-  content: string
-//   likes: number
-//   sportTags?: string[]
-//   comments: Comment[]
-//   publishedDate: string
-  expanded: boolean
-}
+// export interface Post {
+//   id: number
+//   author: {
+//     name: string
+//     image:string
+//     username: string
+//     // avatar: string
+//   }
+// //   imageUrl: string
+//   title: string
+//   content: string
+// //   likes: number
+// //   sportTags?: string[]
+// //   comments: Comment[]
+// //   publishedDate: string
+//   expanded: boolean
+// }
 
-interface PostCardProps {
-    title: string;
-    content: string;
-    id: number;
-    author: {
-      image: string; username:string; name: string
-    };
-    expanded: boolean;
-}
+// interface PostCardProps {
+//     title: string;
+//     content: string;
+//     id: number;
+//     author: {
+//       image: string; username: string; name: string
+//     };
+//     expanded: boolean;
+// }
+
+// export const PostCard = ({
+//   id,
+//   title,
+//   content,
+//   author,
+//   expanded
+// }: {
+//   id: number;
+//   title: string;
+//   content: string;
+//   author: { image: string; username: string; name: string };
+//   expanded: boolean;
+// }) => { ... }
+
 export const PostCard = ({
     id,
     title,
     content,
     author,
+    tags,
     expanded
-}: PostCardProps) => {
+}: Post) => {
   const [liked, setLiked] = useState(false)
   const [saved, setSaved] = useState(false)
   const [likeCount, setLikeCount] = useState(0);
@@ -148,6 +165,15 @@ export const PostCard = ({
       <div className={cn("font-medium dark:text-slate-200 text-sm mb-1 p-1")}>{likeCount} {likeCount === 1 ? "like" : likeCount === 0 ? "like" : "likes"}</div>
 
         <div className="flex justify-between items-center mb-2">
+          {tags && tags.length > 0 && (
+            <div className="flex flex-wrap mt-2 space-x-2 text-sm text-gray-600 dark:text-gray-400 px-3 pb-2">
+              {tags.map((tag, index) => (
+                <span key={index} className="bg-gray-200 px-2 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">
+                  #{tag.name}
+                </span>
+              ))}
+            </div>
+          )}
           <div className="flex space-x-4">
             <button
               onClick={(e) => {

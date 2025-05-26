@@ -212,7 +212,14 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
             {!willAttend ? (
               Array.isArray(story.Storyimages) && story.Storyimages.length > 0 ? (
                 <button
-                  onClick={() => handleWillGo(story.Storyimages[currentImageIndex].id)}
+                  onClick={() => {
+                    const image = story.Storyimages?.[currentImageIndex];
+                    if (image) {
+                      handleWillGo(image.id);
+                    } else {
+                      console.warn("Image not found.");
+                    }
+                  }}
                   className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
                 >
                   Yes, I will go!

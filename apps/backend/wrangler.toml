@@ -15,6 +15,21 @@ FRONTEND_BASE_URL="https://sport-stolt.vercel.app"
 [env.production]
 dns_resolvers = ["1.1.1.1", "8.8.8.8"]
 
+
+# [[triggers]]
+# type = "cron"
+# schedule = "*/10 * * * *" 
+
+
+# [triggers.cron]
+# main = "src/cleanup.ts" 
+
+
+# [env.cleanup]
+# main = "src/cleanup.ts"
+# name = "my-hono-cleanup"
+# compatibility_date = "2024-05-26"
+
 # BASE_URL=https://sportstolt.com
 
 

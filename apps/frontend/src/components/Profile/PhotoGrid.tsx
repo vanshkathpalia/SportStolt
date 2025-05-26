@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { PostType } from "../../hooks/types";
+import { PostType } from "../../hooks/profileTypes";
 import { FullView } from "./FullView";
 
 interface ProfileGridProps {

@@ -93,16 +93,16 @@ export const NewsPage = ({ openCreateModal }: NewsPageProps) => {
         </div>
 
         {/* Main content */}
-        <main className="flex-1 md:ml-16 xl:ml-56 p-4">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-slate-300 mb-6">Sports News</h1>
+        <main className="flex-1 md:ml-16 xl:ml-56 p-4  mr-2">
+          <h1 className="text-3xl ml-5 font-bold text-gray-900 dark:text-slate-300 mb-6">Sports News</h1>
 
           {error && (
-            <p className="mb-4 p-2 bg-yellow-200 text-yellow-800 rounded">
+            <p className="mb-4 p-2 ml-5 bg-yellow-200 text-yellow-800 rounded">
               {error}
             </p>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 ml-5 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {loading
               ? [1, 2, 3].map((key) => <SkeletonCard key={key} />)
               : articles.map((article, index) => (

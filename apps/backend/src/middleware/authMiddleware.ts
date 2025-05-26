@@ -24,7 +24,7 @@ export const authMiddleware: MiddlewareHandler<{
 
     if (user && typeof user.id === "number") {
       c.set("userId", user.id);
-      console.log('Token User ID:', c.get('userId'));
+      // console.log('Token User ID:', c.get('userId'));
       return await next();
     } else {
       console.error("Invalid token structure:", user);
