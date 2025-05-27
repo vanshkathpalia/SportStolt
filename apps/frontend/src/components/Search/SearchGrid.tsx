@@ -13,14 +13,20 @@ interface User {
   username: string;
 }
 
+interface Tag {
+  id: number;
+  name: string;
+  followed: boolean;
+}
+
 export const SearchGrid = ({ posts }: SearchGridProps) => {
   const [query, setQuery] = useState('');
-  const [results, setResults] = useState<{ users: User[]; tags: string[] }>({ users: [], tags: [] });
+  const [results, setResults] = useState<{ users: User[]; tags: Tag[] }>({ users: [], tags: [] });
 
   const navigate = useNavigate();
 
   const [followedUsers, setFollowedUsers] = useState<User[]>([]);
-  const [followedTags, setFollowedTags] = useState<string[]>([]);
+  const [followedTags, setFollowedTags] = useState<Tag[]>([]);
 
   const [showNoResults, setShowNoResults] = useState(false);
 
@@ -52,31 +58,83 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
   };
 
 
-  const toggleFollowTag = async (tag: string) => {
+  // const toggleFollowTag = async (tag: Tag) => {
+  //   try {
+  //     const isFollowing = followedTags.some(t => t.id === tag.id);
+
+  //     if (isFollowing) {
+  //       await axios.delete(`${BACKEND_URL}/api/v1/search/follow/tag/${tag.id}`, {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         },
+  //       });
+
+  //       setFollowedTags(prev => prev.filter(t => t.id !== tag.id));
+  //     } else {
+  //       await axios.post(`${BACKEND_URL}/api/v1/search/follow/tag/${tag.id}`, {}, {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         },
+  //       });
+
+  //       setFollowedTags(prev => [...prev, tag]);
+  //     }
+  //   } catch (error) {
+  //     console.error('Follow/unfollow tag failed:', error);
+  //   }
+  // };
+
+  const toggleFollowTag = async (tag: Tag) => {
     try {
-      if (followedTags.includes(tag)) {
-        await axios.delete(`${BACKEND_URL}/api/v1/search/follow/tag/${tag}`, {
+      const isFollowing = followedTags.some(t => t.id === tag.id);
+
+      if (isFollowing) {
+        await axios.delete(`${BACKEND_URL}/api/v1/search/follow/tag/${tag.id}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
+
+        setFollowedTags(prev => prev.filter(t => t.id !== tag.id));
       } else {
-        await axios.post(`${BACKEND_URL}/api/v1/search/follow/tag/${tag}`, {}, { 
+        await axios.post(`${BACKEND_URL}/api/v1/search/follow/tag/${tag.id}`, {}, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
-          }, 
+          },
         });
-      }
 
-      setFollowedTags(prev =>
-        prev.includes(tag)
-          ? prev.filter((t) => t !== tag)
-          : [...prev, tag]
-      );
+        setFollowedTags(prev => [...prev, tag]);
+      }
     } catch (error) {
       console.error('Follow/unfollow tag failed:', error);
     }
   };
+
+  // const toggleFollowTag = async (tag: Tag) => {
+  //   try {
+  //     if (followedTags.includes(tag)) {
+  //       await axios.delete(`${BACKEND_URL}/api/v1/search/follow/tag/${tag}`, {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         },
+  //       });
+  //     } else {
+  //       await axios.post(`${BACKEND_URL}/api/v1/search/follow/tag/${tag}`, {}, { 
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         }, 
+  //       });
+  //     }
+
+  //     setFollowedTags(prev =>
+  //       prev.includes(tag)
+  //         ? prev.filter((t) => t !== tag)
+  //         : [...prev, tag]
+  //     );
+  //   } catch (error) {
+  //     console.error('Follow/unfollow tag failed:', error);
+  //   }
+  // };
 
   // useEffect(() => {
   //   const delayDebounceFn = setTimeout(() => {
@@ -152,7 +210,8 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
     setResults({ users: [], tags: [] });
     setFollowedUsers([]);
     setFollowedTags([]);
-  }, [location.pathname]);
+  },[]);
+  // }, [location.pathname]);
 
 
   return (
@@ -206,13 +265,31 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
                     </div>
                   ))}
 
+                  {/* {results.tags.map((tag, idx) => (
+                    <div key={`tag-${idx}`} className="...">
+                      <span>{tag.name}</span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleFollowTag(tag.name); // pass tag name only
+                        }}
+                        className="text-sm text-blue-500 hover:underline"
+                      >
+                        {followedTags.includes(tag.name) ? 'Unfollow' : 'Follow'}
+                      </button>
+                    </div>
+                  ))} */}
+
                   {results.tags.map((tag, idx) => (
                     <div
                       key={`tag-${idx}`}
                       className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
-                      onClick={() => navigate(`/tag/${tag}`)}
+                      onClick={() => toggleFollowTag(tag)}
                     >
-                      <span>🏷️ #{tag}</span>
+                      <div key={tag.id}>
+                        <span>{tag.name}</span>
+                      </div>
                       <button
                         type="button"
                         onClick={(e) => {
@@ -221,7 +298,7 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
                         }}
                         className="text-sm text-blue-500 hover:underline"
                       >
-                        {followedTags.includes(tag) ? 'Unfollow' : 'Follow'}
+                        {followedTags.some(t => t.id === tag.id) ? 'Unfollow' : 'Follow'}
                       </button>
                     </div>
                   ))}

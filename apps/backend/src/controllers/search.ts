@@ -151,7 +151,8 @@ searchRouter.get('/followed', authMiddleware, async (c) => {
           },
         },
         followedTags: {
-          select: { name: true },
+          select: { id: true, name: true },
+          // followers: true -> list of all the followers
         },
       },
     });
@@ -161,7 +162,10 @@ searchRouter.get('/followed', authMiddleware, async (c) => {
       username: f.following.username,
     })) || [];
 
-    const followedTags = user?.followedTags.map((tag) => tag.name) || [];
+    const followedTags = user?.followedTags.map((tag) => ({ 
+      id: tag.id,
+      name: tag.name,
+    })) || [];
 
     return c.json({ followedUsers, followedTags });
   } catch (err) {
@@ -258,7 +262,6 @@ searchRouter.post('/follow/user/:id', authMiddleware, async (c) => {
   }
 });
 
-
 // to unfollow a user
 searchRouter.delete('/follow/user/:id', authMiddleware, async (c) => {
   const followingId = parseInt(c.req.param('id'));
@@ -290,6 +293,7 @@ searchRouter.delete('/follow/user/:id', authMiddleware, async (c) => {
     await prisma.$disconnect();
   }
 });
+
 
 // to follow a tag
 searchRouter.post('/follow/tag/:id', authMiddleware, async (c) => {
@@ -338,7 +342,6 @@ searchRouter.post('/follow/tag/:id', authMiddleware, async (c) => {
     await prisma.$disconnect();
   }
 });
-
 
 // to unfollow a tag
 searchRouter.delete('/follow/tag/:id', authMiddleware, async (c) => {
