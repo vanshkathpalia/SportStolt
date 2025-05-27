@@ -15,6 +15,7 @@ export const notificationRouter = new Hono<{
     }
 }>();
 
+// this is uncessary i guess we have seperate logic for this 
 notificationRouter.use('/*', async (c, next) => {
     if (c.req.method === 'OPTIONS') {
         console.log('Preflight OPTIONS request received');

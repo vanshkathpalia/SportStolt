@@ -15,6 +15,13 @@
       "persistent": true,
       "dependsOn": [],
       "outputs": []
+    },
+    "test": {
+      "dependsOn": ["^test"],
+      "outputs": []
+    },
+    "generate": {
+      "outputs": ["node_modules/.prisma/client/**"]
     }
   }
 }

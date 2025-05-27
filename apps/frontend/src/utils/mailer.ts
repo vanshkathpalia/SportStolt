@@ -1,6 +1,6 @@
 import { BACKEND_URL } from "../config";
 
-export const fetchSportsPlaylist = async (username: string, email: string, sportName: string, skillLevel: string, keywords: string) => {
+export const fetchSportsPlaylist = async (userName: string, userEmail: string, sportName: string, skillLevel: string, keywords: string) => {
     try {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("No token found in local storage");
@@ -11,7 +11,7 @@ export const fetchSportsPlaylist = async (username: string, email: string, sport
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`  // Use "Bearer" prefix
             },
-            body: JSON.stringify({ username, email, sportName, skillLevel, keywords }),
+            body: JSON.stringify({ userName, userEmail, sportName, skillLevel, keywords }),
         });
 
         if (!response.ok) {

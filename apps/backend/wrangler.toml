@@ -1,34 +1,56 @@
 name = "backend-me"
-main = "./src/routes/index.ts" 
+main = "./src/index.ts" 
 compatibility_date = "2024-10-19"
-compatibility_flags = [ "nodejs_compat" ]
+compatibility_flags = ["nodejs_compat"]
 
 [vars]
 DATABASE_URL="prisma://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiZDUwMGMzYmMtMmYyYi00ZTkwLTlmNmItYTRjOGUyMWVkZTc0IiwidGVuYW50X2lkIjoiNGM4MDk2NGVhZmJhNmEwNzFhMWE2ZDdmNDQ2M2Y1ZmQ2NTNkMzk3MTk5OGViZmZmZjEzYjA0YWFmNDVlM2JkOSIsImludGVybmFsX3NlY3JldCI6ImU1M2VlMzNiLTg2YmYtNDEyOS04YWMwLWFjOWZhMGZjZDI1MyJ9.DNkOeSk2ynTLuIP3ZEIN1TXVLGgkOOoUeSX5Mp0GX-k"
 JWT_SECRET="mymymysecret"
+
+RESEND_API_KEY="re_Z6a5fdkG_KuPHLQ2cGuKD7Y7FsH9M1BpR"
+RESEND_SENDER_EMAIL="onboarding@resend.dev"
+# RESEND_SENDER_EMAIL="noreply.sportstolt@gmail.com"
+
 YOUTUBE_API_KEY ="AIzaSyAZzFU5xMXgs5bIb5Wgl1Z96VOqUqe0wyk"
 GEOLOCATION_API_KEY="1698e16e9d9731"
+
 FRONTEND_BASE_URL="https://sport-stolt.vercel.app"
 # FRONTEND_BASE_URL = "http://localhost:5173"
+
+
+
+compatibility_flags = ["nodejs_compat"]
+
 
 
 [env.production]
 dns_resolvers = ["1.1.1.1", "8.8.8.8"]
 
 
-# [[triggers]]
-# type = "cron"
-# schedule = "*/10 * * * *" 
+
+[triggers]
+crons = ["*/10 * * * *"]
 
 
-# [triggers.cron]
-# main = "src/cleanup.ts" 
+[env.cleanup]
+main = "src/cleanup.ts"
+name = "my-hono-cleanup"
+compatibility_date = "2024-05-26"
+
+[env.cleanup.vars]
+DATABASE_URL="prisma://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiZDUwMGMzYmMtMmYyYi00ZTkwLTlmNmItYTRjOGUyMWVkZTc0IiwidGVuYW50X2lkIjoiNGM4MDk2NGVhZmJhNmEwNzFhMWE2ZDdmNDQ2M2Y1ZmQ2NTNkMzk3MTk5OGViZmZmZjEzYjA0YWFmNDVlM2JkOSIsImludGVybmFsX3NlY3JldCI6ImU1M2VlMzNiLTg2YmYtNDEyOS04YWMwLWFjOWZhMGZjZDI1MyJ9.DNkOeSk2ynTLuIP3ZEIN1TXVLGgkOOoUeSX5Mp0GX-k"
+JWT_SECRET="mymymysecret"
+YOUTUBE_API_KEY ="AIzaSyAZzFU5xMXgs5bIb5Wgl1Z96VOqUqe0wyk"
+GEOLOCATION_API_KEY="1698e16e9d9731"
+FRONTEND_BASE_URL="https://sport-stolt.vercel.app"
+
+[env.cleanup.triggers]
+crons = ["0 * * * *"]
+
+# crons = ["*/10 * * * *"] would have been 10 mins
 
 
-# [env.cleanup]
-# main = "src/cleanup.ts"
-# name = "my-hono-cleanup"
-# compatibility_date = "2024-05-26"
+
 
 # BASE_URL=https://sportstolt.com
 

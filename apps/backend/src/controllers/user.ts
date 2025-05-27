@@ -11,8 +11,8 @@ import { z, ZodError } from 'zod';
 import nodemailer from 'nodemailer';
 import { authMiddleware } from "../middleware/authMiddleware";
 
-import { auth } from "googleapis/build/src/apis/abusiveexperiencereport";
-import { set } from "date-fns";
+// import { auth } from "googleapis/build/src/apis/abusiveexperiencereport";
+// import { set } from "date-fns";
 // import axios from "axios";
 
 // export const signupInput = z.object({
@@ -275,7 +275,6 @@ userRouter.get('/me', authMiddleware, async (c) => {
     return c.json({ error: 'Internal server error' }, 500);
   }
 });
-
 
 // Get User Profile
 userRouter.get('/:id/profile', authMiddleware, async (c) => {

@@ -1,9 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  // previewFeatures = ["accelerate"]
-  // previewFeatures = ["dataProxy"]
-  // output   = "./node_modules/@prisma/client"
-  // output   = "./../../node_modules/@prisma/client"
 }
 
 datasource db {
@@ -16,24 +12,24 @@ model User {
   email                 String            @unique
   username              String?           @unique
   name                  String?
-  image                 String?           // Profile image , image under author
-  bio                   String?           // Short description
-  location              String?           // e.g. Delhi
-  university            String?           // e.g. XYZ University
-  achievements          String?           // e.g. TT Captain, Football Champion
-  legitimacy            String?           // e.g. "97%" (might calculate this from verified stories)
+  image                 String?
+  bio                   String?
+  location              String?
+  university            String?
+  achievements          String?
+  legitimacy            String?
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
   password              String
 
   points                Int               @default(0)
-  badgeLevel            String?           // e.g. "Gold", "Silver", etc.
+  badgeLevel            String?
 
-  post                  Post[]            // Posts user has made
-  savedPosts            Save[]            // Saved posts
-  likedPosts            Like[]            // Liked posts
+  post                  Post[]
+  savedPosts            Save[]
+  likedPosts            Like[]
   story                 Story[]
-  verifiedStories       Verification[]    // Verification-related stories
+  verifiedStories       Verification[]
   storyAttendance       StoryAttendance[]
   Storyimages           Storyimages[]
   StoryView             StoryView[]
@@ -41,7 +37,7 @@ model User {
   registration          Registration[]
 
   comment               Comment[]
-  event                 Event[]           // Events participated (can be filtered later)
+  event                 Event[]
 
   sentNotifications     Notification[]    @relation("SentNotifications")
   receivedNotifications Notification[]    @relation("ReceivedNotifications")
@@ -49,9 +45,262 @@ model User {
   following             Follow[]          @relation("Following")
   followedTags          Tag[]             @relation("TagFollowers")
 
-  resetToken            String?           
+  resetToken            String?
   resetTokenExpiry      DateTime?
 }
+
+model Tag {
+  id        Int     @id @default(autoincrement())
+  name      String  @unique
+  posts     Post[]  @relation("PostTags")
+  followers User[]  @relation("TagFollowers")
+}
+
+model Post {
+  id        Int       @id @default(autoincrement())
+  title     String
+  content   String
+  authorId  Int
+  tagSting  String[]
+  tags      Tag[]     @relation("PostTags")
+  createdAt DateTime  @default(now())
+
+  author    User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  likes     Like[]
+  saves     Save[]
+  notifications Notification[]
+  Comment   Comment[]
+  PostPhoto PostPhoto[]
+}
+
+model PostPhoto {
+  id     String @id @default(uuid())
+  url    String
+  postId Int
+  Post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model Comment {
+  id           String         @id @default(uuid())
+  content      String
+  createdAt    DateTime       @default(now())
+  authorId     Int
+  eventId      Int?
+  postId       Int?
+
+  author       User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  Event        Event?         @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  Post         Post?          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  notification Notification[]
+}
+
+model Like {
+  id     Int   @id @default(autoincrement())
+  userId Int
+  postId Int
+
+  user   User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post   Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+}
+
+model Save {
+  id     Int   @id @default(autoincrement())
+  userId Int
+  postId Int
+
+  user   User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post   Post  @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, postId])
+}
+
+model Story {
+  id                 Int               @id @default(autoincrement())
+  location           String
+  locationImage      String?
+  sport              String            @default("")
+  stadium            String            @default("")
+  isViewed           Boolean           @default(false)
+  authorId           Int
+  endTime            DateTime          @default(now())
+  activityStarted    DateTime          @default(now())
+  activityEnded      DateTime          @default(now())
+  createdAt          DateTime          @default(now())
+  duration           Int               @default(0)
+  authenticityStatus String?
+  rating             Float?
+  description        String?
+  participants       Int?
+  verificationCount  Int               @default(0)
+  rewardStatus       String            @default("pending")
+  rewardAmount       Float?
+  swipeUpEnabled     Boolean           @default(false)
+
+  author             User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  Storyimages        Storyimages[]
+  StoryView          StoryView[]
+  attendees          StoryAttendance[]
+}
+
+model Storyimages {
+  id                  Int      @id @default(autoincrement())
+  url                 String
+  createdAt           DateTime @default(now())
+  authenticityChecked Boolean  @default(false)
+  verifiedBy          Int[]
+  verificationCount   Int      @default(0)
+  totalReviews        Int      @default(0)
+  isRewarded          Boolean  @default(false)
+  userId              Int
+  storyImageId        Int
+  
+  User                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story               Story    @relation(fields: [storyImageId], references: [id], onDelete: Cascade)
+  Verification        Verification[]
+  attendance          StoryAttendance[]
+  notifications       Notification[]
+}
+
+model StoryView {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  storyId   Int
+  viewedAt  DateTime @default(now())
+
+  story     Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storyId])
+}
+
+model Verification {
+  id             Int         @id @default(autoincrement())
+  verificationId Int
+  userId         Int
+  verified       Boolean
+  createdAt      DateTime    @default(now())
+
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  storyImages    Storyimages @relation(fields: [verificationId], references: [id], onDelete: Cascade)
+}
+
+model StoryAttendance {
+  id           Int      @id @default(autoincrement())
+  storyImageId Int
+  userId       Int
+  attendedAt   DateTime @default(now())
+  storyId      Int?
+
+  storyImage Storyimages @relation(fields: [storyImageId], references: [id], onDelete: Cascade)
+  User       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Story      Story?      @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([storyImageId, userId])
+}
+
+model Event {
+  id          Int       @id @default(autoincrement())
+  image       String
+  likeCount   Int       @default(0)
+  country     String    @default("")
+  state       String    @default("")
+  city        String    @default("")
+  authorId    Int
+  stadium     String    @default("")
+  StartDate   DateTime
+  EndDate     DateTime
+  StartTime   DateTime
+  OrganisedBy String
+  name        String
+  createdAt   DateTime  @default(now())
+
+  Comment     Comment[]
+  registration Registration[]
+  author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+}
+
+model Registration {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  eventId   Int
+  createdAt DateTime @default(now())
+
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  event Event @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, eventId])
+}
+
+model Notification {
+  id           Int       @id @default(autoincrement())
+  type         String?
+  message      String
+  senderId     Int?
+  receiverId   Int
+  createdAt    DateTime  @default(now())
+  seen         Boolean   @default(false)
+  postId       Int?
+  commentId    String?
+  storyImageId Int?
+  followId     Int?
+  scheduledAt  DateTime?
+
+  sender     User?        @relation("SentNotifications", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver   User         @relation("ReceivedNotifications", fields: [receiverId], references: [id], onDelete: Cascade)
+  post       Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
+  comment    Comment?     @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  storyImage Storyimages? @relation(fields: [storyImageId], references: [id], onDelete: Cascade)
+  follow     Follow?      @relation(fields: [followId], references: [id], onDelete: Cascade)
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  FOLLOW
+  MENTION
+  STORY_ATTENDANCE
+  STORY_VERIFICATION
+  SYSTEM
+}
+
+model Follow {
+  id          Int       @id @default(autoincrement())
+  followerId  Int
+  followingId Int
+  createdAt   DateTime  @default(now())
+
+  follower    User      @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  following   User      @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  notifications Notification[]
+
+  @@unique([followerId, followingId], name: "followerId_followingId")
+}
+
+model Tweet {
+  id        String   @id @default(uuid())
+  content   String
+  createdAt DateTime @default(now())
+  authorId  Int
+  updatedAt DateTime @updatedAt
+  userId    Int
+  author    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Playlist {
+  id         Int      @id @default(autoincrement())
+  sportName  String
+  skillLevel String
+  keywords   String
+  link       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+
+
 
 // model User {
 //   id                    Int               @id @default(autoincrement())
@@ -133,37 +382,6 @@ model User {
 // }
 
 
-model Tag {
-  id        Int     @id @default(autoincrement())
-  name      String  @unique
-  posts     Post[]  @relation("PostTags")
-  followers User[] @relation("TagFollowers")
-}
-
-
-model Post {
-  id       Int      @id @default(autoincrement())
-  title    String
-  content  String
-  authorId Int
-  tagSting   String[] 
-  tags     Tag[]    @relation("PostTags") // assuming a relation
-  createdAt DateTime @default(now())
-  author   User     @relation(fields: [authorId], references: [id])
-  likes    Like[]
-  saves    Save[]
-  notifications Notification[]
-  Comment       Comment[]
-  PostPhoto     PostPhoto[]
-}
-
-model PostPhoto {
-  id     String @id @default(uuid())
-  url    String
-  postId Int
-  Post   Post   @relation(fields: [postId], references: [id])
-}
-
 // model Photo {
 //   id        String   @id @default(uuid())
 //   url       String
@@ -174,239 +392,3 @@ model PostPhoto {
 //   User      User     @relation(fields: [userId], references: [id])
 // }
 //why this is here ??? what is the use of this model 
-
-model Comment {
-  id           String         @id @default(uuid())
-  content      String
-  createdAt    DateTime       @default(now())
-  authorId     Int
-  eventId      Int?
-  postId       Int?
-  author       User           @relation(fields: [authorId], references: [id])
-  Event        Event?         @relation(fields: [eventId], references: [id])
-  Post         Post?          @relation(fields: [postId], references: [id])
-  notification Notification[]
-}
-
-model Like {
-  id     Int   @id @default(autoincrement())
-  user   User  @relation(fields: [userId], references: [id])
-  userId Int
-  post   Post  @relation(fields: [postId], references: [id])
-  postId Int
-
-  @@unique([userId, postId]) // Prevent double likes
-}
-
-model Save {
-  id     Int   @id @default(autoincrement())
-  user   User  @relation(fields: [userId], references: [id])
-  userId Int
-  post   Post  @relation(fields: [postId], references: [id])
-  postId Int
-
-  @@unique([userId, postId]) // Prevent double saves
-}
-
-
-
-
-model Story {
-  id                 Int               @id @default(autoincrement())
-  Storyimages        Storyimages[]
-  StoryView          StoryView[] 
-  attendees          StoryAttendance[]
-  location           String
-  locationImage      String? // New field for storing location image
-  sport              String            @default("")
-  stadium            String            @default("")
-  isViewed           Boolean           @default(false)
-  authorId           Int
-  endTime            DateTime          @default(now())
-  activityStarted    DateTime          @default(now())
-  activityEnded      DateTime          @default(now())
-  createdAt          DateTime          @default(now())
-  duration           Int               @default(0)
-  author             User              @relation(fields: [authorId], references: [id])
-  authenticityStatus String? // 'pending', 'verified', 'not_verified'
-  rating             Float? // Average rating
-  description        String? // Detailed description of the story
-  participants       Int? // No of participants
-  verificationCount  Int               @default(0) // Number of verifications received
-  rewardStatus       String            @default("pending") // pending, eligible, rewarded
-  rewardAmount       Float? // Amount of reward tokens
-  swipeUpEnabled     Boolean           @default(false) // Whether story has swipe-up content
-}
-
-model Storyimages {
-  id                  Int      @id @default(autoincrement())
-  url                 String
-  createdAt           DateTime @default(now())
-  authenticityChecked Boolean  @default(false)
-  verifiedBy          Int[]
-  verificationCount   Int      @default(0) // <-- Add this field with a default value
-  totalReviews        Int      @default(0) // Optional, if you need it
-  isRewarded          Boolean  @default(false) // Optional, if needed
-  userId              Int
-  storyImageId        Int
-  
-  User                User     @relation(fields: [userId], references: [id])
-  story               Story    @relation(fields: [storyImageId], references: [id], onDelete: Cascade)
-  Verification        Verification[]
-  attendance          StoryAttendance[]
-  notifications       Notification[]
-}
-
-model StoryView {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  storyId   Int
-  viewedAt  DateTime @default(now())
-  
-  story     Story    @relation(fields: [storyId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
-
-  @@unique([userId, storyId])
-}
-
-
-model Verification {
-  id             Int         @id @default(autoincrement())
-  verificationId Int
-  userId         Int
-  verified       Boolean
-  createdAt      DateTime    @default(now())
-  user           User        @relation(fields: [userId], references: [id])
-  storyImages    Storyimages @relation(fields: [verificationId], references: [id])
-}
-
-model StoryAttendance {
-  id           Int      @id @default(autoincrement())
-  storyImageId Int
-  userId       Int
-  attendedAt   DateTime @default(now())
-
-  storyImage Storyimages @relation(fields: [storyImageId], references: [id], onDelete: Cascade)
-  User       User        @relation(fields: [userId], references: [id])
-  Story      Story?      @relation(fields: [storyId], references: [id])
-  storyId    Int?
-
-  @@unique([storyImageId, userId]) // Ensures a user can attend only once per story
-}
-
-
-
-
-model Event {
-  id          Int       @id @default(autoincrement())
-  image       String
-  likeCount   Int       @default(0)
-  country     String    @default("")
-  state       String    @default("")
-  city        String    @default("")
-  authorId    Int
-  stadium     String    @default("")
-  StartDate   DateTime
-  EndDate     DateTime
-  StartTime   DateTime
-  OrganisedBy String
-  name        String
-  createdAt   DateTime  @default(now())
-  Comment     Comment[]
-  registration Registration[]
-  author      User      @relation(fields: [authorId], references: [id])
-}
-
-model Registration {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  eventId   Int
-  createdAt DateTime @default(now())
-
-  user  User  @relation(fields: [userId], references: [id])
-  event Event @relation(fields: [eventId], references: [id])
-
-  @@unique([userId, eventId]) // Ensure one user can register only once per event
-}
-
-
-
-
-
-model Notification {
-  id           Int       @id @default(autoincrement())
-  type         String?
-  message      String
-  senderId     Int? // Who triggered the notification
-  receiverId   Int // Who will receive the notification
-  createdAt    DateTime  @default(now())
-  seen         Boolean   @default(false) // Has the user seen the notification?
-  postId       Int? // If related to a post
-  commentId    String? // If related to a comment
-  storyImageId Int? // If related to a story
-  followId     Int? // If related to a follow event
-  scheduledAt  DateTime?
-
-  sender     User?        @relation("SentNotifications", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver   User         @relation("ReceivedNotifications", fields: [receiverId], references: [id], onDelete: Cascade)
-  post       Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
-  comment    Comment?     @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  storyImage Storyimages? @relation(fields: [storyImageId], references: [id], onDelete: Cascade)
-  follow     Follow?      @relation(fields: [followId], references: [id], onDelete: Cascade)
-}
-
-enum NotificationType {
-  LIKE
-  COMMENT
-  FOLLOW
-  MENTION
-  STORY_ATTENDANCE
-  STORY_VERIFICATION
-  SYSTEM
-}
-
-
-
-// model Badge {
-//   id        String   @id @default(uuid())
-//   name      String
-//   userId    Int
-//   createdAt DateTime @default(now())
-//   User      User     @relation(fields: [userId], references: [id])
-// }
-
-model Follow {
-  id          Int       @id @default(autoincrement())
-  followerId  Int
-  follower    User      @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
-
-  followingId Int
-  following   User      @relation("Followers", fields: [followingId], references: [id], onDelete: Cascade)
-
-  createdAt   DateTime  @default(now())
-  notifications Notification[]
-
-  @@unique([followerId, followingId], name: "followerId_followingId")
-}
-
-
-model Tweet {
-  id        String   @id @default(uuid())
-  content   String
-  createdAt DateTime @default(now())
-  authorId  Int
-  updatedAt DateTime @updatedAt
-  userId    Int
-  author    User     @relation(fields: [userId], references: [id])
-}
-
-//wasn't useful maybe
-model Playlist {
-    id         Int      @id @default(autoincrement())
-    sportName  String
-    skillLevel String
-    keywords   String
-    link       String
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
-}
