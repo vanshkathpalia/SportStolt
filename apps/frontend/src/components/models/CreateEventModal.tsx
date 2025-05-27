@@ -23,53 +23,137 @@ export function CreateEventModal({ isOpen, onClose }: CreateEventModalProps) {
   const [organisedBy, setOrganisedBy] = useState("")
   const [image, setImage] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [formErrors, setFormErrors] = useState<{
+    startDate?: string;
+    endDate?: string;
+    startTime?: string;
+  }>({});
 
+
+
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault()
+  //   setIsLoading(true)
+
+  //   try {
+  //     // Compose startTime as ISO string combining date + time
+  //     const startDateTime = new Date(`${startDate}T${startTime}`).toISOString();
+
+  //     // Backend expects dates as ISO strings or date objects:
+  //     const formData = {
+  //       name,
+  //       StartDate: startDate,
+  //       EndDate: endDate,
+  //       StartTime: startDateTime,
+  //       city,
+  //       state,
+  //       country,
+  //       stadium,
+  //       OrganisedBy: organisedBy,
+  //       image,
+  //     }
+
+  //     await axios.post(`${BACKEND_URL}/api/v1/event`, formData, {
+  //       headers: {
+  //         Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //       },
+  //     })
+
+  //     // Reset form and close modal
+  //     setName("")
+  //     setStartDate("")
+  //     setEndDate("")
+  //     setStartTime("")
+  //     setCity("")
+  //     setState("")
+  //     setCountry("")
+  //     setStadium("")
+  //     setOrganisedBy("")
+  //     setImage("")
+  //     onClose()
+  //   } catch (error) {
+  //     console.error("Error creating event:", error)
+  //   } finally {
+  //     setIsLoading(false)
+  //   }
+  // }
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsLoading(true)
+    e.preventDefault();
+    setIsLoading(true);
 
+    const errors: typeof formErrors = {};
+    const now = new Date();
+    const startDateTime = new Date(`${startDate}T${startTime}`);
+    const startDateObj = new Date(startDate);
+    const endDateObj = new Date(endDate);
+
+    // Validation rules
+    if (endDateObj < startDateObj) {
+      errors.endDate = "End date must be after or same as start date.";
+    }
+
+    const todayStr = now.toISOString().split("T")[0];
+    if (startDate === todayStr && startDateTime < now) {
+      errors.startTime = "Start time must be in the future for today's date.";
+    }
+
+    if (startDateTime < now) {
+      errors.startDate = "Start date or time must be in the future.";
+    }
+
+    // If any errors found, set and stop
+    if (Object.keys(errors).length > 0) {
+      setFormErrors(errors);
+      setIsLoading(false);
+      return;
+    }
+
+    // Clear any previous errors
+    setFormErrors({});
+
+    // Submit the form (your original logic)
     try {
-      // Compose startTime as ISO string combining date + time
-      const startDateTime = new Date(`${startDate}T${startTime}`)
+      const isoStartTime = startDateTime.toISOString();
 
-      // Backend expects dates as ISO strings or date objects:
       const formData = {
         name,
         StartDate: startDate,
         EndDate: endDate,
-        StartTime: startDateTime.toISOString(),
+        StartTime: isoStartTime,
         city,
         state,
         country,
         stadium,
         OrganisedBy: organisedBy,
         image,
-      }
+      };
 
       await axios.post(`${BACKEND_URL}/api/v1/event`, formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
-      })
+      });
 
-      // Reset form and close modal
-      setName("")
-      setStartDate("")
-      setEndDate("")
-      setStartTime("")
-      setCity("")
-      setState("")
-      setCountry("")
-      setStadium("")
-      setOrganisedBy("")
-      setImage("")
-      onClose()
+      // Reset form
+      setName("");
+      setStartDate("");
+      setEndDate("");
+      setStartTime("");
+      setCity("");
+      setState("");
+      setCountry("");
+      setStadium("");
+      setOrganisedBy("");
+      setImage("");
+      onClose();
     } catch (error) {
-      console.error("Error creating event:", error)
+      console.error("Error creating event:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
+
+
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -108,33 +192,55 @@ export function CreateEventModal({ isOpen, onClose }: CreateEventModalProps) {
                 <Input
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
+                onChange={(e) => {
+                  setStartDate(e.target.value);
+                  setFormErrors((prev) => ({ ...prev, startDate: undefined }));
+                }}
                 className="w-full px-3 py-2 border dark:border-gray-700 rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
                 />
             </div>
+
 
             <div className="space-y-2">
                 <Label className="block text-sm font-medium dark:text-white text-black mb-2">End Date</Label>
                 <Input
                 type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
+                onChange={(e) => {
+                  setEndDate(e.target.value);
+                  setFormErrors((prev) => ({ ...prev, startDate: undefined }));
+                }}
                 className="w-full px-3 py-2 border dark:border-gray-700 rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 required
                 />
             </div>
           </div>
 
+            <div className="grid grid-cols-2 gap-4 dark:text-white text-black">
+                {formErrors.startDate && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.startDate}</p>
+                )}
+                {formErrors.endDate && (
+                  <p className="text-red-500 text-sm mt-1">{formErrors.endDate}</p>
+                )}
+            </div>
+
           <div>
             <Label className="block text-sm font-medium dark:text-white text-black mb-2">Start Time</Label>
             <Input
               type="time"
               value={startTime}
-              onChange={(e) => setStartTime(e.target.value)}
+              onChange={(e) => {
+                setStartTime(e.target.value);
+                setFormErrors((prev) => ({ ...prev, startDate: undefined }));
+              }}
               className="w-fit px-3 py-2 border dark:border-gray-700 rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               required
             />
+            {formErrors.startTime && (
+              <p className="text-red-500 text-sm mt-1">{formErrors.startTime}</p>
+            )}
           </div>
 
 

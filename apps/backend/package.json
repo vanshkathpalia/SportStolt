@@ -14,7 +14,8 @@
     "hono": "^4.6.5",
     "nodemailer": "^7.0.3",
     "sharp": "^0.33.5",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "worker-mailer": "^1.1.4"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250525.0",

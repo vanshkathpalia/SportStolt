@@ -5,7 +5,7 @@ import { MobileNav } from '../components/StickyBars/MobileNav';
 import { useMediaQuery } from '../hooks/useMediaQuery';
 
 export const Training = ({ openCreateModal }: { openCreateModal: () => void }) => {
-    const [email, setEmail] = useState('');
+    const [userName, setUserName] = useState('');
     const [userEmail, setUserEmail] = useState('');
     const [sportName, setSportName] = useState('Football');
     const [skillLevel, setSkillLevel] = useState('Beginner');
@@ -15,7 +15,7 @@ export const Training = ({ openCreateModal }: { openCreateModal: () => void }) =
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await fetchSportsPlaylist(email, userEmail, sportName, skillLevel, keywords);
+            await fetchSportsPlaylist(userName, userEmail, sportName, skillLevel, keywords);
             alert(`Email sent to ${userEmail} for ${sportName} tutorials.`);
         } catch (error) {
             console.error(error);
@@ -41,8 +41,8 @@ export const Training = ({ openCreateModal }: { openCreateModal: () => void }) =
 
                         <label className="block mb-2 font-semibold text-gray-700 dark:text-gray-200">Name:</label>
                         <input
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            value={userName}
+                            onChange={(e) => setUserName(e.target.value)}
                             type="text"
                             placeholder="Enter your name"
                             required
