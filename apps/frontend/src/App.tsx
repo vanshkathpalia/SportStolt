@@ -15,7 +15,7 @@ import { PostsPage } from "./pages/Posts"
 import { PostPage } from "./pages/Post"
 import { CreatePostModal } from './components/models/CreatePostModal'
 // import { AddStory } from './pages/AddStory'
-import { AppContextProvider } from "./context/AppContext"
+import { AppContextProvider } from "./context/AppProvider"
 import { AddEvent } from "./pages/AddEvent"
 import { Search } from './pages/Search'
 import { EventsPage } from './pages/Events'

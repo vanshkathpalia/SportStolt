@@ -1,18 +1,22 @@
-// services/trainingService.ts
-import { sendMail } from '../utils/emailUtils';
-import dotenv from 'dotenv';  
-import { getPrisma } from '../lib/prisma';
+import { sendMail } from '~/utils/emailUtils';
+import { getPrisma } from '../lib/prismaClient';  // factory, not singleton
 
-dotenv.config();
-
-export async function getOrCreatePlaylist(dburl: string, sportName: string, skillLevel: string, keywords: string, apiKey: string) {
-  const prisma = getPrisma(dburl);
+export async function getOrCreatePlaylist(
+  env: any,
+  sportName: string,
+  skillLevel: string,
+  keywords: string,
+  apiKey: string
+) {
+  const prisma = getPrisma(env.DATABASE_URL);  // Pass DB URL explicitly
 
   const existing = await prisma.playlist.findFirst({
     where: { sportName, skillLevel, keywords },
   });
 
   if (existing) return existing.link;
+
+  // now start, 2nd service (but happens first in the flow) youtube playlist fetch
 
   const searchQuery = `${sportName} ${skillLevel} ${keywords}`;
   const maxResults = 10;
@@ -57,8 +61,10 @@ export const TEMPLATE_SPORTS_PLAYLIST = (
 </body>
 </html>`;
 
+
+// Called in controller
 export async function sendTrainingEmail(
-  dburl: string,
+  env: any,
   name: string,
   email: string,
   sportName: string,
@@ -67,8 +73,10 @@ export async function sendTrainingEmail(
   apiKey: string,
   resendSenderEmail: string
 ) {
+
+  // code upper 
   const playlistLink = await getOrCreatePlaylist(
-    dburl,
+    env,
     sportName,
     skillLevel,
     keywords,

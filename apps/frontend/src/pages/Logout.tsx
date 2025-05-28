@@ -13,7 +13,7 @@ export const Logout = () => {
 
     // Redirect to signin
     navigate("/signin");
-  }, []);
+  }, [navigate]);
 
   return null; // or a spinner/loading state
 };

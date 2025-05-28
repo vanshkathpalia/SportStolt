@@ -22,8 +22,15 @@ export function MobileNav({ openCreateModal }: MobileNavProps) {
     { icon: User, label: "Profile", href: "/profile" },
   ];
 
+  // const handleLogout = () => {
+  //   localStorage.removeItem("token");
+  //   navigate("/signin");
+  // };
   const handleLogout = () => {
     localStorage.removeItem("token");
+    // localStorage.setItem('user', JSON.stringify(user));
+    localStorage.removeItem("user");
+    // setUser(null);
     navigate("/signin");
   };
 

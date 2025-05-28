@@ -6,14 +6,16 @@ import { Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import { signupInput } from "@vanshkathpalia/sportstolt-common";
 import { z } from "zod";
-import { useAuth } from "../../context/AuthContext.tsx";
+import { useAuth } from "../../context/useAuth.ts";
 
 type SignupInput = z.infer<typeof signupInput>;
 
 
 export const Auth = ({ type }: { type: "signup" | "signin" }) => {
   const navigate = useNavigate();
-  const { setUser } = useAuth();
+  // const { setUser } = useAuth();
+  const { handleLoginSuccess } = useAuth();
+
 
   const [postInputs, setPostInputs] = useState<SignupInput>({
     username: "",
@@ -28,7 +30,7 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
     try {
       const response = await axios.post(`${BACKEND_URL}/api/v1/user/${type}`, postInputs);
       const jwt = response.data.token;
-      const user = response.data.user;  // Assuming backend sends this
+      const user = response.data.user;  // backend sends this
 
       if (!jwt) {
         alert("Forgot Password? Change your password");
@@ -37,15 +39,18 @@ export const Auth = ({ type }: { type: "signup" | "signin" }) => {
       }
 
       // Store token and user in localStorage
-      localStorage.setItem("token", jwt);
-      if (user) {
-        localStorage.setItem("user", JSON.stringify(user));
-        setUser(user);  // update context immediately
-      }
+      // localStorage.setItem("token", jwt);
+      // if (user) {
+      //   localStorage.setItem("user", JSON.stringify(user));
+      //   setUser(user);  // update context immediately
+      // }
+      // this all is done by ->
+
+      handleLoginSuccess(user, jwt);
 
       navigate("/post", { replace: true });
     } catch (e: unknown) {
-      // your error handling code
+      console.error(e);
     } finally {
       setLoading(false);
     }
