@@ -2,7 +2,7 @@ import { Home, Search, PlusSquare, Trophy, User, Bell, Activity, Menu, DollarSig
 import { cn } from "../lib/utils";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "../../context/useAuth";
 
 interface SidebarItemProps {
   icon: React.ElementType;
@@ -141,7 +141,7 @@ export function Sidebar({ openCreateModal }: SidebarProps) {
 // import { Home, Search, PlusSquare, Trophy, User, Bell, Activity, Menu, DollarSign, Settings, LogOut, Newspaper } from "lucide-react";
 // import { cn } from "../lib/utils";
 // import { Link, useLocation, useNavigate } from "react-router-dom";
-// import { useAuth } from "../../context/AuthContext";
+// import { useAuth } from "../../context/useAuth";
 // import { BACKEND_URL } from "../../config";
 
 // interface SidebarItemProps {

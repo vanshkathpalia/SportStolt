@@ -11,21 +11,6 @@ import { z, ZodError } from 'zod';
 import nodemailer from 'nodemailer';
 import { authMiddleware } from "../middleware/authMiddleware";
 
-// import { auth } from "googleapis/build/src/apis/abusiveexperiencereport";
-// import { set } from "date-fns";
-// import axios from "axios";
-
-// export const signupInput = z.object({
-//   name: z.string().min(1),
-//   email: z.string().email(),
-//   password: z.string().min(6),
-//   role: z.enum(["INDIVIDUAL", "ORGANIZATION"])
-// });
-
-// export const signinInput = z.object({
-//   email: z.string().email(),
-//   password: z.string().min(6),
-// });
 
 export const userRouter = new Hono<{
     Bindings: {

@@ -8,16 +8,8 @@ import { ProfileHeader } from "../components/Profile/ProfileHeader";
 import { ProfileTabs } from "../components/Profile/ProfileTabs";
 import { ProfileGrid } from "../components/Profile/PhotoGrid";
 import { EventGrid } from "../components/Profile/EventGrid";
-import { useAuth } from "../context/AuthContext";
-import { BACKEND_URL } from "../config";
-
-export async function getUserIdFromUsername(username: string): Promise<number> {
-  const res = await fetch(`${BACKEND_URL}/api/v1/user/id/${username}`);
-  if (!res.ok) throw new Error("User not found");
-  const data = await res.json();
-  if (typeof data.id !== "number") throw new Error("Invalid response");
-  return data.id;
-}
+import { useAuth } from "../context/useAuth";
+import { getUserIdFromUsername } from "../utils/getUserIdFromUsername";
 
 export const Profile: React.FC<{ openCreateModal: () => void }> = ({ openCreateModal }) => {
   const { username } = useParams<{ username: string }>();

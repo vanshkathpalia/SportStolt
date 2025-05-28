@@ -3,7 +3,7 @@ import { Settings } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useProfile } from '../../hooks/useProfile'; 
 import { Tooltip } from '../ui/tooltip';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/useAuth';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
 interface ProfileHeaderProps {

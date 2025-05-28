@@ -29,7 +29,7 @@ dns_resolvers = ["1.1.1.1", "8.8.8.8"]
 
 
 [triggers]
-crons = ["*/10 * * * *"]
+crons = ["0 0 * * *"]
 
 
 [env.cleanup]

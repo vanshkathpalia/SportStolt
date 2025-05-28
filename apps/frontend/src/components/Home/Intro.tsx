@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Moon, Sun, ArrowRight } from 'lucide-react';
 import { useTheme } from '../../context/useTheme';
 
+
 export const Intro = () => {
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate(); // get navigate function

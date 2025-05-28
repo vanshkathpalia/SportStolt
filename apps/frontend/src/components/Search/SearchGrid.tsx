@@ -288,8 +288,8 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
                       onClick={() => toggleFollowTag(tag)}
                     >
                       <div key={tag.id}>
-                        <span>{tag.name}</span>
-                      </div>
+                        <span>#{tag.name}</span>
+                      </div>f
                       <button
                         type="button"
                         onClick={(e) => {
