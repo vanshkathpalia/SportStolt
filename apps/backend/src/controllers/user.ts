@@ -53,7 +53,7 @@ export const UserEditInput = z.object({
 
 userRouter.post('/signup', async (c) => {
     const body = await c.req.json();
-    
+
 
     const result = signupInput.safeParse(body);
     if (!result.success) {

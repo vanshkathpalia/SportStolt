@@ -6,6 +6,7 @@ import { z } from "zod"
 import axios from 'axios';
 // import { addHours } from 'date-fns';
 import { authMiddleware } from '../middleware/authMiddleware'
+import { getPrisma } from '~/lib/prismaClient';
 
 export const storyRouter = new Hono<{
     Bindings: {
@@ -171,69 +172,6 @@ storyRouter.post('/', async (c) => {
     }
 });
 
-// geting stories with toggle between location and sports
-storyRouter.get('/fetch', async (c) => {
-    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-    const userId = c.get('userId');
-    const groupByParam = c.req.query('groupBy');
-    const groupBy: 'sport' | 'location' | 'all' = groupByParam === 'sport' || groupByParam === 'location' ? groupByParam : 'all';
-
-    const utcNow = new Date();
-
-    try {
-        const stories = await prisma.story.findMany({
-            where: {
-                endTime: { gte: utcNow }
-            },
-            select: {
-                id: true,
-                location: true,
-                sport: true,
-                locationImage: true,
-                createdAt: true,
-                activityStarted: true,
-                activityEnded: true,
-                endTime: true,
-                description: true,
-                stadium: true,
-                swipeUpEnabled: true,
-                Storyimages: { select: { id: true, url: true, userId: true, createdAt: true } },
-                author: { select: { id: true, username: true, image: true } },
-                StoryView: userId
-                    ? {
-                        where: { userId },
-                        select: { id: true }
-                    }
-                    : false
-            },
-        });
-
-        // Add isViewed property
-        const updatedStories = stories.map(story => ({
-            ...story,
-            isViewed: story.StoryView?.length > 0
-        }));
-
-        // Filter or group if needed
-        let sortedStories = updatedStories;
-
-        if (groupBy === 'location') {
-            sortedStories.sort((a, b) => a.location?.localeCompare(b.location || '') || 0);
-        } else if (groupBy === 'sport') {
-            sortedStories.sort((a, b) => a.sport?.localeCompare(b.sport || '') || 0);
-        }
-
-        // Sort unviewed first
-        sortedStories.sort((a, b) => Number(a.isViewed) - Number(b.isViewed));
-
-        return c.json({ stories: sortedStories });
-
-    } catch (e) {
-        console.error('Error fetching stories:', e);
-        c.status(500);
-        return c.json({ message: "Error fetching stories" });
-    }
-});
 
 // storyRouter.get('/fetch', async (c) => {
 //     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
@@ -284,6 +222,373 @@ storyRouter.get('/fetch', async (c) => {
 //     return c.json({ stories: updatedStories });
 
 // });
+
+// storyRouter.get('/fetch', async (c) => {
+//   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+//   const userId = c.get('userId');
+//   const groupByParam = c.req.query('groupBy');
+//   const groupBy = groupByParam === 'sport' || groupByParam === 'location' ? groupByParam : 'all';
+
+//   const utcNow = new Date();
+
+//   // Fetch user preferences
+//   const userPrefs = await prisma.userPreference.findUnique({
+//     where: { userId },
+//     select: {
+//       preferredSports: true,
+//       preferredLocations: true,
+//     },
+//   });
+
+//   if (!userPrefs) {
+//     return c.json({ stories: [] });
+//   }
+
+//   // Build the WHERE clause based on user preferences and the selected groupBy
+//   const whereClause = {
+//     endTime: { gte: utcNow },
+//     ...(groupBy === 'sport' && userPrefs.preferredSports.length > 0
+//       ? { sport: { in: userPrefs.preferredSports } }
+//       : {}),
+//     ...(groupBy === 'location' && userPrefs.preferredLocations.length > 0
+//       ? { location: { in: userPrefs.preferredLocations } }
+//       : {}),
+//   };
+
+//   try {
+//     const stories = await prisma.story.findMany({
+//       where: whereClause,
+//       select: {
+//         id: true,
+//         location: true,
+//         sport: true,
+//         locationImage: true,
+//         createdAt: true,
+//         activityStarted: true,
+//         activityEnded: true,
+//         endTime: true,
+//         description: true,
+//         stadium: true,
+//         swipeUpEnabled: true,
+//         Storyimages: { select: { id: true, url: true, userId: true, createdAt: true } },
+//         author: { select: { id: true, username: true, image: true } },
+//         StoryView: userId
+//           ? {
+//               where: { userId },
+//               select: { id: true },
+//             }
+//           : false,
+//       },
+//       orderBy: [{ activityStarted: 'asc' }, { isViewed: 'asc' }],
+//     });
+
+//     // Add isViewed based on StoryView existence
+//     const updatedStories = stories.map((story) => ({
+//       ...story,
+//       isViewed: story.StoryView?.length > 0,
+//     }));
+
+//     // Sort: unviewed first, then viewed (true comes after false)
+//     updatedStories.sort((a, b) => (a.isViewed === b.isViewed ? 0 : a.isViewed ? 1 : -1));
+
+//     return c.json({ stories: updatedStories });
+//   } catch (e) {
+//     console.error('Error fetching stories:', e);
+//     c.status(500);
+//     return c.json({ message: 'Error fetching stories' });
+//   }
+// });
+
+
+// storyRouter.get('/fetch', async (c) => {
+//   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+//   const userId = c.get('userId');
+//   const utcNow = new Date();
+
+//   // Fetch user preferences
+//   const preferences = await prisma.userPreference.findUnique({
+//     where: { userId: Number(userId) }
+//   });
+
+//   const preferredSports = preferences?.preferredSports ?? [];
+//   const preferredLocations = preferences?.preferredLocations ?? [];
+
+//   const stories = await prisma.story.findMany({
+//     where: {
+//       endTime: { gte: utcNow },
+//       AND: [
+//         {
+//           OR: [
+//             { location: { in: preferredLocations } },
+//             // ...preferredLocations.map((loc) => ({ 
+//             //     location: { contains: loc, mode: 'insensitive' }      
+//             //     })),
+//               // Extra matching, e.g., location can be "Mumbai, Maharashtra, India"
+//             //   OR: preferredLocations.map((loc) => ({
+//             //     location: { contains: loc, mode: 'insensitive' }
+//             //   }))
+//             // }
+//           ]
+//         },
+//         {
+//           sport: { in: preferredSports }
+//         }
+//       ]
+//     },
+//     select: {
+//       id: true,
+//       location: true,
+//       sport: true,
+//       locationImage: true,
+//       createdAt: true,
+//       activityStarted: true,
+//       activityEnded: true,
+//       endTime: true,
+//       description: true,
+//       stadium: true,
+//       swipeUpEnabled: true,
+//       Storyimages: {
+//         select: { id: true, url: true, userId: true, createdAt: true }
+//       },
+//       author: {
+//         select: { id: true, username: true, image: true }
+//       },
+//       StoryView: userId
+//         ? {
+//             where: { userId },
+//             select: { id: true }
+//           }
+//         : false
+//     },
+//     orderBy: [{ activityStarted: 'asc' }, { isViewed: 'asc' }]
+//   });
+
+//   const updatedStories = stories.map((story) => ({
+//     ...story,
+//     isViewed: story.StoryView?.length > 0
+//   }));
+
+//   updatedStories.sort((a, b) => {
+//     if (a.isViewed === b.isViewed) return 0;
+//     return a.isViewed ? 1 : -1;
+//   });
+
+//   return c.json({ stories: updatedStories });
+// });
+
+
+// storyRouter.get('/fetch', async (c) => {
+//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+//     const userId = c.get('userId');
+//     const filterBy = c.req.query('filterBy'); // 'location' | 'sport' | null
+
+//     const utcNow = new Date();
+
+//     // Fetch user preferences
+//     const preferences = await prisma.userPreference.findUnique({
+//     where: { userId },
+//     select: {
+//         preferredLocations: true,
+//         preferredSports: true,
+//     },
+//     });
+
+//     let storyFilter: any = {
+//         endTime: { gte: utcNow },
+//     };
+
+//     if (filterBy === 'location' && preferences?.preferredLocations?.length) {
+//     storyFilter.location = {
+//         in: preferences.preferredLocations,
+//         mode: 'insensitive',
+//     };
+//     } else if (filterBy === 'sport' && preferences?.preferredSports?.length) {
+//     storyFilter.sport = {
+//         in: preferences.preferredSports,
+//         mode: 'insensitive',
+//     };
+//     }
+
+//     // Fetch stories based on filter
+//     const stories = await prisma.story.findMany({
+//     where: storyFilter,
+//     select: {
+//         id: true,
+//         location: true,
+//         sport: true,
+//         locationImage: true,
+//         createdAt: true,
+//         activityStarted: true,
+//         activityEnded: true,
+//         endTime: true,
+//         description: true,
+//         stadium: true,
+//         swipeUpEnabled: true,
+//         Storyimages: { select: { id: true, url: true, userId: true, createdAt: true } },
+//         author: { select: { id: true, username: true, image: true } },
+//         StoryView: userId
+//         ? {
+//             where: { userId },
+//             select: { id: true },
+//             }
+//         : false,
+//     },
+//     orderBy: [{ activityStarted: 'asc' }, { isViewed: 'asc' }],
+//     });
+
+//     // Add isViewed based on StoryView existence
+//     const updatedStories = stories.map(story => ({
+//     ...story,
+//     isViewed: story.StoryView?.length > 0,
+//     }));
+
+//     // Sort: unviewed first, then viewed
+//     updatedStories.sort((a, b) => {
+//     if (a.isViewed === b.isViewed) return 0;
+//     return a.isViewed ? 1 : -1;
+//     });
+
+//     return c.json({ stories: updatedStories });
+
+// });
+
+storyRouter.get('/fetch', async (c) => {
+    const prisma = getPrisma(c.env.DATABASE_URL);
+    const userId = c.get('userId');
+    const filterBy = c.req.query('filterBy');
+
+    // console.log('Fetching stories with filter:', filterBy);
+    // console.log('User ID:', userId);
+
+    // Get current time in UTC
+    const utcNow = new Date();
+    // console.log('Current UTC time:', utcNow);
+
+    // Base where clause - only get stories that haven't ended yet
+    let whereClause: any = {};
+
+    // Only apply preference filtering if filterBy is specified
+    if (filterBy) {
+        // Fetch user preferences
+        const userPrefs = await prisma.userPreference.findUnique({
+            where: { userId },
+            select: {
+                preferredSports: true,
+                preferredLocations: true,
+            },
+        });
+
+        // console.log('User preferences:', userPrefs);
+
+        // Add preference-based filtering only if preferences exist
+        if (filterBy === 'location' && userPrefs?.preferredLocations?.length) {
+            whereClause.location = {
+                in: userPrefs.preferredLocations,
+                mode: 'insensitive',
+            };
+            // console.log('Filtering by locations:', userPrefs.preferredLocations);
+        } else if (filterBy === 'sport' && userPrefs?.preferredSports?.length) {
+            whereClause.sport = {
+                in: userPrefs.preferredSports,
+                mode: 'insensitive',
+            };
+            // console.log('Filtering by sports:', userPrefs.preferredSports);
+        }
+    }
+
+    // console.log('Final where clause:', whereClause);
+
+    // First, let's get all stories to see what we have
+    const allStories = await prisma.story.findMany({
+        select: {
+            id: true,
+            location: true,
+            sport: true,
+            endTime: true,
+            activityStarted: true,
+            activityEnded: true,
+        }
+    });
+    // console.log('All stories in DB:', allStories);
+
+    // Now get the filtered stories
+    const stories = await prisma.story.findMany({
+        where: whereClause,
+        select: {
+            id: true,
+            location: true,
+            sport: true,
+            locationImage: true,
+            createdAt: true,
+            activityStarted: true,
+            activityEnded: true,
+            endTime: true,
+            description: true,
+            stadium: true,
+            swipeUpEnabled: true,
+            participants: true,
+            authenticityStatus: true,
+            Storyimages: { 
+                select: { 
+                    id: true, 
+                    url: true, 
+                    userId: true 
+                } 
+            },
+            author: { 
+                select: { 
+                    id: true, 
+                    username: true, 
+                    image: true 
+                } 
+            },
+            StoryView: userId ? {
+                where: { userId },
+                select: { id: true }
+            } : false
+        },
+        orderBy: [
+            { activityStarted: 'asc' },
+            { isViewed: 'asc' }
+        ]
+    });
+
+    // console.log('Found stories:', stories.length);
+
+    // Filter out stories that have ended
+    const activeStories = stories.filter(story => {
+        const endTime = new Date(story.endTime);
+        return endTime > utcNow;
+    });
+
+    // console.log('Active stories after filtering:', activeStories.length);
+
+    // Add isViewed flag and format response
+    const formattedStories = activeStories.map(story => ({
+        ...story,
+        isViewed: story.StoryView?.length > 0
+    }));
+
+    // Sort stories: upcoming activities first, then by viewed status
+    formattedStories.sort((a, b) => {
+        // First sort by activity start time
+        const aStarted = new Date(a.activityStarted);
+        const bStarted = new Date(b.activityStarted);
+        
+        if (aStarted > bStarted) return 1;
+        if (aStarted < bStarted) return -1;
+        
+        // If same start time, unviewed stories come first
+        if (a.isViewed === b.isViewed) return 0;
+        return a.isViewed ? 1 : -1;
+    });
+
+    // console.log('Final formatted stories:', formattedStories.length);
+    return c.json({ stories: formattedStories });
+});
+
+
+
 
 storyRouter.post('/view', async (c) => {
     const body = await c.req.json();

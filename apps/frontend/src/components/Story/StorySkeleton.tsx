@@ -13,7 +13,7 @@ export const StorySkeleton = () => {
         </div>
         
         <div className="flex gap-4 scroll-pr-24 overflow-x-auto pb-2">
-          {Array.from({ length: 12 }).map((_, index) => (
+          {Array.from({ length: 10 }).map((_, index) => (
             <div key={index} className="flex flex-col items-center">
               {/* Circle to represent the story icon */}
               <div className="h-14 w-14 bg-gray-200 dark:bg-gray-700 rounded-full mb-2"></div>
