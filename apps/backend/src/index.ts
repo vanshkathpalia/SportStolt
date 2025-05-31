@@ -18,6 +18,7 @@ import { postRouter } from '~/controllers/post';
 import { searchRouter } from '~/controllers/search';
 import { storyRouter } from '~/controllers/story';
 import { userRouter } from '~/controllers/user';
+import { settingsRouter } from './routes/settingsRouter';
 
 // import { PrismaClient } from '@prisma/client/edge'
 // import { withAccelerate } from '@prisma/extension-accelerate';
@@ -63,6 +64,7 @@ app.route("/api/v1/event", eventRouter);
 app.route("/api/v1/search", searchRouter);
 app.route("/api/v1/notificaiton", notificationRouter);
 app.route("/api/v1/training", trainingRouter)
+app.route("/api/v1/settings", settingsRouter);
 
 export default app
 

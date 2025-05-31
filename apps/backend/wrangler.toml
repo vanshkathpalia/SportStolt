@@ -1,51 +1,39 @@
 name = "backend-me"
-main = "./src/index.ts" 
-compatibility_date = "2024-10-19"
+main = "src/index.ts" 
+compatibility_date = "2025-05-31"
 compatibility_flags = ["nodejs_compat"]
+
+# Specify your static assets directory here for worker assets upload
+# [assets]
+# directory = "./dist"
 
 [vars]
-DATABASE_URL="prisma://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiZDUwMGMzYmMtMmYyYi00ZTkwLTlmNmItYTRjOGUyMWVkZTc0IiwidGVuYW50X2lkIjoiNGM4MDk2NGVhZmJhNmEwNzFhMWE2ZDdmNDQ2M2Y1ZmQ2NTNkMzk3MTk5OGViZmZmZjEzYjA0YWFmNDVlM2JkOSIsImludGVybmFsX3NlY3JldCI6ImU1M2VlMzNiLTg2YmYtNDEyOS04YWMwLWFjOWZhMGZjZDI1MyJ9.DNkOeSk2ynTLuIP3ZEIN1TXVLGgkOOoUeSX5Mp0GX-k"
-JWT_SECRET="mymymysecret"
+DATABASE_URL="prisma://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiMDFKV0tDV0NNS1lUOVdCRlkzRkI1OVhIUFYiLCJ0ZW5hbnRfaWQiOiI2MTBkODc2ZDU4OTQzMmI1MzQ3N2JiN2UyODkzYzRmODU5NjQ1MWFiYmI1NWMwN2EwZjZmZjA5YzFkMzU3YzJiIiwiaW50ZXJuYWxfc2VjcmV0IjoiZjM0M2I1MWQtOWQwNS00MjE5LTlmOGMtOTcwZGRiOWI3N2QzIn0.60yxT5kIQf4P8VsRF40PDw21seVKzIKhYVpESqqy51s"
+JWT_SECRET = "mymymysecret"
 
-RESEND_API_KEY="re_Z6a5fdkG_KuPHLQ2cGuKD7Y7FsH9M1BpR"
-RESEND_SENDER_EMAIL="onboarding@resend.dev"
-# RESEND_SENDER_EMAIL="noreply.sportstolt@gmail.com"
+RESEND_API_KEY = "re_Z6a5fdkG_KuPHLQ2cGuKD7Y7FsH9M1BpR"
+RESEND_SENDER_EMAIL = "onboarding@resend.dev"
 
-YOUTUBE_API_KEY ="AIzaSyAZzFU5xMXgs5bIb5Wgl1Z96VOqUqe0wyk"
-GEOLOCATION_API_KEY="1698e16e9d9731"
+YOUTUBE_API_KEY = "AIzaSyAZzFU5xMXgs5bIb5Wgl1Z96VOqUqe0wyk"
+GEOLOCATION_API_KEY = "1698e16e9d9731"
 
-FRONTEND_BASE_URL="https://sport-stolt.vercel.app"
-# FRONTEND_BASE_URL = "http://localhost:5173"
+FRONTEND_BASE_URL = "https://sport-stolt.vercel.app"
 
-
-
-compatibility_flags = ["nodejs_compat"]
-
-
-
-[env.production]
-dns_resolvers = ["1.1.1.1", "8.8.8.8"]
-
-
+# [env.production]
+# vars = { DATABASE_URL = "prisma://accelerate.prisma-data.net/?api_key=...", JWT_SECRET = "mymymysecret", YOUTUBE_API_KEY = "...", GEOLOCATION_API_KEY = "...", # # FRONTEND_BASE_URL = "https://sport-stolt.vercel.app" }
+# dns_resolvers = ["1.1.1.1", "8.8.8.8"]
 
 [triggers]
 crons = ["0 0 * * *"]
 
-
 [env.cleanup]
-main = "src/cleanup.ts"
 name = "my-hono-cleanup"
+main = "src/cleanup.ts"
 compatibility_date = "2024-05-26"
-
-[env.cleanup.vars]
-DATABASE_URL="prisma://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiZDUwMGMzYmMtMmYyYi00ZTkwLTlmNmItYTRjOGUyMWVkZTc0IiwidGVuYW50X2lkIjoiNGM4MDk2NGVhZmJhNmEwNzFhMWE2ZDdmNDQ2M2Y1ZmQ2NTNkMzk3MTk5OGViZmZmZjEzYjA0YWFmNDVlM2JkOSIsImludGVybmFsX3NlY3JldCI6ImU1M2VlMzNiLTg2YmYtNDEyOS04YWMwLWFjOWZhMGZjZDI1MyJ9.DNkOeSk2ynTLuIP3ZEIN1TXVLGgkOOoUeSX5Mp0GX-k"
-JWT_SECRET="mymymysecret"
-YOUTUBE_API_KEY ="AIzaSyAZzFU5xMXgs5bIb5Wgl1Z96VOqUqe0wyk"
-GEOLOCATION_API_KEY="1698e16e9d9731"
-FRONTEND_BASE_URL="https://sport-stolt.vercel.app"
-
+vars = { DATABASE_URL = "prisma://accelerate.prisma-data.net/?api_key=...", JWT_SECRET = "mymymysecret", YOUTUBE_API_KEY = "...", GEOLOCATION_API_KEY = "...", FRONTEND_BASE_URL = "https://sport-stolt.vercel.app" }
 [env.cleanup.triggers]
 crons = ["0 * * * *"]
+
 
 # crons = ["*/10 * * * *"] would have been 10 mins
 
@@ -75,3 +63,7 @@ crons = ["0 * * * *"]
 # [observability]
 # enabled = true
 # head_sampling_rate = 1
+
+
+# RESEND_SENDER_EMAIL="noreply.sportstolt@gmail.com"
+# FRONTEND_BASE_URL = "http://localhost:5173"

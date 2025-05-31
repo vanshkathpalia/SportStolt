@@ -183,75 +183,197 @@ postRouter.put('/', async (c) => {
     return c.json({ id: updatedPost.id });
 });
 
-postRouter.get('/bulk', async (c) => {
-    const prisma = new PrismaClient({
-        datasourceUrl: c.env.DATABASE_URL,
-    }).$extends(withAccelerate());
 
-    const groupBy = c.req.query('groupBy') || 'default';
+postRouter.get('/bulk', authMiddleware, async (c) => {
+  const prisma = new PrismaClient({
+    datasourceUrl: c.env.DATABASE_URL,
+  }).$extends(withAccelerate());
 
-    let posts;
+  const groupBy = c.req.query('groupBy') || 'default';
+  const userId = c.get('userId');
 
-    if (groupBy === 'user') {
-        posts = await prisma.post.findMany({
-            select: {
-                id: true,
-                title: true,
-                content: true,
-                createdAt: true,
-                author: {
-                    select: {
-                        name: true,
-                        image: true,
-                        username: true
-                    }
-                }
-            },
-            orderBy: { createdAt: 'desc' }
-        });
-    } else if (groupBy === 'tag') {
-        posts = await prisma.post.findMany({
-            select: {
-                id: true,
-                title: true,
-                content: true,
-                createdAt: true,
-                author: {
-                    select: {
-                        name: true,
-                        image: true,
-                        username: true
-                    }
-                },
-                tags: {
-                    select: {
-                        name: true
-                    }
-                }
-            },
-            orderBy: { createdAt: 'desc' }
-        });
-    } else {
-        posts = await prisma.post.findMany({
-            select: {
-                id: true,
-                title: true,
-                content: true,
-                createdAt: true,
-                author: {
-                    select: {
-                        name: true,
-                        image: true,
-                        username: true
-                    }
-                }
-            },
-            orderBy: { createdAt: 'desc' }
-        });
-    }
+  if (!userId) {
+    return c.json({ error: 'Unauthorized' }, 401);
+  }
 
-    return c.json({ posts });
+  let posts;
+
+  if (groupBy === 'user') {
+    // Get followed user IDs
+    const followedUsers = await prisma.follow.findMany({
+      where: {
+        followerId: Number(userId)
+      },
+      select: {
+        followingId: true
+      }
+    });
+
+    const followedUserIds = followedUsers.map(f => f.followingId);
+
+    posts = await prisma.post.findMany({
+      where: {
+        authorId: {
+          in: followedUserIds
+        }
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAt: true,
+        author: {
+          select: {
+            name: true,
+            image: true,
+            username: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+  } else if (groupBy === 'tag') {
+    // Get followed tag IDs
+    const followedTags = await prisma.user.findMany({
+      where: {
+        id: Number(userId)
+      },
+      select: {
+        followedTags: {
+          select: {
+            id: true
+          }
+        }
+      }
+    });
+
+    const followedTagIds = followedTags.flatMap(t => t.followedTags.map(tag => tag.id));
+    // const followedTagIds = followedTags.map(t => t.followedTags.id);
+
+    posts = await prisma.post.findMany({
+      where: {
+        tags: {
+          some: {
+            id: {
+              in: followedTagIds
+            }
+          }
+        }
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAt: true,
+        author: {
+          select: {
+            name: true,
+            image: true,
+            username: true
+          }
+        },
+        tags: {
+          select: {
+            name: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+
+  } else {
+    posts = await prisma.post.findMany({
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAt: true,
+        author: {
+          select: {
+            name: true,
+            image: true,
+            username: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' }
+    });
+  }
+
+  return c.json({ posts });
 });
+
+
+// postRouter.get('/bulk', async (c) => {
+//     const prisma = new PrismaClient({
+//         datasourceUrl: c.env.DATABASE_URL,
+//     }).$extends(withAccelerate());
+
+//     const groupBy = c.req.query('groupBy') || 'default';
+
+//     let posts;
+
+//     if (groupBy === 'user') {
+//         posts = await prisma.post.findMany({
+//             select: {
+//                 id: true,
+//                 title: true,
+//                 content: true,
+//                 createdAt: true,
+//                 author: {
+//                     select: {
+//                         name: true,
+//                         image: true,
+//                         username: true
+//                     }
+//                 }
+//             },
+//             orderBy: { createdAt: 'desc' }
+//         });
+//     } else if (groupBy === 'tag') {
+//         posts = await prisma.post.findMany({
+//             select: {
+//                 id: true,
+//                 title: true,
+//                 content: true,
+//                 createdAt: true,
+//                 author: {
+//                     select: {
+//                         name: true,
+//                         image: true,
+//                         username: true
+//                     }
+//                 },
+//                 tags: {
+//                     select: {
+//                         name: true
+//                     }
+//                 }
+//             },
+//             orderBy: { createdAt: 'desc' }
+//         });
+//     } else {
+//         posts = await prisma.post.findMany({
+//             select: {
+//                 id: true,
+//                 title: true,
+//                 content: true,
+//                 createdAt: true,
+//                 author: {
+//                     select: {
+//                         name: true,
+//                         image: true,
+//                         username: true
+//                     }
+//                 }
+//             },
+//             orderBy: { createdAt: 'desc' }
+//         });
+//     }
+
+//     return c.json({ posts });
+// });
 
 // Showing all posts by all users with pagination
 // postRouter.get('/bulk', async (c) => {

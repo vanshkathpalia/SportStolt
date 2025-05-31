@@ -289,7 +289,7 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
                     >
                       <div key={tag.id}>
                         <span>#{tag.name}</span>
-                      </div>f
+                      </div>
                       <button
                         type="button"
                         onClick={(e) => {

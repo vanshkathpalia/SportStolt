@@ -144,8 +144,11 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                   </div>
                 </div> */}
 
+
                 {/* Posts Section */}
                 <PostList />
+
+
                 {/* <div className="mt-2 px-6 pt-6 space-y-4 md:px-4 pb-16 md:pb-8">
                   {loading ? (
                     Array(3)

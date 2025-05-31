@@ -25,6 +25,7 @@ import { NewsPage} from "./pages/News"
 import { Profile } from './pages/Profile'
 import { Logout } from "./pages/Logout"; 
 import { EditProfile } from "./components/Profile/EditProfile"
+import { SettingsPage } from "./pages/Settings"
 
 
 
@@ -60,10 +61,11 @@ function App() {
                 <Route path="/profile" element={<Profile openCreateModal={() => setCreatePostModalOpen(true)}/>} />
                 <Route path="/profile/:username" element={<Profile openCreateModal={() => setCreatePostModalOpen(true)}/>} />
                 <Route path="/editprofile/:id" element={<EditProfile openCreateModal={() => setCreatePostModalOpen(true)}/>} />
+                <Route path="/settings" element={<SettingsPage />} />
                 {/* <Route path="/addstory" element={<AddStory />} /> */}
                 
                 {/* Add Event Page */}
-                <Route path="/logout" element={<Logout />} />
+                <Route path="/logout" element={<Logout />} />   Settings
               </Routes>
 
               {/* Global Create Post Modal */}

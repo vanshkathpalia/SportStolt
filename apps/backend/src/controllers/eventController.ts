@@ -2,9 +2,10 @@ import { PrismaClient } from '@prisma/client/edge';
 import { createEventInput } from '../schema/eventSchema';
 import { Context } from 'hono';
 import { formatDateToDDMMYYYY } from '../utils/eventTime';
+import { getPrisma } from '~/lib/prismaClient';
 
-const getPrisma = (c: Context) =>
-  new PrismaClient({ datasources: { db: { url: c.env.DATABASE_URL } } });
+// const getPrisma = (c: Context) =>
+//   new PrismaClient({ datasources: { db: { url: c.env.DATABASE_URL } } });
 
 // POST /api/v1/events/
 export const createEventHandler = async (c: Context) => {
@@ -51,7 +52,9 @@ export const createEventHandler = async (c: Context) => {
     //   },
     // });
 
-    const prisma = getPrisma(c);
+    // const prisma = getPrisma(c);
+
+    const prisma = getPrisma(c.env.DATABASE_URL);
 
     // const event = await createEvent(c.env.DATABASE_URL, body, Number(userId)); 
     // if using services
@@ -84,7 +87,7 @@ export const createEventHandler = async (c: Context) => {
 // GET api/v1/event/bulk 
 export const getBulkEventsHandler = async (c: Context) => {
   try {
-    const prisma = getPrisma(c);
+    const prisma = getPrisma(c.env.DATABASE_URL);
 
     const events = await prisma.event.findMany({
       select: {
@@ -153,7 +156,7 @@ export const registerUserHandler = async (c: Context) => {
     const eventId = Number(c.req.param('id'));
     const userId = c.get("userId");
 
-    const prisma = getPrisma(c);
+    const prisma = getPrisma(c.env.DATABASE_URL);
 
     const alreadyRegistered = await prisma.registration.findUnique({
       where: {
@@ -186,7 +189,7 @@ export const registerUserHandler = async (c: Context) => {
 export const getRegistrationsHandler = async (c: Context) => {
   try {
     const eventId = Number(c.req.param('id'));
-    const prisma = getPrisma(c);
+    const prisma = getPrisma(c.env.DATABASE_URL);
 
     const registrations = await prisma.registration.findMany({
       where: { eventId },
@@ -205,7 +208,7 @@ export const deleteEventHandler = async (c: Context) => {
   try {
     const eventId = Number(c.req.param('id'));
     const userId = c.get("userId");
-    const prisma = getPrisma(c);
+    const prisma = getPrisma(c.env.DATABASE_URL);
 
     const event = await prisma.event.findUnique({ where: { id: eventId } });
 
