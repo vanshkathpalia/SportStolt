@@ -24,5 +24,5 @@ export interface StoryType {
     swipeUpEnabled?: boolean;
     authenticityStatus?: string;
     stadium?: string;
-    isViewed?: boolean;
+    viewed?: boolean;
 }

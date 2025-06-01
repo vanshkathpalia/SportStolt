@@ -25,7 +25,7 @@ const createApiPostInput = z.object({
     // .refine(
     //   (file) => ACCEPTED_IMAGE_TYPES.includes(file?.type),
     //   "Only .jpg, .jpeg, .png and .webp formats are supported."
-    isViewed: z.boolean().optional(),
+    viewed: z.boolean().optional(),
     location: z.string().min(1, 'hisar'),
     // createdAt: z.date(),
 });

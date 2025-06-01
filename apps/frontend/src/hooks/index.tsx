@@ -20,7 +20,7 @@ export interface Story {
     id: number;
     locationImage: string;
     location: string;
-    isViewed?: boolean;
+    viewed?: boolean;
     description?: string;
     participants?: number;
     createdAt: string;

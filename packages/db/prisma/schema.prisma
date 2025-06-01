@@ -1,12 +1,14 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../../node_modules/@prisma/client"
+  output   = "../../../apps/backend/node_modules/@prisma/client"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  directUrl  = env("DIRECT_DATABASE_URL") // this fixes CLI usage
 }
+
 
 model User {
   id                    Int               @id @default(autoincrement())
@@ -138,7 +140,6 @@ model Story {
   locationImage      String?
   sport              String            @default("")
   stadium            String            @default("")
-  isViewed           Boolean           @default(false)
   endTime            DateTime          @default(now())
   activityStarted    DateTime          @default(now())
   activityEnded      DateTime          @default(now())
@@ -153,6 +154,7 @@ model Story {
   rewardAmount       Float?
   swipeUpEnabled     Boolean           @default(false)
   authorId           Int
+  viewed             Boolean           @default(false)
 
   author             User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
   Storyimages        Storyimages[]
@@ -165,15 +167,15 @@ model Storyimages {
   url                 String
   createdAt           DateTime @default(now())
   authenticityChecked Boolean  @default(false)
-  verifiedBy          Int[]
+  verifiedBy          Int[]    @default([])
   verificationCount   Int      @default(0)
   totalReviews        Int      @default(0)
   isRewarded          Boolean  @default(false)
   userId              Int
-  storyImageId        Int
+  storyId             Int
   
   User                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  story               Story    @relation(fields: [storyImageId], references: [id], onDelete: Cascade)
+  story               Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
   Verification        Verification[]
   attendance          StoryAttendance[]
   notifications       Notification[]
