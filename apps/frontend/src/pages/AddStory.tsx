@@ -76,7 +76,7 @@
 //             setIsLoading(true);
 //             await axios.post(`${BACKEND_URL}/api/v1/story`, {
 //                 ...formData,
-//                 isViewed: false
+//                 viewed: false
 //             }, {
 //                 headers: {
 //                     Authorization: `Bearer ${localStorage.getItem("token")}`,

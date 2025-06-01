@@ -27,23 +27,23 @@ export interface StoryType {
   swipeUpEnabled?: boolean;
   authenticityStatus?: string;
   stadium?: string;
-  isViewed?: boolean;
+  viewed?: boolean;
 }
 
 interface StoryCardProps {
   story: StoryType;
-  isViewed?: boolean;
+  viewed?: boolean;
   onClose: () => void;
   filterBy?: 'location' | 'sport' | null;
 }
 
 export const StoryCard: React.FC<StoryCardProps> = ({ story, filterBy }) => {
-  const [isViewingStory, setIsViewingStory] = useState(false);
-  const [isViewed, setIsViewed] = useState(story.isViewed || false);
+  const [viewedingStory, setviewedingStory] = useState(false);
+  const [viewed, setviewed] = useState(story.viewed || false);
 
   const handleOpenStory = async () => {
-    setIsViewingStory(true);
-    setIsViewed(true);
+    setviewedingStory(true);
+    setviewed(true);
 
     const token = localStorage.getItem('token');
     try {
@@ -104,7 +104,7 @@ export const StoryCard: React.FC<StoryCardProps> = ({ story, filterBy }) => {
       >
         <div
           className={`p-[2px] rounded-full ${
-            isViewed ? 'bg-gray-300' : 'bg-gradient-to-tr from-yellow-400 to-pink-600'
+            viewed ? 'bg-gray-300' : 'bg-gradient-to-tr from-yellow-400 to-pink-600'
           }`}
         >
           <div className="bg-white dark:bg-gray-800 p-[2px] rounded-full">
@@ -120,7 +120,7 @@ export const StoryCard: React.FC<StoryCardProps> = ({ story, filterBy }) => {
         </span>
       </div>
 
-      {isViewingStory && (
+      {viewedingStory && (
         <StoryView
           story={{
             id: story.id,
@@ -144,7 +144,7 @@ export const StoryCard: React.FC<StoryCardProps> = ({ story, filterBy }) => {
               userId: story.author?.userId || '',
             },
           }}
-          onClose={() => setIsViewingStory(false)}
+          onClose={() => setviewedingStory(false)}
         />
       )}
     </>
@@ -187,7 +187,7 @@ export default StoryCard;
 //     swipeUpEnabled?: boolean;
 //     authenticityStatus?: string;
 //     stadium?: string;
-//     isViewed?: boolean;
+//     viewed?: boolean;
 // }
 
 // interface StoryCardProps {
@@ -216,23 +216,23 @@ export default StoryCard;
 //         swipeUpEnabled?: boolean;
 //         authenticityStatus?: string;
 //         stadium?: string;
-//         isViewed?: boolean;
+//         viewed?: boolean;
 //     };
-//     isViewed?: boolean;
+//     viewed?: boolean;
 //     onClose: () => void;
 // }
 
 
 // export const StoryCard: React.FC<StoryCardProps> = ({ story }) => {
 
-//     const [isViewingStory, setIsViewingStory] = useState(false);
-//     const [isViewed, setIsViewed] = useState(story.isViewed || false);  // Track if the story is viewed
+//     const [viewedingStory, setviewedingStory] = useState(false);
+//     const [viewed, setviewed] = useState(story.viewed || false);  // Track if the story is viewed
 //     // const navigate = useNavigate();
 
 
 //     const handleOpenStory = async () => {
-//         setIsViewingStory(true);
-//         setIsViewed(true); // Update local state
+//         setviewedingStory(true);
+//         setviewed(true); // Update local state
 
 //         const token = localStorage.getItem('token');
 //         try {
@@ -247,7 +247,7 @@ export default StoryCard;
 //             // await fetch(`${BACKEND_URL}/api/v1/story/view`, {
 //             //     method: 'POST',
 //             //     headers: { 'Content-Type': 'application/json' },
-//             //     body: JSON.stringify({ storyId: story.id, userId: <loggedInUserId>, isViewed: true }),
+//             //     body: JSON.stringify({ storyId: story.id, userId: <loggedInUserId>, viewed: true }),
 //             // });
 //         } catch (error) {
 //             console.error('Error updating story view status:', error);
@@ -273,7 +273,7 @@ export default StoryCard;
 //                 className="flex flex-col items-center hover:bg-muted justify-center gap-1 cursor-pointer"
 //                 onClick={handleOpenStory}  // Call handleOpenStory instead
 //             >
-//                 <div className={`p-[2px] rounded-full ${isViewed ? 'bg-gray-300' : 'bg-gradient-to-tr from-yellow-400 to-pink-600'}`}>
+//                 <div className={`p-[2px] rounded-full ${viewed ? 'bg-gray-300' : 'bg-gradient-to-tr from-yellow-400 to-pink-600'}`}>
 //                     <div className="bg-white dark:bg-gray-800 p-[2px] rounded-full">
 //                         <img
 //                             src={story.locationImage}
@@ -285,9 +285,9 @@ export default StoryCard;
 //                 <span className="text-xs truncate w-16 dark:text-slate-300 text-center">{story.location}</span>
 //             </div>
 
-//             {isViewingStory && (
+//             {viewedingStory && (
 //                 <StoryView
-//                     // isViewingStory={isViewingStory}
+//                     // viewedingStory={viewedingStory}
 //                     story={{
 //                         id: story.id,
 //                         locationImage: story.locationImage,
@@ -310,7 +310,7 @@ export default StoryCard;
 //                             userId: story.author?.userId || ""
 //                         }
 //                     }}
-//                     onClose={() => setIsViewingStory(false)}
+//                     onClose={() => setviewedingStory(false)}
 //                 />
 //             )}
 //         </>
@@ -360,7 +360,7 @@ export default StoryCard;
 // //     swipeUpEnabled?: boolean;
 // //     authenticityStatus?: string;
 // //     stadium?: string;
-// //     isViewed?: boolean;
+// //     viewed?: boolean;
 // // }
 
 // // interface StoryCardProps {
@@ -388,34 +388,34 @@ export default StoryCard;
 // //         swipeUpEnabled?: boolean;
 // //         authenticityStatus?: string;
 // //         stadium?: string;
-// //         isViewed?: boolean;
+// //         viewed?: boolean;
 // //     };
-// //     isViewed?: boolean;
+// //     viewed?: boolean;
 // //     onClose: () => void;
 // // }
 
 
 // export const StoryCard: React.FC<StoryCardProps> = ({ story, onClose }) => {
 
-//     const [isViewingStory, setIsViewingStory] = useState(false);
-//     const [isViewed, setIsViewed] = useState(story.isViewed || false);  // Track if the story is viewed
+//     const [viewedingStory, setviewedingStory] = useState(false);
+//     const [viewed, setviewed] = useState(story.viewed || false);  // Track if the story is viewed
 //     const navigate = useNavigate();
 
 
 //     const handleOpenStory = async () => {
-//         setIsViewingStory(true);
-//         setIsViewed(true); // Update local state
+//         setviewedingStory(true);
+//         setviewed(true); // Update local state
 
 //         try {
 //             await fetch(`${BACKEND_URL}/api/v1/story/view`, {
 //                 method: 'POST',
 //                 headers: { 'Content-Type': 'application/json' },
-//                 body: JSON.stringify({ storyId: story.id, isViewed: true }),
+//                 body: JSON.stringify({ storyId: story.id, viewed: true }),
 //             });
 //             // await fetch(`${BACKEND_URL}/api/v1/story/view`, {
 //             //     method: 'POST',
 //             //     headers: { 'Content-Type': 'application/json' },
-//             //     body: JSON.stringify({ storyId: story.id, userId: <loggedInUserId>, isViewed: true }),
+//             //     body: JSON.stringify({ storyId: story.id, userId: <loggedInUserId>, viewed: true }),
 //             // });
 //         } catch (error) {
 //             console.error('Error updating story view status:', error);
@@ -455,7 +455,7 @@ export default StoryCard;
 //                 className="flex flex-col items-center hover:bg-muted justify-center gap-1 cursor-pointer"
 //                 onClick={handleOpenStory}  // Call handleOpenStory instead
 //             >
-//                 <div className={`p-[2px] rounded-full ${isViewed ? 'bg-gray-300' : 'bg-gradient-to-tr from-yellow-400 to-pink-600'}`}>
+//                 <div className={`p-[2px] rounded-full ${viewed ? 'bg-gray-300' : 'bg-gradient-to-tr from-yellow-400 to-pink-600'}`}>
 //                     <div className="bg-white p-[2px] rounded-full">
 //                         <img
 //                             src={story.locationImage}
@@ -467,9 +467,9 @@ export default StoryCard;
 //                 <span className="text-xs truncate w-16 dark:text-slate-300 text-center">{story.location}</span>
 //             </div>
 
-//             {isViewingStory && (
+//             {viewedingStory && (
 //                 <StoryView
-//                     // isViewingStory={isViewingStory}
+//                     // viewedingStory={viewedingStory}
 //                     story={{
 //                         id: story.id,
 //                         locationImage: story.locationImage,
@@ -492,7 +492,7 @@ export default StoryCard;
 //                             userId: story.author?.userId || ""
 //                         }
 //                     }}
-//                     onClose={() => setIsViewingStory(false)}
+//                     onClose={() => setviewedingStory(false)}
 //                 />
 //             )}
 //         </>

@@ -20,13 +20,13 @@ export const storyRouter = new Hono<{
 
 const viewStoryInput = z.object({
     storyId: z.number(),
-    isViewed: z.boolean().optional()
+    viewed: z.boolean().optional()
 });
 
 const createStoryInput = z.object({
     locationImage: z.string().min(1, 'Image URL is required'),
     images: z.array(z.number()).optional(),
-    isViewed: z.boolean().optional(),
+    viewed: z.boolean().optional(),
     location: z.string().min(1, 'Location is required'),
     description: z.string().optional(),
     participants: z.number().optional().default(0),
@@ -144,7 +144,7 @@ storyRouter.post('/', async (c) => {
                     verificationCount: 0,
                     rewardStatus: "pending",
                     rewardAmount: null,
-                    isViewed: false,
+                    // viewed: false,
                     locationImage,
                 }
             });
@@ -152,12 +152,13 @@ storyRouter.post('/', async (c) => {
 
         // Add the user's uploaded image to Storyimages
         const storyImage = await prisma.storyimages.create({
-            data: {
-                url: body.image,
-                storyImageId: existingStory.id,
-                userId: userId,
-                authenticityChecked: false
-            }
+        data: {
+            url: body.image,
+            storyId: existingStory.id,
+            userId: userId,
+            authenticityChecked: false,
+            verifiedBy: [],  // make sure to provide default empty array
+        }
         });
 
         return c.json({
@@ -204,19 +205,19 @@ storyRouter.post('/', async (c) => {
 //                 }
 //                 : false
 //         },
-//         orderBy: [{ activityStarted: 'asc' }, { isViewed: 'asc' }]
+//         orderBy: [{ activityStarted: 'asc' }, { viewed: 'asc' }]
 //     });
 
-//     // Add isViewed based on StoryView existence
+//     // Add viewed based on StoryView existence
 //     const updatedStories = stories.map(story => ({
 //         ...story,
-//         isViewed: story.StoryView?.length > 0
+//         viewed: story.StoryView?.length > 0
 //     }));
 
 //     // Sort: unviewed first, then viewed (true comes after false)
 //     updatedStories.sort((a, b) => {
-//         if (a.isViewed === b.isViewed) return 0;
-//         return a.isViewed ? 1 : -1;
+//         if (a.viewed === b.viewed) return 0;
+//         return a.viewed ? 1 : -1;
 //     });
 
 //     return c.json({ stories: updatedStories });
@@ -279,17 +280,17 @@ storyRouter.post('/', async (c) => {
 //             }
 //           : false,
 //       },
-//       orderBy: [{ activityStarted: 'asc' }, { isViewed: 'asc' }],
+//       orderBy: [{ activityStarted: 'asc' }, { viewed: 'asc' }],
 //     });
 
-//     // Add isViewed based on StoryView existence
+//     // Add viewed based on StoryView existence
 //     const updatedStories = stories.map((story) => ({
 //       ...story,
-//       isViewed: story.StoryView?.length > 0,
+//       viewed: story.StoryView?.length > 0,
 //     }));
 
 //     // Sort: unviewed first, then viewed (true comes after false)
-//     updatedStories.sort((a, b) => (a.isViewed === b.isViewed ? 0 : a.isViewed ? 1 : -1));
+//     updatedStories.sort((a, b) => (a.viewed === b.viewed ? 0 : a.viewed ? 1 : -1));
 
 //     return c.json({ stories: updatedStories });
 //   } catch (e) {
@@ -360,17 +361,17 @@ storyRouter.post('/', async (c) => {
 //           }
 //         : false
 //     },
-//     orderBy: [{ activityStarted: 'asc' }, { isViewed: 'asc' }]
+//     orderBy: [{ activityStarted: 'asc' }, { viewed: 'asc' }]
 //   });
 
 //   const updatedStories = stories.map((story) => ({
 //     ...story,
-//     isViewed: story.StoryView?.length > 0
+//     viewed: story.StoryView?.length > 0
 //   }));
 
 //   updatedStories.sort((a, b) => {
-//     if (a.isViewed === b.isViewed) return 0;
-//     return a.isViewed ? 1 : -1;
+//     if (a.viewed === b.viewed) return 0;
+//     return a.viewed ? 1 : -1;
 //   });
 
 //   return c.json({ stories: updatedStories });
@@ -433,19 +434,19 @@ storyRouter.post('/', async (c) => {
 //             }
 //         : false,
 //     },
-//     orderBy: [{ activityStarted: 'asc' }, { isViewed: 'asc' }],
+//     orderBy: [{ activityStarted: 'asc' }, { viewed: 'asc' }],
 //     });
 
-//     // Add isViewed based on StoryView existence
+//     // Add viewed based on StoryView existence
 //     const updatedStories = stories.map(story => ({
 //     ...story,
-//     isViewed: story.StoryView?.length > 0,
+//     viewed: story.StoryView?.length > 0,
 //     }));
 
 //     // Sort: unviewed first, then viewed
 //     updatedStories.sort((a, b) => {
-//     if (a.isViewed === b.isViewed) return 0;
-//     return a.isViewed ? 1 : -1;
+//     if (a.viewed === b.viewed) return 0;
+//     return a.viewed ? 1 : -1;
 //     });
 
 //     return c.json({ stories: updatedStories });
@@ -549,7 +550,7 @@ storyRouter.get('/fetch', async (c) => {
         },
         orderBy: [
             { activityStarted: 'asc' },
-            { isViewed: 'asc' }
+            // { viewed: 'asc' }
         ]
     });
 
@@ -563,69 +564,123 @@ storyRouter.get('/fetch', async (c) => {
 
     // console.log('Active stories after filtering:', activeStories.length);
 
-    // Add isViewed flag and format response
-    const formattedStories = activeStories.map(story => ({
-        ...story,
-        isViewed: story.StoryView?.length > 0
-    }));
+    // Add viewed flag and format response
+    // const formattedStories = activeStories.map(story => ({
+    //     ...story,
+    //     viewed: story.StoryView?.length > 0
+    // }));
 
     // Sort stories: upcoming activities first, then by viewed status
-    formattedStories.sort((a, b) => {
-        // First sort by activity start time
-        const aStarted = new Date(a.activityStarted);
-        const bStarted = new Date(b.activityStarted);
+    // formattedStories.sort((a, b) => {
+    //     // First sort by activity start time
+    //     const aStarted = new Date(a.activityStarted);
+    //     const bStarted = new Date(b.activityStarted);
         
-        if (aStarted > bStarted) return 1;
-        if (aStarted < bStarted) return -1;
+    //     if (aStarted > bStarted) return 1;
+    //     if (aStarted < bStarted) return -1;
         
-        // If same start time, unviewed stories come first
-        if (a.isViewed === b.isViewed) return 0;
-        return a.isViewed ? 1 : -1;
-    });
+    //     // If same start time, unviewed stories come first
+    //     if (a.viewed === b.viewed) return 0;
+    //     return a.viewed ? 1 : -1;
+    // });
 
     // console.log('Final formatted stories:', formattedStories.length);
-    return c.json({ stories: formattedStories });
+    // return c.json({ stories: formattedStories });
+    return c.json({ stories: activeStories });
 });
 
 
+// storyRouter.patch('/view', async (c) => {
+//     const body = await c.req.json();
+//     const parsed = viewStoryInput.safeParse(body);
 
+//     if (!parsed.success) {
+//         c.status(400);
+//         return c.json({ error: 'Invalid input' });
+//     }
 
-storyRouter.post('/view', async (c) => {
-    const body = await c.req.json();
-    const { storyId } = body;
-    const userId = c.get('userId'); // assume you set this in middleware after auth
+//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
 
-    if (!userId || !storyId) {
-        c.status(400);
-        return c.json({ error: 'Missing userId or storyId' });
-    }
+//     try {
+//         const { storyId } = parsed.data;
 
-    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+//         const updated = await prisma.story.update({
+//             where: { id: storyId },
+//             data: { viewed: true }
+//         });
 
-    try {
-        // Avoid duplicate views
-        const existingView = await prisma.storyView.findUnique({
-            where: {
-                userId_storyId: {
-                    userId,
-                    storyId
-                }
-            }
-        });
+//         return c.json({ message: 'Story marked as viewed', updated });
+//     } catch (error) {
+//         console.error('Error marking story as viewed:', error);
+//         c.status(500);
+//         return c.json({ error: 'Server error while marking story as viewed' });
+//     }
+// });
 
-        if (!existingView) {
-            await prisma.storyView.create({
-                data: { userId, storyId }
-            });
-        }
+// storyRouter.patch('/view', async (c) => {
+//     const body = await c.req.json();
+//     const parsed = viewStoryInput.safeParse(body);
 
-        return c.json({ message: 'Story marked as viewed' });
-    } catch (error) {
-        console.error('Error marking story as viewed:', error);
-        c.status(500);
-        return c.json({ error: 'Server error while marking story as viewed' });
-    }
-});
+//     if (!parsed.success) {
+//         c.status(400);
+//         return c.json({ error: 'Invalid input' });
+//     }
+
+//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+//     try {
+//         const { storyId } = parsed.data;
+
+//         // Update only if it's not already viewed
+//         const updated = await prisma.story.update({
+//             where: { id: storyId },
+//             data: { viewed: true }
+//         });
+
+//         return c.json({ message: 'Story marked as viewed', updated });
+//     } catch (error) {
+//         console.error('Error marking story as viewed:', error);
+//         c.status(500);
+//         return c.json({ error: 'Server error while marking story as viewed' });
+//     }
+// });
+
+// storyRouter.post('/view', async (c) => {
+//     const body = await c.req.json();
+//     const { storyId } = body;
+//     const userId = c.get('userId'); // assume you set this in middleware after auth
+
+//     if (!userId || !storyId) {
+//         c.status(400);
+//         return c.json({ error: 'Missing userId or storyId' });
+//     }
+
+//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+//     try {
+//         // Avoid duplicate views
+//         const existingView = await prisma.storyView.findUnique({
+//             where: {
+//                 userId_storyId: {
+//                     userId,
+//                     storyId
+//                 }
+//             }
+//         });
+
+//         if (!existingView) {
+//             await prisma.storyView.create({
+//                 data: { userId, storyId }
+//             });
+//         }
+
+//         return c.json({ message: 'Story marked as viewed' });
+//     } catch (error) {
+//         console.error('Error marking story as viewed:', error);
+//         c.status(500);
+//         return c.json({ error: 'Server error while marking story as viewed' });
+//     }
+// });
 
 
 storyRouter.get('/points', async (c) => {
@@ -764,7 +819,7 @@ storyRouter.delete('/', async (c) => {
         // even if i comment it, story gets deleted -> not foreign key constraint -> @@unique in schema
         await prisma.storyimages.deleteMany({
             where: {
-                storyImageId: {
+                storyId: {
                     in: storyIds
                 }
             }
@@ -913,10 +968,10 @@ storyRouter.delete('/', async (c) => {
 //                 swipeUpEnabled: true,
 //                 Storyimages: { select: { id: true, url: true, userId: true, createdAt: true } },
 //                 author: { select: { id: true, username: true, image: true } },
-//                 isViewed: true
+//                 viewed: true
 //             },
 //             orderBy: [
-//                 { isViewed: 'asc' },
+//                 { viewed: 'asc' },
 //                 { activityStarted: 'asc' as const },
 //                 ...(groupBy === 'sport'
 //                     ? [{ sport: 'asc' as const }]
@@ -958,61 +1013,6 @@ storyRouter.delete('/', async (c) => {
 //       return c.json({ error: 'Internal Server Error' }, 500);
 //     }
 //   });
-
-// storyRouter.patch('/view', async (c) => {
-//     const body = await c.req.json();
-//     const parsed = viewStoryInput.safeParse(body);
-
-//     if (!parsed.success) {
-//         c.status(400);
-//         return c.json({ error: 'Invalid input' });
-//     }
-
-//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-
-//     try {
-//         const { storyId } = parsed.data;
-
-//         const updated = await prisma.story.update({
-//             where: { id: storyId },
-//             data: { isViewed: true }
-//         });
-
-//         return c.json({ message: 'Story marked as viewed', updated });
-//     } catch (error) {
-//         console.error('Error marking story as viewed:', error);
-//         c.status(500);
-//         return c.json({ error: 'Server error while marking story as viewed' });
-//     }
-// });
-
-// storyRouter.patch('/view', async (c) => {
-//     const body = await c.req.json();
-//     const parsed = viewStoryInput.safeParse(body);
-
-//     if (!parsed.success) {
-//         c.status(400);
-//         return c.json({ error: 'Invalid input' });
-//     }
-
-//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-
-//     try {
-//         const { storyId } = parsed.data;
-
-//         // Update only if it's not already viewed
-//         const updated = await prisma.story.update({
-//             where: { id: storyId },
-//             data: { isViewed: true }
-//         });
-
-//         return c.json({ message: 'Story marked as viewed', updated });
-//     } catch (error) {
-//         console.error('Error marking story as viewed:', error);
-//         c.status(500);
-//         return c.json({ error: 'Server error while marking story as viewed' });
-//     }
-// });
 
 // storyRouter.post('/verify', async (c) => {
 //     const body = await c.req.json();

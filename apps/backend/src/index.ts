@@ -26,12 +26,20 @@ import { settingsRouter } from './routes/settingsRouter';
 
 dotenv.config();
 
+// console.log("DATABASE_URL:", process.env.DATABASE_URL);
+// console.log("DIRECT_DATABASE_URL:", process.env.DIRECT_DATABASE_URL);
+
 const app = new Hono<{
   Bindings: {
     DATABASE_URL: string;
     JWT_SECRET: string;
   }
 }>();
+
+app.use('*', async (c, next) => {
+  c.header('Cache-Control', 'no-store');
+  await next();
+});
 
 app.use('*', cors({
   origin: '*', // or restrict to your domain -> with vercel deployed domail 

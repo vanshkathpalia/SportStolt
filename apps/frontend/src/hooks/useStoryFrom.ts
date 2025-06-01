@@ -43,7 +43,7 @@
 //         activityStarted,
 //         activityEnded,
 //         stadium,
-//         isViewed: false,
+//         viewed: false,
 //       }
 
 //       console.log("Form Data being sent:", formData)

@@ -27,9 +27,9 @@ export interface Story {
         swipeUpEnabled?: boolean;
         authenticityStatus?: string;
         stadium?: string;
-        isViewed?: boolean;
+        viewed?: boolean;
     // };
-    // isViewed?: boolean;
+    // viewed?: boolean;
     onClose: () => void;
 }
 export const useStories = (filterBy: 'location' | 'sport' | null) => {

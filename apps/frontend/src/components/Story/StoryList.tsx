@@ -172,7 +172,7 @@ export const StoryList: React.FC = () => {
                   endTime: storyItem.endTime,
                   author: storyItem.author,
                   Storyimages: storyItem.Storyimages,
-                  isViewed: storyItem.isViewed,
+                  viewed: storyItem.viewed,
                   swipeUpEnabled: storyItem.swipeUpEnabled,
                   authenticityStatus: storyItem.authenticityStatus,
                 }}

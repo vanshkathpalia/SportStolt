@@ -2,13 +2,27 @@
   "name": "sportstolt",
   "private": true,
   "scripts": {
-    "build": "turbo build",
     "dev": "turbo dev",
+    "build": "turbo build",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "generate": "prisma generate --no-engine",
-    "deploy": "wrangler deploy --env production"
+
+    "studio": "dotenv -e packages/db/.env.local -- prisma studio --schema=packages/db/prisma/schema.prisma",
+    "migrate": "dotenv -e packages/db/.env.local -- prisma migrate dev --schema=packages/db/prisma/schema.prisma",
+    "reset": "dotenv -e packages/db/.env.local -- prisma migrate reset --force --schema=packages/db/prisma/schema.prisma",
+    "reset:prod": "dotenv -e packages/db/.env.production -- prisma migrate reset --force --skip-generate --schema=packages/db/prisma/schema.prisma",
+    "generate": "dotenv -e packages/db/.env.local -- prisma generate --schema=packages/db/prisma/schema.prisma",
+    
+    "generate:prod": "dotenv -e packages/db/.env.production -- prisma generate --schema=packages/db/prisma/schema.prisma",
+    "generate:acc": "dotenv -e packages/db/.env.production -- prisma generate --schema=packages/db/prisma/schema.prisma --accelerate",
+
+    "migrate:deploy": "dotenv -e packages/db/.env.production -- prisma migrate deploy --schema=packages/db/prisma/schema.prisma",
+    "push": "dotenv -e packages/db/.env.production -- prisma db push --schema=packages/db/prisma/schema.prisma",
+
+    "deploy": "cd apps/backend && dotenv -e ../../packages/db/.env.production -- wrangler deploy --minify",
+    "deploy:all": "npm run push && npm run generate:acc && npm run deploy"
   },
+
   "prisma": {
     "schema": "./packages/db/prisma/schema.prisma"
   },
