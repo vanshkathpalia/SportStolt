@@ -99,8 +99,6 @@ export const EventsPage = ({ openCreateModal }: { openCreateModal: () => void })
             )}
           </div>
         </main>
-
-
       </div>
     </div>
   );

@@ -23,7 +23,7 @@ export const EventHomeSidebar = ({ events, onRegister }: EventHomeSidebarProps) 
       {reversedEvents.length === 0 ? (
         <p className="border border-border dark:text-slate-300 rounded-lg p-4">No events currently</p>
       ) : (
-      <div className="space-y-4 max-h-[455px] overflow-auto pr-2">
+      <div className="space-y-4 max-h-[455px] overflow-auto scroll scroll-smooth pr-2 hide-scrollbar">
       {reversedEvents.map((event) => (
         <div key={event.id} className="border border-border rounded-lg p-4 hover:border-gray-500 transition-colors">
             <h3 className="font-medium dark:text-gray-400 mb-2">{event.name}</h3>

@@ -115,7 +115,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
         activityStarted,
         activityEnded,
         stadium,
-        viewed: false,
+        isViewed: false,
       };
   
       console.log("Form Data being sent:", formData);
@@ -465,7 +465,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
 //             setIsLoading(true);
 //             await axios.post(`${BACKEND_URL}/api/v1/story`, {
 //                 ...formData,
-//                 viewed: false
+//                 isViewed: false
 //             }, {
 //                 headers: {
 //                     Authorization: `Bearer ${localStorage.getItem("token")}`,

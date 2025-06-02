@@ -154,7 +154,7 @@ model Story {
   rewardAmount       Float?
   swipeUpEnabled     Boolean           @default(false)
   authorId           Int
-  viewed             Boolean           @default(false)
+  isViewed             Boolean           @default(false)
 
   author             User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
   Storyimages        Storyimages[]

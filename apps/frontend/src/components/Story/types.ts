@@ -1,7 +1,7 @@
 export interface StoryType {
     id: number;
     locationImage: string;
-    image: string;
+    // image: string;
     location: string;
     description?: string;
     activityStarted: Date;
@@ -9,20 +9,20 @@ export interface StoryType {
     participants?: number;
     createdAt: string;
     sport?: string;
-    endTime: any;
+    endTime: Date;
     author: {
         // name: string;
         username: string;
         image?: string;
         userId: string;
     };
-    Storyimages: {
+    Storyimages?: {
         id: number;
         userId: string;
         url?: string;
     }[];
     swipeUpEnabled?: boolean;
     authenticityStatus?: string;
-    stadium?: string;
-    viewed?: boolean;
+    stadium: string;
+    isViewed: boolean;
 }

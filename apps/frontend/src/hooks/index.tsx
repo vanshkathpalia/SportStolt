@@ -20,7 +20,7 @@ export interface Story {
     id: number;
     locationImage: string;
     location: string;
-    viewed?: boolean;
+    isViewed: boolean;
     description?: string;
     participants?: number;
     createdAt: string;
@@ -74,7 +74,7 @@ export interface EventInterface {
     city: string;
     likes: number;
     sportTags: string[];
-    comments: any[];
+    comments: Comment[];
     publishedDate: string;
     isRegistered?: boolean;
 }

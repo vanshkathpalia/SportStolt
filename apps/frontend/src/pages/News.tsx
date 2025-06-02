@@ -93,7 +93,7 @@ export const NewsPage = ({ openCreateModal }: NewsPageProps) => {
         </div>
 
         {/* Main content */}
-        <main className="flex-1 md:ml-16 xl:ml-56 p-4  mr-2">
+        <main className="flex-1 md:ml-16 xl:ml-56 mr-5 ml-5 p-4">
           <h1 className="text-3xl ml-5 font-bold text-gray-900 dark:text-slate-300 mb-6">Sports News</h1>
 
           {error && (
