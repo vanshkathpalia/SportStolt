@@ -1,10 +1,6 @@
-
 "use client"
-//this  is on opeing of a story
 
-import type React from "react"
-
-import { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { ChevronUp, ChevronLeft, ChevronRight, X, Users, Clock, MapPin } from "lucide-react"
 import type { StoryType } from "./types"
 import { BACKEND_URL } from "../../config"
@@ -12,70 +8,148 @@ import { BACKEND_URL } from "../../config"
 interface StoryViewProps {
   story: StoryType
   onClose: () => void
+  onImageViewed?: (storyId: number, imageId: number) => void;
 }
 
-export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
+export const StoryView: React.FC<StoryViewProps> = ({ story, onClose, onImageViewed }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [showDetails, setShowDetails] = useState(false)
   const [willAttend, setWillAttend] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [progress, setProgress] = useState(0)
+  
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const elapsedBeforePauseRef = useRef(0)
+  const intervalStartRef = useRef(0)
 
-  const images = story.Storyimages
+  const images = Array.isArray(story.Storyimages) && story.Storyimages.length > 0
     ? story.Storyimages
-    : story.Storyimages
-      ? [story.Storyimages]
-      : [{ url: story.locationImage, userId: story.author.userId || "0" }]
+    : [{ id: 0, url: story.locationImage || "/placeholder.svg", userId: story.author.userId }]
+
+  const durationPerStory = 5000 // 5 seconds per story
+
+  const currentImage = images[Math.max(0, Math.min(currentImageIndex, images.length - 1))]
 
   const handleNext = useCallback(() => {
     if (currentImageIndex < images.length - 1) {
-      setCurrentImageIndex((prev) => prev + 1)
+      setCurrentImageIndex(prev => prev + 1)
+      setProgress(0)
+    } else {
+      onClose()
     }
-  }, [currentImageIndex, images.length])
+  }, [currentImageIndex, images.length, onClose])
 
   const handlePrevious = useCallback(() => {
     if (currentImageIndex > 0) {
-      setCurrentImageIndex((prev) => prev - 1)
+      setCurrentImageIndex(prev => prev - 1)
+      setProgress(0)
     }
   }, [currentImageIndex])
 
   useEffect(() => {
+    if (onImageViewed && currentImage) {
+      onImageViewed(story.id, currentImage.id);
+    }
+  }, [currentImageIndex, story.id, currentImage, onImageViewed]);
+
+  useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
-      if (event.key === "ArrowRight") {
-        handleNext()
-      } else if (event.key === "ArrowLeft") {
-        handlePrevious()
-      } else if (event.key === "Escape") {
-        onClose()
-      }
+      if (showDetails) return
+      if (event.key === "ArrowRight") handleNext()
+      else if (event.key === "ArrowLeft") handlePrevious()
+      else if (event.key === "Escape") onClose()
     }
 
     window.addEventListener("keydown", handleKeyPress)
     return () => window.removeEventListener("keydown", handleKeyPress)
-  }, [currentImageIndex, handleNext, handlePrevious, onClose])
+  }, [handleNext, handlePrevious, onClose, showDetails])
+
+  useEffect(() => {
+    if (showDetails) {
+      // Paused: clear timer, store elapsed so far
+      if (intervalStartRef.current) {
+        elapsedBeforePauseRef.current += Date.now() - intervalStartRef.current
+        clearInterval(timerRef.current!)
+        intervalStartRef.current = 0
+      }
+      return
+    }
+
+    // Resumed: mark interval start time
+    intervalStartRef.current = Date.now()
+
+    timerRef.current = setInterval(() => {
+      const elapsed = elapsedBeforePauseRef.current + (Date.now() - intervalStartRef.current)
+      const percentage = Math.min(100, (elapsed / durationPerStory) * 100)
+      setProgress(percentage)
+
+      if (percentage >= 100) {
+        clearInterval(timerRef.current!)
+        elapsedBeforePauseRef.current = 0
+        intervalStartRef.current = 0
+        handleNext()
+      }
+    }, 100)
+
+    return () => {
+      clearInterval(timerRef.current!)
+    }
+  }, [showDetails, durationPerStory, handleNext])
+
+  // const startRef = useRef(0) // absolute start time of current story image display
+
+  // useEffect(() => {
+  //   if (showDetails) {
+  //     // Pause timer: accumulate elapsed and clear interval
+  //     if (startRef.current) {
+  //       elapsedBeforePauseRef.current += Date.now() - startRef.current
+  //       clearInterval(timerRef.current!)
+  //       startRef.current = 0
+  //     }
+  //     return
+  //   }
+
+  //   // Resume or start timer
+  //   startRef.current = Date.now() - elapsedBeforePauseRef.current
+
+  //   timerRef.current = setInterval(() => {
+  //     const elapsed = Date.now() - startRef.current
+  //     const percentage = Math.min(100, (elapsed / durationPerStory) * 100)
+  //     setProgress(percentage)
+  //     if (percentage >= 100) {
+  //       clearInterval(timerRef.current!)
+  //       elapsedBeforePauseRef.current = 0
+  //       startRef.current = 0
+  //       handleNext()
+  //     }
+  //   }, 100)
+
+  //   return () => {
+  //     clearInterval(timerRef.current!)
+  //     startRef.current = 0
+  //   }
+  // }, [durationPerStory, handleNext, showDetails])
+
 
   const handleWillGo = async (selectedImageId: number) => {
     try {
       setError(null)
-
-      // Get the token from localStorage
       const token = localStorage.getItem("token")
-
       if (!token) {
-        setError("You need to be logged in to attend this event")
+        setError("You need to be logged in to attend this event.")
         return
       }
 
-      // Fix the URL (remove double slash)
       const response = await fetch(`${BACKEND_URL}/api/v1/story/will-go`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`, // Add the authorization header
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
-          storyImageId: selectedImageId, // Use exact key "storyImageId"
+          storyImageId: selectedImageId,
           userId: Number(story.author.userId),
-          storyId: story.id, // Include storyId if available
+          storyId: story.id,
         }),
       })
 
@@ -84,8 +158,7 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
         throw new Error(errorData.message || "Failed to register attendance")
       }
 
-      const data = await response.json()
-      console.log("Response:", data)
+      await response.json()
       setWillAttend(true)
     } catch (error) {
       console.error("Error saving attendance:", error)
@@ -93,21 +166,79 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
     }
   }
 
+  const startTime = new Date(story.activityStarted)
+  const endTime = new Date(story.activityEnded)
+
+  const clickCountRef = useRef(0)
+  const clickTimerRef = useRef<NodeJS.Timeout | null>(null)
+
+  // Modified overlay click handler:
+  // - If details shown, close them on any click.
+  // - If click anywhere in bottom half of screen, show details.
+  // - Else count clicks for double tap to close story.
+  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (showDetails) {
+      setShowDetails(false)
+      return
+    }
+
+    const clickY = e.clientY
+    const windowHeight = window.innerHeight
+
+    if (clickY > windowHeight / 2 && story.swipeUpEnabled) {
+      // Click in bottom half: open details
+      setShowDetails(true)
+      return
+    }
+
+    // Else: track clicks for double-tap to close
+    clickCountRef.current += 1
+
+    if (clickCountRef.current >= 2) {
+      onClose()
+    }
+
+    if (clickTimerRef.current) clearTimeout(clickTimerRef.current)
+    clickTimerRef.current = setTimeout(() => {
+      clickCountRef.current = 0
+    }, 600)
+  }
+
   return (
     <div className="fixed inset-0 z-50 bg-black">
-      <div className="relative h-full">
-        {/* Main Story Image */}
-        {Array.isArray(images) && (
-          <img
-            src={images[Math.max(0, Math.min(currentImageIndex, images.length - 1))].url || "/placeholder.svg"}
-            alt={`${story.sport} at ${story.location}`}
-            className={`w-full h-full object-contain transition-all duration-300 ${
-              showDetails ? "blur-sm brightness-50" : ""
-            }`}
-          />
-        )}
+      <div
+        className="w-screen h-screen flex items-center justify-center"
+        onClick={handleOverlayClick}
+      >
+        {/* Image */}
+        <img
+          src={currentImage.url || "/placeholder.svg"}
+          alt={`${story.sport} at ${story.location}`}
+          className={`w-full max-h-[85%] object-contain transition-all duration-300 ${
+            showDetails ? "blur-sm brightness-50" : ""
+          }`}
+        />
 
-        {/* Close Button */}
+        {/* Progress Bar */}
+        <div className="absolute top-0 left-0 right-0 flex gap-1 p-2 z-50">
+          {images.map((_, index) => (
+            <div
+              key={index}
+              className={`h-1 flex-1 rounded-full overflow-hidden bg-white/30`}
+            >
+              <div
+                className={`h-full bg-white transition-all duration-100 linear`}
+                style={{
+                  width: index < currentImageIndex ? "100%" :
+                        index === currentImageIndex ? `${progress}%` :
+                        "0%",
+                }}
+              />
+            </div>
+          ))}
+        </div>
+
+        {/* Close */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-white p-4 rounded-full bg-black/30 hover:bg-black/50 z-50"
@@ -115,28 +246,12 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
           <X className="w-6 h-6" />
         </button>
 
-        {/* Progress Bars */}
-        <div className="absolute top-0 left-0 right-0 flex gap-1 p-2">
-          {images.map((_, index: number) => (
-            <div
-              key={index}
-              className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                index === currentImageIndex ? "bg-white" : "bg-white/30"
-              }`}
-            />
-          ))}
-        </div>
-
-        {/* Header */}
-        <div className="absolute top-4 left-0 right-0 pl-4 pt-2">
+        {/* Author */}
+        <div className="absolute top-4 left-4 z-40">
           <div className="flex items-center space-x-2">
-            <div className="w-10 h-10 rounded-full bg-gray-300 overflow-hidden">
+            <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-300">
               {story.author.image ? (
-                <img
-                  src={story.author.image || "/placeholder.svg"}
-                  alt={story.author.username}
-                  className="w-full h-full object-cover"
-                />
+                <img src={story.author.image} alt={story.author.username} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full bg-gray-400" />
               )}
@@ -148,30 +263,39 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
           </div>
         </div>
 
-        {/* Navigation Buttons */}
-        {currentImageIndex > 0 && (
+        {/* Navigation */}
+        {!showDetails && currentImageIndex > 0 && (
           <button
-            onClick={handlePrevious}
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white p-2 rounded-full bg-black/30 hover:bg-black/50"
+            onClick={(e) => {
+              e.stopPropagation()
+              handlePrevious()
+            }}
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white p-2 rounded-full bg-black/30 hover:bg-black/50 z-40"
           >
             <ChevronLeft className="w-6 h-6" />
           </button>
         )}
-        {currentImageIndex < images.length - 1 && (
+        {!showDetails && currentImageIndex < images.length - 1 && (
           <button
-            onClick={handleNext}
-            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white p-2 rounded-full bg-black/30 hover:bg-black/50"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleNext()
+            }}
+            className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white p-2 rounded-full bg-black/30 hover:bg-black/50 z-40"
           >
             <ChevronRight className="w-6 h-6" />
           </button>
         )}
 
-        {/* Swipe Up Button */}
+        {/* Swipe Up Button (still there for user hint) */}
         {story.swipeUpEnabled && !showDetails && (
-          <div className="absolute bottom-8 w-full flex justify-center">
+          <div className="absolute bottom-8 w-full flex justify-center z-30 pointer-events-none">
             <button
-              onClick={() => setShowDetails(true)}
-              className="text-white flex flex-col items-center animate-bounce"
+              onClick={(e) => {
+                e.stopPropagation()
+                setShowDetails(true)
+              }}
+              className="text-white flex flex-col items-center animate-bounce pointer-events-auto"
             >
               <ChevronUp className="w-6 h-6" />
               <span className="text-sm">Swipe up for details</span>
@@ -179,63 +303,154 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose }) => {
           </div>
         )}
 
-        {/* Details Modal */}
-        {showDetails && (
-          <div className="absolute bottom-0 left-0 right-0 bg-black/80 p-4 rounded-t-xl backdrop-blur-sm">
+        {/* Details Section */}
+        {/* {showDetails && (
+          <div
+            className="absolute bottom-0 left-0 right-0 bg-black/90 p-6 rounded-t-2xl backdrop-blur-md z-50"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div
               className="w-12 h-1 bg-white/30 rounded-full mx-auto mb-4 cursor-pointer"
-              onClick={() => setShowDetails(false)}
+              onClick={() => {
+                intervalStartRef.current = Date.now()
+                setShowDetails(false)
+              }}
             ></div>
 
-            <h3 className="text-white text-lg font-bold mb-2">{story.sport}</h3>
-            <p className="text-white/80 text-sm mb-4">{story.description}</p>
+            <h3 className="text-white text-xl font-bold mb-2">{story.sport}</h3>
+            <p className="text-white/80 text-base mb-4 leading-relaxed">{story.description}</p>
 
-            <div className="space-y-3">
-              <div className="flex items-center text-white/90">
-                <MapPin className="h-4 w-4 mr-2" />
+            <div className="space-y-3 text-white text-base">
+              <div className="flex items-center">
+                <MapPin className="h-5 w-5 mr-2" />
                 <span>{story.location}</span>
               </div>
-              <div className="flex items-center text-white/90">
-                <Clock className="h-4 w-4 mr-2" />
-                <span>{/* {story.activityStarted} - {story.activityEnded} */}</span>
+              <div className="flex items-center">
+                <Clock className="h-5 w-5 mr-2" />
+                <span>
+                  {startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
+                  {endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
               </div>
-              <div className="flex items-center text-white/90">
-                <Users className="h-4 w-4 mr-2" />
-                {/* <span>{story.participants} participants</span> */}
+              <div className="flex items-center">
+                <Users className="h-5 w-5 mr-2" />
+                <span>{story.participants} participants</span>
               </div>
             </div>
 
-            {/* Error message */}
             {error && <div className="mt-4 text-red-400 text-sm">{error}</div>}
 
-            {/* Will You Go Button */}
             {!willAttend ? (
-              Array.isArray(story.Storyimages) && story.Storyimages.length > 0 ? (
+              currentImage?.id && (
                 <button
-                  onClick={() => {
-                    const image = story.Storyimages?.[currentImageIndex];
-                    if (image) {
-                      handleWillGo(image.id);
-                    } else {
-                      console.warn("Image not found.");
-                    }
-                  }}
-                  className="mt-4 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition-colors"
+                  onClick={() => handleWillGo(currentImage.id)}
+                  className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-all"
                 >
                   Yes, I will go!
                 </button>
-              ) : null
+              )
             ) : (
-              <p className="mt-6 text-green-400">You have confirmed attendance!</p>
+              <p className="mt-6 text-green-400 font-semibold">You have confirmed attendance!</p>
             )}
 
-            <button onClick={() => setShowDetails(false)} className="mt-4 pl-4 text-white/90 hover:text-white">
+            <button
+              onClick={() => {
+                // intervalStartRef.current = Date.now()
+                setShowDetails(false)
+              }}
+              className="mt-6 bg-gray-700 text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-all"
+            >
               Close Details
             </button>
           </div>
+        )} */}
+        {showDetails && (
+          <div
+            className="fixed inset-0 flex items-center justify-center bg-black/50 dark:bg-gray-900/70 backdrop-blur-sm z-50 p-4"
+            onClick={() => setShowDetails(false)} // clicking outside closes modal
+          >
+            <div
+              className="relative w-full max-w-md bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-6 sm:p-8"
+              onClick={(e) => e.stopPropagation()} // prevent closing on inside click
+            >
+              {/* Grab bar */}
+              <div
+                className="w-14 h-1.5 bg-gray-300 dark:bg-gray-600 rounded-full mx-auto mb-6 cursor-pointer"
+                onClick={() => {
+                  intervalStartRef.current = Date.now();
+                  setShowDetails(false);
+                }}
+              ></div>
+
+              {/* Title */}
+              <h3 className="text-gray-900 dark:text-white text-2xl font-semibold mb-3 text-center">
+                {story.sport}
+              </h3>
+
+              {/* Description */}
+              <p className="text-gray-700 dark:text-gray-300 text-base mb-6 leading-relaxed text-center">
+                {story.description}
+              </p>
+
+              {/* Details list */}
+              <div className="space-y-4 text-gray-800 dark:text-gray-200 text-base">
+                <div className="flex items-center space-x-3">
+                  <MapPin className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+                  <span>{story.location}</span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Clock className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+                  <span>
+                    {startTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} -{" "}
+                    {endTime.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                </div>
+                <div className="flex items-center space-x-3">
+                  <Users className="h-5 w-5 text-blue-500 dark:text-blue-400" />
+                  <span>{story.participants} participants</span>
+                </div>
+              </div>
+
+              {/* Error message */}
+              {error && (
+                <div className="mt-5 text-red-500 text-sm font-medium text-center">{error}</div>
+              )}
+
+              {/* Attendance button / confirmation */}
+              <div className="mt-8 flex flex-col items-center space-y-4">
+                {!willAttend ? (
+                  currentImage?.id && (
+                    <button
+                      onClick={() => handleWillGo(currentImage.id)}
+                      className="w-full max-w-xs bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800 text-white font-semibold py-3 rounded-lg transition-all"
+                    >
+                      Yes, I will go!
+                    </button>
+                  )
+                ) : (
+                  <p className="text-green-500 font-semibold text-center">
+                    You have confirmed attendance!
+                  </p>
+                )}
+
+                {/* Close button */}
+                <button
+                  onClick={() => {
+                    // intervalStartRef.current = Date.now()
+                    setShowDetails(false);
+                  }}
+                  className="w-full max-w-xs bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 focus:ring-4 focus:ring-gray-400 dark:focus:ring-gray-600 text-gray-900 dark:text-gray-200 font-semibold py-3 rounded-lg transition-all"
+                >
+                  Close Details
+                </button>
+              </div>
+            </div>
+          </div>
         )}
+
       </div>
     </div>
   )
 }
 
+export default StoryView

@@ -20,13 +20,13 @@ export const storyRouter = new Hono<{
 
 const viewStoryInput = z.object({
     storyId: z.number(),
-    viewed: z.boolean().optional()
+    isViewed: z.boolean().optional()
 });
 
 const createStoryInput = z.object({
     locationImage: z.string().min(1, 'Image URL is required'),
     images: z.array(z.number()).optional(),
-    viewed: z.boolean().optional(),
+    isViewed: z.boolean().optional(),
     location: z.string().min(1, 'Location is required'),
     description: z.string().optional(),
     participants: z.number().optional().default(0),
@@ -42,7 +42,7 @@ const verifyStoryInput = z.object({
 });
 
 
-async function fetchLocationImage(location: string): Promise<string | null> {
+async function fetchLocationImage(location: string,): Promise<string | null> {
     const API_KEY = 'HumkAY45IhFQNjKoq50xxWo1b619Te5RmwhC9Ti0O8Bx09tdBS2hPxOp'; 
     const pexelsUrl = `https://api.pexels.com/v1/search?query=${encodeURIComponent(location)}&per_page=1`;
 
@@ -65,10 +65,117 @@ storyRouter.use('/*', authMiddleware);
 
 
 // Create story with enhanced details
+// storyRouter.post('/', async (c) => {
+//     const body = await c.req.json();
+//     console.log("Received body:", JSON.stringify(body, null, 2));
+    
+//     const parseResult = createStoryInput.safeParse(body);
+//     if (!parseResult.success) {
+//         console.error("Validation Errors:", parseResult.error.errors);
+//         c.status(400);
+//         return c.json({ 
+//             message: "Invalid input", 
+//             errors: parseResult.error.errors.map(err => ({
+//                 path: err.path.join('.'),
+//                 message: err.message
+//             }))
+//         });
+//     }
+
+//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+
+//     try {
+//         const userId = c.get('userId');
+
+//         const today = new Date();
+//         const datePart = today.toISOString().split('T')[0]; // e.g., "2025-03-21"
+
+//         // Combine date with received time (hh:mmZ)
+//         const combinedEndTime = `${datePart}T${body.activityEnded}`;
+//         const combinedStartTime = `${datePart}T${body.activityStarted}`;
+
+//         const activityEnded = new Date(combinedEndTime);
+//         const activityStarted = new Date(combinedStartTime);
+
+//         if (activityEnded <= activityStarted) {
+//             c.status(400);
+//             return c.json({ message: "Activity Ended time must be after Activity Started time." });
+//         }
+        
+//         const endTime = new Date(activityEnded.getTime() + 60 * 60 * 1000);
+        
+
+//         console.log("Activity Ended:", activityEnded.toISOString());
+//         console.log("Story Expires At:", endTime.toISOString());
+
+//         // Check if a story already exists for this location & sport
+//         let existingStory = await prisma.story.findFirst({
+//             where: { location: body.location, sport: body.sport }
+//         });
+
+//         if (!existingStory) {
+//             // Fetch location image only for a new story
+//             const locationImage = await fetchLocationImage(body.location);
+
+//             // console.log("Data passed to Prisma:", 
+//             //     participants: body.participants ? body.participants : null, // or some other default value
+//             // );
+            
+
+//             existingStory = await prisma.story.create({
+//                 data: {
+//                     location: body.location,
+//                     sport: body.sport,
+//                     stadium: body.stadium || "",
+//                     description: body.description,
+//                     authorId: userId,
+//                     authenticityStatus: "pending",
+//                     duration: 60,
+//                     activityStarted,
+//                     activityEnded,
+//                     endTime,
+//                     swipeUpEnabled: true,
+//                     // if participants were given using partInt
+//                     // participants: isNaN(parseInt(participants, 10)) ? 0 : parseInt(participants, 10),
+
+//                     participants: typeof body.participants === "number" ? body.participants : undefined,
+//                     // participants: body.participants ?? 0,
+//                     rating: 0, // Initialize rating as 0
+//                     verificationCount: 0,
+//                     rewardStatus: "pending",
+//                     rewardAmount: null,
+//                     // isViewed: false,
+//                     locationImage,
+//                 }
+//             });
+//         }
+
+//         // Add the user's uploaded image to Storyimages
+//         const storyImage = await prisma.storyimages.create({
+//         data: {
+//             url: body.image,
+//             storyId: existingStory.id,
+//             userId: userId,
+//             authenticityChecked: false,
+//             verifiedBy: [],  // make sure to provide default empty array
+//         }
+//         });
+
+//         return c.json({
+//             message: "Story created successfully",
+//             story: existingStory,
+//             storyImage
+//         });
+//     } catch (e) {
+//         console.error(e);
+//         c.status(500);
+//         return c.json({ message: "Error while creating story" });
+//     }
+// });
 storyRouter.post('/', async (c) => {
     const body = await c.req.json();
     console.log("Received body:", JSON.stringify(body, null, 2));
-    
+
     const parseResult = createStoryInput.safeParse(body);
     if (!parseResult.success) {
         console.error("Validation Errors:", parseResult.error.errors);
@@ -88,9 +195,8 @@ storyRouter.post('/', async (c) => {
         const userId = c.get('userId');
 
         const today = new Date();
-        const datePart = today.toISOString().split('T')[0]; // e.g., "2025-03-21"
+        const datePart = today.toISOString().split('T')[0];
 
-        // Combine date with received time (hh:mmZ)
         const combinedEndTime = `${datePart}T${body.activityEnded}`;
         const combinedStartTime = `${datePart}T${body.activityStarted}`;
 
@@ -101,28 +207,39 @@ storyRouter.post('/', async (c) => {
             c.status(400);
             return c.json({ message: "Activity Ended time must be after Activity Started time." });
         }
-        
+
         const endTime = new Date(activityEnded.getTime() + 60 * 60 * 1000);
-        
 
         console.log("Activity Ended:", activityEnded.toISOString());
         console.log("Story Expires At:", endTime.toISOString());
 
-        // Check if a story already exists for this location & sport
-        let existingStory = await prisma.story.findFirst({
-            where: { location: body.location, sport: body.sport }
+        // Check if any story exists with the same location and sport
+        const possibleExistingStories = await prisma.story.findMany({
+            where: {
+                location: body.location,
+                sport: body.sport
+            }
         });
 
-        if (!existingStory) {
-            // Fetch location image only for a new story
+        let matchingStory = null;
+
+        // Now check if any of those have the same stadium and user as author
+        for (const story of possibleExistingStories) {
+            if (
+                story.stadium === (body.stadium || "") &&
+                story.authorId === userId
+            ) {
+                matchingStory = story;
+                break;
+            }
+        }
+
+        let finalStory = matchingStory;
+
+        if (!matchingStory) {
             const locationImage = await fetchLocationImage(body.location);
 
-            // console.log("Data passed to Prisma:", 
-            //     participants: body.participants ? body.participants : null, // or some other default value
-            // );
-            
-
-            existingStory = await prisma.story.create({
+            finalStory = await prisma.story.create({
                 data: {
                     location: body.location,
                     sport: body.sport,
@@ -135,37 +252,39 @@ storyRouter.post('/', async (c) => {
                     activityEnded,
                     endTime,
                     swipeUpEnabled: true,
-                    // if participants were given using partInt
-                    // participants: isNaN(parseInt(participants, 10)) ? 0 : parseInt(participants, 10),
-
                     participants: typeof body.participants === "number" ? body.participants : undefined,
-                    // participants: body.participants ?? 0,
-                    rating: 0, // Initialize rating as 0
+                    rating: 0,
                     verificationCount: 0,
                     rewardStatus: "pending",
+                    isViewed: false,
                     rewardAmount: null,
-                    // viewed: false,
                     locationImage,
                 }
             });
         }
 
-        // Add the user's uploaded image to Storyimages
-        const storyImage = await prisma.storyimages.create({
-        data: {
-            url: body.image,
-            storyId: existingStory.id,
-            userId: userId,
-            authenticityChecked: false,
-            verifiedBy: [],  // make sure to provide default empty array
+        // Now TypeScript knows finalStory is not null
+        if (!finalStory) {
+            c.status(500);
+            return c.json({ message: "Failed to create or find a valid story" });
         }
+
+        const storyImage = await prisma.storyimages.create({
+            data: {
+                url: body.image,
+                storyId: finalStory.id, // earlier i had ts error here, bc its = matchstory = null
+                userId: userId,
+                authenticityChecked: false,
+                verifiedBy: [],
+            }
         });
 
         return c.json({
-            message: "Story created successfully",
-            story: existingStory,
+            message: matchingStory ? "Existing story found, added image." : "New story created successfully",
+            story: finalStory,
             storyImage
         });
+
     } catch (e) {
         console.error(e);
         c.status(500);
@@ -173,285 +292,6 @@ storyRouter.post('/', async (c) => {
     }
 });
 
-
-// storyRouter.get('/fetch', async (c) => {
-//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-//     const userId = c.get('userId');
-
-//     const utcNow = new Date();
-
-//     const stories = await prisma.story.findMany({
-//         where: {
-//             endTime: { gte: utcNow }
-//         },
-//         select: {
-//             id: true,
-//             location: true,
-//             sport: true,
-//             locationImage: true,
-//             createdAt: true,
-//             activityStarted: true,
-//             activityEnded: true,
-//             endTime: true,
-//             description: true,
-//             stadium: true,
-//             swipeUpEnabled: true,
-//             Storyimages: { select: { id: true, url: true, userId: true, createdAt: true } },
-//             author: { select: { id: true, username: true, image: true } },
-//             StoryView: userId
-//                 ? {
-//                     where: { userId },
-//                     select: { id: true }
-//                 }
-//                 : false
-//         },
-//         orderBy: [{ activityStarted: 'asc' }, { viewed: 'asc' }]
-//     });
-
-//     // Add viewed based on StoryView existence
-//     const updatedStories = stories.map(story => ({
-//         ...story,
-//         viewed: story.StoryView?.length > 0
-//     }));
-
-//     // Sort: unviewed first, then viewed (true comes after false)
-//     updatedStories.sort((a, b) => {
-//         if (a.viewed === b.viewed) return 0;
-//         return a.viewed ? 1 : -1;
-//     });
-
-//     return c.json({ stories: updatedStories });
-
-// });
-
-// storyRouter.get('/fetch', async (c) => {
-//   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-//   const userId = c.get('userId');
-//   const groupByParam = c.req.query('groupBy');
-//   const groupBy = groupByParam === 'sport' || groupByParam === 'location' ? groupByParam : 'all';
-
-//   const utcNow = new Date();
-
-//   // Fetch user preferences
-//   const userPrefs = await prisma.userPreference.findUnique({
-//     where: { userId },
-//     select: {
-//       preferredSports: true,
-//       preferredLocations: true,
-//     },
-//   });
-
-//   if (!userPrefs) {
-//     return c.json({ stories: [] });
-//   }
-
-//   // Build the WHERE clause based on user preferences and the selected groupBy
-//   const whereClause = {
-//     endTime: { gte: utcNow },
-//     ...(groupBy === 'sport' && userPrefs.preferredSports.length > 0
-//       ? { sport: { in: userPrefs.preferredSports } }
-//       : {}),
-//     ...(groupBy === 'location' && userPrefs.preferredLocations.length > 0
-//       ? { location: { in: userPrefs.preferredLocations } }
-//       : {}),
-//   };
-
-//   try {
-//     const stories = await prisma.story.findMany({
-//       where: whereClause,
-//       select: {
-//         id: true,
-//         location: true,
-//         sport: true,
-//         locationImage: true,
-//         createdAt: true,
-//         activityStarted: true,
-//         activityEnded: true,
-//         endTime: true,
-//         description: true,
-//         stadium: true,
-//         swipeUpEnabled: true,
-//         Storyimages: { select: { id: true, url: true, userId: true, createdAt: true } },
-//         author: { select: { id: true, username: true, image: true } },
-//         StoryView: userId
-//           ? {
-//               where: { userId },
-//               select: { id: true },
-//             }
-//           : false,
-//       },
-//       orderBy: [{ activityStarted: 'asc' }, { viewed: 'asc' }],
-//     });
-
-//     // Add viewed based on StoryView existence
-//     const updatedStories = stories.map((story) => ({
-//       ...story,
-//       viewed: story.StoryView?.length > 0,
-//     }));
-
-//     // Sort: unviewed first, then viewed (true comes after false)
-//     updatedStories.sort((a, b) => (a.viewed === b.viewed ? 0 : a.viewed ? 1 : -1));
-
-//     return c.json({ stories: updatedStories });
-//   } catch (e) {
-//     console.error('Error fetching stories:', e);
-//     c.status(500);
-//     return c.json({ message: 'Error fetching stories' });
-//   }
-// });
-
-
-// storyRouter.get('/fetch', async (c) => {
-//   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-//   const userId = c.get('userId');
-//   const utcNow = new Date();
-
-//   // Fetch user preferences
-//   const preferences = await prisma.userPreference.findUnique({
-//     where: { userId: Number(userId) }
-//   });
-
-//   const preferredSports = preferences?.preferredSports ?? [];
-//   const preferredLocations = preferences?.preferredLocations ?? [];
-
-//   const stories = await prisma.story.findMany({
-//     where: {
-//       endTime: { gte: utcNow },
-//       AND: [
-//         {
-//           OR: [
-//             { location: { in: preferredLocations } },
-//             // ...preferredLocations.map((loc) => ({ 
-//             //     location: { contains: loc, mode: 'insensitive' }      
-//             //     })),
-//               // Extra matching, e.g., location can be "Mumbai, Maharashtra, India"
-//             //   OR: preferredLocations.map((loc) => ({
-//             //     location: { contains: loc, mode: 'insensitive' }
-//             //   }))
-//             // }
-//           ]
-//         },
-//         {
-//           sport: { in: preferredSports }
-//         }
-//       ]
-//     },
-//     select: {
-//       id: true,
-//       location: true,
-//       sport: true,
-//       locationImage: true,
-//       createdAt: true,
-//       activityStarted: true,
-//       activityEnded: true,
-//       endTime: true,
-//       description: true,
-//       stadium: true,
-//       swipeUpEnabled: true,
-//       Storyimages: {
-//         select: { id: true, url: true, userId: true, createdAt: true }
-//       },
-//       author: {
-//         select: { id: true, username: true, image: true }
-//       },
-//       StoryView: userId
-//         ? {
-//             where: { userId },
-//             select: { id: true }
-//           }
-//         : false
-//     },
-//     orderBy: [{ activityStarted: 'asc' }, { viewed: 'asc' }]
-//   });
-
-//   const updatedStories = stories.map((story) => ({
-//     ...story,
-//     viewed: story.StoryView?.length > 0
-//   }));
-
-//   updatedStories.sort((a, b) => {
-//     if (a.viewed === b.viewed) return 0;
-//     return a.viewed ? 1 : -1;
-//   });
-
-//   return c.json({ stories: updatedStories });
-// });
-
-
-// storyRouter.get('/fetch', async (c) => {
-//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-//     const userId = c.get('userId');
-//     const filterBy = c.req.query('filterBy'); // 'location' | 'sport' | null
-
-//     const utcNow = new Date();
-
-//     // Fetch user preferences
-//     const preferences = await prisma.userPreference.findUnique({
-//     where: { userId },
-//     select: {
-//         preferredLocations: true,
-//         preferredSports: true,
-//     },
-//     });
-
-//     let storyFilter: any = {
-//         endTime: { gte: utcNow },
-//     };
-
-//     if (filterBy === 'location' && preferences?.preferredLocations?.length) {
-//     storyFilter.location = {
-//         in: preferences.preferredLocations,
-//         mode: 'insensitive',
-//     };
-//     } else if (filterBy === 'sport' && preferences?.preferredSports?.length) {
-//     storyFilter.sport = {
-//         in: preferences.preferredSports,
-//         mode: 'insensitive',
-//     };
-//     }
-
-//     // Fetch stories based on filter
-//     const stories = await prisma.story.findMany({
-//     where: storyFilter,
-//     select: {
-//         id: true,
-//         location: true,
-//         sport: true,
-//         locationImage: true,
-//         createdAt: true,
-//         activityStarted: true,
-//         activityEnded: true,
-//         endTime: true,
-//         description: true,
-//         stadium: true,
-//         swipeUpEnabled: true,
-//         Storyimages: { select: { id: true, url: true, userId: true, createdAt: true } },
-//         author: { select: { id: true, username: true, image: true } },
-//         StoryView: userId
-//         ? {
-//             where: { userId },
-//             select: { id: true },
-//             }
-//         : false,
-//     },
-//     orderBy: [{ activityStarted: 'asc' }, { viewed: 'asc' }],
-//     });
-
-//     // Add viewed based on StoryView existence
-//     const updatedStories = stories.map(story => ({
-//     ...story,
-//     viewed: story.StoryView?.length > 0,
-//     }));
-
-//     // Sort: unviewed first, then viewed
-//     updatedStories.sort((a, b) => {
-//     if (a.viewed === b.viewed) return 0;
-//     return a.viewed ? 1 : -1;
-//     });
-
-//     return c.json({ stories: updatedStories });
-
-// });
 
 storyRouter.get('/fetch', async (c) => {
     const prisma = getPrisma(c.env.DATABASE_URL);
@@ -550,7 +390,7 @@ storyRouter.get('/fetch', async (c) => {
         },
         orderBy: [
             { activityStarted: 'asc' },
-            // { viewed: 'asc' }
+            // { isViewed: 'asc' }
         ]
     });
 
@@ -564,86 +404,85 @@ storyRouter.get('/fetch', async (c) => {
 
     // console.log('Active stories after filtering:', activeStories.length);
 
-    // Add viewed flag and format response
-    // const formattedStories = activeStories.map(story => ({
-    //     ...story,
-    //     viewed: story.StoryView?.length > 0
-    // }));
+    // Add isViewed flag and format response
+    const formattedStories = activeStories.map(story => ({
+        ...story,
+        isViewed: story.StoryView?.length > 0
+    }));
 
-    // Sort stories: upcoming activities first, then by viewed status
-    // formattedStories.sort((a, b) => {
-    //     // First sort by activity start time
-    //     const aStarted = new Date(a.activityStarted);
-    //     const bStarted = new Date(b.activityStarted);
+    // Sort stories: upcoming activities first, then by isViewed status
+    formattedStories.sort((a, b) => {
+        // First sort by activity start time
+        const aStarted = new Date(a.activityStarted);
+        const bStarted = new Date(b.activityStarted);
         
-    //     if (aStarted > bStarted) return 1;
-    //     if (aStarted < bStarted) return -1;
+        if (aStarted > bStarted) return 1;
+        if (aStarted < bStarted) return -1;
         
-    //     // If same start time, unviewed stories come first
-    //     if (a.viewed === b.viewed) return 0;
-    //     return a.viewed ? 1 : -1;
-    // });
+        // If same start time, unisViewed stories come first
+        if (a.isViewed === b.isViewed) return 0;
+        return a.isViewed ? 1 : -1;
+    });
 
-    // console.log('Final formatted stories:', formattedStories.length);
-    // return c.json({ stories: formattedStories });
-    return c.json({ stories: activeStories });
+    console.log('Final formatted stories:', formattedStories[formattedStories.length - 1]);
+    return c.json({ stories: formattedStories });
+    // return c.json({ stories: activeStories });
 });
 
+storyRouter.patch('/view', async (c) => {
+    const body = await c.req.json();
+    const parsed = viewStoryInput.safeParse(body);
 
-// storyRouter.patch('/view', async (c) => {
-//     const body = await c.req.json();
-//     const parsed = viewStoryInput.safeParse(body);
+    if (!parsed.success) {
+        c.status(400);
+        return c.json({ error: 'Invalid input' });
+    }
 
-//     if (!parsed.success) {
-//         c.status(400);
-//         return c.json({ error: 'Invalid input' });
-//     }
+    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
 
-//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+    try {
+        const { storyId } = parsed.data;
 
-//     try {
-//         const { storyId } = parsed.data;
+        const updated = await prisma.story.update({
+            where: { id: storyId },
+            data: { isViewed: true }
+        });
 
-//         const updated = await prisma.story.update({
-//             where: { id: storyId },
-//             data: { viewed: true }
-//         });
+        return c.json({ message: 'Story marked as isViewed', updated });
+    } catch (error) {
+        console.error('Error marking story as isViewed:', error);
+        c.status(500);
+        return c.json({ error: 'Server error while marking story as isViewed' });
+    }
+});
 
-//         return c.json({ message: 'Story marked as viewed', updated });
-//     } catch (error) {
-//         console.error('Error marking story as viewed:', error);
-//         c.status(500);
-//         return c.json({ error: 'Server error while marking story as viewed' });
-//     }
-// });
+storyRouter.patch('/view', async (c) => {
+    const body = await c.req.json();
+    const parsed = viewStoryInput.safeParse(body);
 
-// storyRouter.patch('/view', async (c) => {
-//     const body = await c.req.json();
-//     const parsed = viewStoryInput.safeParse(body);
+    if (!parsed.success) {
+        c.status(400);
+        return c.json({ error: 'Invalid input' });
+    }
 
-//     if (!parsed.success) {
-//         c.status(400);
-//         return c.json({ error: 'Invalid input' });
-//     }
+    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
 
-//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+    try {
+        const { storyId } = parsed.data;
 
-//     try {
-//         const { storyId } = parsed.data;
+        // Update only if it's not already isViewed
+        const updated = await prisma.story.update({
+            where: { id: storyId },
+            data: { isViewed: true }
+        });
 
-//         // Update only if it's not already viewed
-//         const updated = await prisma.story.update({
-//             where: { id: storyId },
-//             data: { viewed: true }
-//         });
-
-//         return c.json({ message: 'Story marked as viewed', updated });
-//     } catch (error) {
-//         console.error('Error marking story as viewed:', error);
-//         c.status(500);
-//         return c.json({ error: 'Server error while marking story as viewed' });
-//     }
-// });
+        return c.json({ message: 'Story marked as isViewed', updated });
+    } catch (error) {
+        console.error('Error marking story as isViewed:', error);
+        c.status(500);
+        return c.json({ error: 'Server error while marking story as isViewed' });
+    }
+});
 
 // storyRouter.post('/view', async (c) => {
 //     const body = await c.req.json();
@@ -674,12 +513,291 @@ storyRouter.get('/fetch', async (c) => {
 //             });
 //         }
 
-//         return c.json({ message: 'Story marked as viewed' });
+//         return c.json({ message: 'Story marked as isViewed' });
 //     } catch (error) {
-//         console.error('Error marking story as viewed:', error);
+//         console.error('Error marking story as isViewed:', error);
 //         c.status(500);
-//         return c.json({ error: 'Server error while marking story as viewed' });
+//         return c.json({ error: 'Server error while marking story as isViewed' });
 //     }
+// });
+
+// storyRouter.get('/fetch', async (c) => {
+//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+//     const userId = c.get('userId');
+
+//     const utcNow = new Date();
+
+//     const stories = await prisma.story.findMany({
+//         where: {
+//             endTime: { gte: utcNow }
+//         },
+//         select: {
+//             id: true,
+//             location: true,
+//             sport: true,
+//             locationImage: true,
+//             createdAt: true,
+//             activityStarted: true,
+//             activityEnded: true,
+//             endTime: true,
+//             description: true,
+//             stadium: true,
+//             swipeUpEnabled: true,
+//             Storyimages: { select: { id: true, url: true, userId: true, createdAt: true } },
+//             author: { select: { id: true, username: true, image: true } },
+//             StoryView: userId
+//                 ? {
+//                     where: { userId },
+//                     select: { id: true }
+//                 }
+//                 : false
+//         },
+//         orderBy: [{ activityStarted: 'asc' }, { isViewed: 'asc' }]
+//     });
+
+//     // Add isViewed based on StoryView existence
+//     const updatedStories = stories.map(story => ({
+//         ...story,
+//         isViewed: story.StoryView?.length > 0
+//     }));
+
+//     // Sort: unisViewed first, then isViewed (true comes after false)
+//     updatedStories.sort((a, b) => {
+//         if (a.isViewed === b.isViewed) return 0;
+//         return a.isViewed ? 1 : -1;
+//     });
+
+//     return c.json({ stories: updatedStories });
+
+// });
+
+// storyRouter.get('/fetch', async (c) => {
+//   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+//   const userId = c.get('userId');
+//   const groupByParam = c.req.query('groupBy');
+//   const groupBy = groupByParam === 'sport' || groupByParam === 'location' ? groupByParam : 'all';
+
+//   const utcNow = new Date();
+
+//   // Fetch user preferences
+//   const userPrefs = await prisma.userPreference.findUnique({
+//     where: { userId },
+//     select: {
+//       preferredSports: true,
+//       preferredLocations: true,
+//     },
+//   });
+
+//   if (!userPrefs) {
+//     return c.json({ stories: [] });
+//   }
+
+//   // Build the WHERE clause based on user preferences and the selected groupBy
+//   const whereClause = {
+//     endTime: { gte: utcNow },
+//     ...(groupBy === 'sport' && userPrefs.preferredSports.length > 0
+//       ? { sport: { in: userPrefs.preferredSports } }
+//       : {}),
+//     ...(groupBy === 'location' && userPrefs.preferredLocations.length > 0
+//       ? { location: { in: userPrefs.preferredLocations } }
+//       : {}),
+//   };
+
+//   try {
+//     const stories = await prisma.story.findMany({
+//       where: whereClause,
+//       select: {
+//         id: true,
+//         location: true,
+//         sport: true,
+//         locationImage: true,
+//         createdAt: true,
+//         activityStarted: true,
+//         activityEnded: true,
+//         endTime: true,
+//         description: true,
+//         stadium: true,
+//         swipeUpEnabled: true,
+//         Storyimages: { select: { id: true, url: true, userId: true, createdAt: true } },
+//         author: { select: { id: true, username: true, image: true } },
+//         StoryView: userId
+//           ? {
+//               where: { userId },
+//               select: { id: true },
+//             }
+//           : false,
+//       },
+//       orderBy: [{ activityStarted: 'asc' }, { isViewed: 'asc' }],
+//     });
+
+//     // Add isViewed based on StoryView existence
+//     const updatedStories = stories.map((story) => ({
+//       ...story,
+//       isViewed: story.StoryView?.length > 0,
+//     }));
+
+//     // Sort: unisViewed first, then isViewed (true comes after false)
+//     updatedStories.sort((a, b) => (a.isViewed === b.isViewed ? 0 : a.isViewed ? 1 : -1));
+
+//     return c.json({ stories: updatedStories });
+//   } catch (e) {
+//     console.error('Error fetching stories:', e);
+//     c.status(500);
+//     return c.json({ message: 'Error fetching stories' });
+//   }
+// });
+
+
+// storyRouter.get('/fetch', async (c) => {
+//   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+//   const userId = c.get('userId');
+//   const utcNow = new Date();
+
+//   // Fetch user preferences
+//   const preferences = await prisma.userPreference.findUnique({
+//     where: { userId: Number(userId) }
+//   });
+
+//   const preferredSports = preferences?.preferredSports ?? [];
+//   const preferredLocations = preferences?.preferredLocations ?? [];
+
+//   const stories = await prisma.story.findMany({
+//     where: {
+//       endTime: { gte: utcNow },
+//       AND: [
+//         {
+//           OR: [
+//             { location: { in: preferredLocations } },
+//             // ...preferredLocations.map((loc) => ({ 
+//             //     location: { contains: loc, mode: 'insensitive' }      
+//             //     })),
+//               // Extra matching, e.g., location can be "Mumbai, Maharashtra, India"
+//             //   OR: preferredLocations.map((loc) => ({
+//             //     location: { contains: loc, mode: 'insensitive' }
+//             //   }))
+//             // }
+//           ]
+//         },
+//         {
+//           sport: { in: preferredSports }
+//         }
+//       ]
+//     },
+//     select: {
+//       id: true,
+//       location: true,
+//       sport: true,
+//       locationImage: true,
+//       createdAt: true,
+//       activityStarted: true,
+//       activityEnded: true,
+//       endTime: true,
+//       description: true,
+//       stadium: true,
+//       swipeUpEnabled: true,
+//       Storyimages: {
+//         select: { id: true, url: true, userId: true, createdAt: true }
+//       },
+//       author: {
+//         select: { id: true, username: true, image: true }
+//       },
+//       StoryView: userId
+//         ? {
+//             where: { userId },
+//             select: { id: true }
+//           }
+//         : false
+//     },
+//     orderBy: [{ activityStarted: 'asc' }, { isViewed: 'asc' }]
+//   });
+
+//   const updatedStories = stories.map((story) => ({
+//     ...story,
+//     isViewed: story.StoryView?.length > 0
+//   }));
+
+//   updatedStories.sort((a, b) => {
+//     if (a.isViewed === b.isViewed) return 0;
+//     return a.isViewed ? 1 : -1;
+//   });
+
+//   return c.json({ stories: updatedStories });
+// });
+
+
+// storyRouter.get('/fetch', async (c) => {
+//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+//     const userId = c.get('userId');
+//     const filterBy = c.req.query('filterBy'); // 'location' | 'sport' | null
+
+//     const utcNow = new Date();
+
+//     // Fetch user preferences
+//     const preferences = await prisma.userPreference.findUnique({
+//     where: { userId },
+//     select: {
+//         preferredLocations: true,
+//         preferredSports: true,
+//     },
+//     });
+
+//     let storyFilter: any = {
+//         endTime: { gte: utcNow },
+//     };
+
+//     if (filterBy === 'location' && preferences?.preferredLocations?.length) {
+//     storyFilter.location = {
+//         in: preferences.preferredLocations,
+//         mode: 'insensitive',
+//     };
+//     } else if (filterBy === 'sport' && preferences?.preferredSports?.length) {
+//     storyFilter.sport = {
+//         in: preferences.preferredSports,
+//         mode: 'insensitive',
+//     };
+//     }
+
+//     // Fetch stories based on filter
+//     const stories = await prisma.story.findMany({
+//     where: storyFilter,
+//     select: {
+//         id: true,
+//         location: true,
+//         sport: true,
+//         locationImage: true,
+//         createdAt: true,
+//         activityStarted: true,
+//         activityEnded: true,
+//         endTime: true,
+//         description: true,
+//         stadium: true,
+//         swipeUpEnabled: true,
+//         Storyimages: { select: { id: true, url: true, userId: true, createdAt: true } },
+//         author: { select: { id: true, username: true, image: true } },
+//         StoryView: userId
+//         ? {
+//             where: { userId },
+//             select: { id: true },
+//             }
+//         : false,
+//     },
+//     orderBy: [{ activityStarted: 'asc' }, { isViewed: 'asc' }],
+//     });
+
+//     // Add isViewed based on StoryView existence
+//     const updatedStories = stories.map(story => ({
+//     ...story,
+//     isViewed: story.StoryView?.length > 0,
+//     }));
+
+//     // Sort: unisViewed first, then isViewed
+//     updatedStories.sort((a, b) => {
+//     if (a.isViewed === b.isViewed) return 0;
+//     return a.isViewed ? 1 : -1;
+//     });
+
+//     return c.json({ stories: updatedStories });
+
 // });
 
 
@@ -968,10 +1086,10 @@ storyRouter.delete('/', async (c) => {
 //                 swipeUpEnabled: true,
 //                 Storyimages: { select: { id: true, url: true, userId: true, createdAt: true } },
 //                 author: { select: { id: true, username: true, image: true } },
-//                 viewed: true
+//                 isViewed: true
 //             },
 //             orderBy: [
-//                 { viewed: 'asc' },
+//                 { isViewed: 'asc' },
 //                 { activityStarted: 'asc' as const },
 //                 ...(groupBy === 'sport'
 //                     ? [{ sport: 'asc' as const }]

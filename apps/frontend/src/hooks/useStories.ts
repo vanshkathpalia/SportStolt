@@ -26,10 +26,10 @@ export interface Story {
         }[];
         swipeUpEnabled?: boolean;
         authenticityStatus?: string;
-        stadium?: string;
-        viewed?: boolean;
+        stadium: string;
+        isViewed: boolean;
     // };
-    // viewed?: boolean;
+    // isViewed?: boolean;
     onClose: () => void;
 }
 export const useStories = (filterBy: 'location' | 'sport' | null) => {
