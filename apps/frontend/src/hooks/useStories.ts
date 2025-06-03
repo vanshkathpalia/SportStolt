@@ -19,7 +19,7 @@ export interface Story {
             image?: string;
             userId: string;
         };
-        Storyimages?: {
+        Storyimages: {
             id: number;
             userId: string;
             url?: string;

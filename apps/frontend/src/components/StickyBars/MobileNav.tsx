@@ -29,7 +29,8 @@ export function MobileNav({ openCreateModal }: MobileNavProps) {
   const handleLogout = () => {
     localStorage.removeItem("token");
     // localStorage.setItem('user', JSON.stringify(user));
-    localStorage.removeItem("user");
+    // this is wiping all the  user info, we want just the token to wipe
+    // localStorage.removeItem("user");
     // setUser(null);
     navigate("/signin");
   };

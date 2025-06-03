@@ -8,10 +8,12 @@ import { BACKEND_URL } from "../../config"
 interface StoryViewProps {
   story: StoryType
   onClose: () => void
-  onImageViewed?: (storyId: number, imageId: number) => void;
+  onImageViewed?: (storyId: number, imageId: number) => void
+  markImageAsViewed: (storyId: number, imageId: number) => void
+  viewedImages: number[] // ✅ Add this line
 }
 
-export const StoryView: React.FC<StoryViewProps> = ({ story, onClose, onImageViewed }) => {
+export const StoryView: React.FC<StoryViewProps> = ({ story, onClose, onImageViewed, markImageAsViewed }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [showDetails, setShowDetails] = useState(false)
   const [willAttend, setWillAttend] = useState(false)
@@ -50,7 +52,10 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose, onImageVie
     if (onImageViewed && currentImage) {
       onImageViewed(story.id, currentImage.id);
     }
-  }, [currentImageIndex, story.id, currentImage, onImageViewed]);
+
+    markImageAsViewed(story.id, currentImage.id)
+
+  }, [currentImageIndex, story.id, currentImage, onImageViewed, markImageAsViewed]);
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -304,66 +309,6 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose, onImageVie
         )}
 
         {/* Details Section */}
-        {/* {showDetails && (
-          <div
-            className="absolute bottom-0 left-0 right-0 bg-black/90 p-6 rounded-t-2xl backdrop-blur-md z-50"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div
-              className="w-12 h-1 bg-white/30 rounded-full mx-auto mb-4 cursor-pointer"
-              onClick={() => {
-                intervalStartRef.current = Date.now()
-                setShowDetails(false)
-              }}
-            ></div>
-
-            <h3 className="text-white text-xl font-bold mb-2">{story.sport}</h3>
-            <p className="text-white/80 text-base mb-4 leading-relaxed">{story.description}</p>
-
-            <div className="space-y-3 text-white text-base">
-              <div className="flex items-center">
-                <MapPin className="h-5 w-5 mr-2" />
-                <span>{story.location}</span>
-              </div>
-              <div className="flex items-center">
-                <Clock className="h-5 w-5 mr-2" />
-                <span>
-                  {startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - 
-                  {endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                </span>
-              </div>
-              <div className="flex items-center">
-                <Users className="h-5 w-5 mr-2" />
-                <span>{story.participants} participants</span>
-              </div>
-            </div>
-
-            {error && <div className="mt-4 text-red-400 text-sm">{error}</div>}
-
-            {!willAttend ? (
-              currentImage?.id && (
-                <button
-                  onClick={() => handleWillGo(currentImage.id)}
-                  className="mt-6 bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition-all"
-                >
-                  Yes, I will go!
-                </button>
-              )
-            ) : (
-              <p className="mt-6 text-green-400 font-semibold">You have confirmed attendance!</p>
-            )}
-
-            <button
-              onClick={() => {
-                // intervalStartRef.current = Date.now()
-                setShowDetails(false)
-              }}
-              className="mt-6 bg-gray-700 text-white px-6 py-2 rounded-md hover:bg-gray-800 transition-all"
-            >
-              Close Details
-            </button>
-          </div>
-        )} */}
         {showDetails && (
           <div
             className="fixed inset-0 flex items-center justify-center bg-black/50 dark:bg-gray-900/70 backdrop-blur-sm z-50 p-4"
