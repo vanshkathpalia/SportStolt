@@ -86,6 +86,7 @@ export const PostPage = ({ openCreateModal }: PostPageProps) => {
                           author={post.author}
                           title={post.title}
                           content={post.content}
+                          createdAt={post.createdAt}
                         //   publishedDate={"date"} 
                         expanded={true}  />}
                   </div>

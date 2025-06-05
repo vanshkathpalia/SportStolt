@@ -42,9 +42,9 @@ export function CreateEventModal({ isOpen, onClose }: CreateEventModalProps) {
   //     // Backend expects dates as ISO strings or date objects:
   //     const formData = {
   //       name,
-  //       StartDate: startDate,
-  //       EndDate: endDate,
-  //       StartTime: startDateTime,
+  //       startDate: startDate,
+  //       endDate: endDate,
+  //       startTime: startDateTime,
   //       city,
   //       state,
   //       country,
@@ -62,8 +62,8 @@ export function CreateEventModal({ isOpen, onClose }: CreateEventModalProps) {
   //     // Reset form and close modal
   //     setName("")
   //     setStartDate("")
-  //     setEndDate("")
-  //     setStartTime("")
+  //     setendDate("")
+  //     setstartTime("")
   //     setCity("")
   //     setState("")
   //     setCountry("")
@@ -113,13 +113,13 @@ export function CreateEventModal({ isOpen, onClose }: CreateEventModalProps) {
 
     // Submit the form (your original logic)
     try {
-      const isoStartTime = startDateTime.toISOString();
+      const isostartTime = startDateTime.toISOString();
 
       const formData = {
         name,
-        StartDate: startDate,
-        EndDate: endDate,
-        StartTime: isoStartTime,
+        startDate: startDate,
+        endDate: endDate,
+        startTime: isostartTime,
         city,
         state,
         country,

@@ -110,13 +110,17 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ userId }) => {
             <span className="font-semibold">{profile.storiesCount}</span>
             <div className="text-gray-500 dark:text-gray-400 text-sm">Stories</div>
           </div>
-          <div>
+          {/* <div>
             <span className="font-semibold">{profile.verifiedStoriesCount}</span>
             <div className="text-gray-500 dark:text-gray-400 text-sm">Verified</div>
-          </div>
+          </div> */}
           <div>
             <span className="font-semibold">{profile.legitimacy}</span>
             <div className="text-gray-500 dark:text-gray-400 text-sm">Accuracy</div>
+          </div>
+          <div>
+            <span className="font-semibold">{profile.points}</span>
+            <div className="text-gray-500 dark:text-gray-400 text-sm">Points</div>
           </div>
         </div>
 

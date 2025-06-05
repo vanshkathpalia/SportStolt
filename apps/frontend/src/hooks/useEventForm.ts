@@ -5,9 +5,9 @@
 
 // export function useEventForm(onSuccess: () => void) {
 //   const [title, setTitle] = useState("")
-//   const [startDate, setStartDate] = useState("")
-//   const [endDate, setEndDate] = useState("")
-//   const [startTime, setStartTime] = useState("")
+//   const [startDate, setstartDate] = useState("")
+//   const [endDate, setendDate] = useState("")
+//   const [startTime, setstartTime] = useState("")
 //   const [stadium, setStadium] = useState("")
 //   const [city, setCity] = useState("")
 //   const [state, setState] = useState("")
@@ -48,9 +48,9 @@
 
 //       // Reset form
 //       setTitle("")
-//       setStartDate("")
-//       setEndDate("")
-//       setStartTime("")
+//       setstartDate("")
+//       setendDate("")
+//       setstartTime("")
 //       setStadium("")
 //       setCity("")
 //       setState("")
@@ -72,11 +72,11 @@
 //     title,
 //     setTitle,
 //     startDate,
-//     setStartDate,
+//     setstartDate,
 //     endDate,
-//     setEndDate,
+//     setendDate,
 //     startTime,
-//     setStartTime,
+//     setstartTime,
 //     stadium,
 //     setStadium,
 //     city,

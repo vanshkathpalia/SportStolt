@@ -56,7 +56,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
             {/* Contains start and end info*
             this date and time will not work bc in interface be expect string... not date/}
             {/* <span>
-              {new Date(event.StartDate).toLocaleDateString()} - {new Date(event.EndDate).toLocaleDateString()}
+              {new Date(event.startDate).toLocaleDateString()} - {new Date(event.endDate).toLocaleDateString()}
             </span> */}
 
           </div>

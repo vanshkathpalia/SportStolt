@@ -13,11 +13,11 @@ export const AddEvent = ({openCreateModal}: AddEventPageProps) => {
     name: '',
     city: '',
     stadium: '',
-    StartDate: '',
+    startDate: '',
     country: '',
     state: '',
-    EndDate: '',
-    StartTime: '',
+    endDate: '',
+    startTime: '',
     OrganisedBy: ''
   });
 
@@ -32,11 +32,11 @@ export const AddEvent = ({openCreateModal}: AddEventPageProps) => {
     console.log("JWT Token:", token);
 
 
-    // const formattedStartDate = new Date(`${formData.StartDate}T${formData.StartTime}:00Z`).toISOString();
+    // const formattedstartDate = new Date(`${formData.startDate}T${formData.startTime}:00Z`).toISOString();
 
     // const eventPayload = {
     //       ...formData,
-    //       StartDate: formattedStartDate,
+    //       startDate: formattedstartDate,
     // };
 
     try {
@@ -56,9 +56,9 @@ export const AddEvent = ({openCreateModal}: AddEventPageProps) => {
           country: '',
           state: '',
           stadium: '',
-          StartDate: '',
-          EndDate: '',
-          StartTime: '',
+          startDate: '',
+          endDate: '',
+          startTime: '',
           OrganisedBy: ''
         });
       } else {
@@ -123,7 +123,7 @@ export const AddEvent = ({openCreateModal}: AddEventPageProps) => {
 
     // Convert date inputs to ISO format if needed
     let formattedValue = value;
-    if (name === "StartDate" || name === "EndDate" || name === "StartTime") {
+    if (name === "startDate" || name === "endDate" || name === "startTime") {
         formattedValue = new Date(value).toISOString();
     }
     
@@ -310,8 +310,8 @@ export const AddEvent = ({openCreateModal}: AddEventPageProps) => {
                   </label>
                   <input
                     type="date"
-                    name="StartDate"
-                    value={formData.StartDate.split("T")[0]} // Show only "YYYY-MM-DD"
+                    name="startDate"
+                    value={formData.startDate.split("T")[0]} // Show only "YYYY-MM-DD"
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
@@ -326,8 +326,8 @@ export const AddEvent = ({openCreateModal}: AddEventPageProps) => {
                   </label>
                   <input
                     type="date"
-                    name="EndDate"
-                    value={formData.EndDate.split("T")[0]} // Show only "YYYY-MM-DD"
+                    name="endDate"
+                    value={formData.endDate.split("T")[0]} // Show only "YYYY-MM-DD"
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
@@ -343,8 +343,8 @@ export const AddEvent = ({openCreateModal}: AddEventPageProps) => {
                   </label>
                   <input
                     type="date"
-                    name="StartTime"
-                    value={formData.StartTime.split("T")[0]}
+                    name="startTime"
+                    value={formData.startTime.split("T")[0]}
                     onChange={handleChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required

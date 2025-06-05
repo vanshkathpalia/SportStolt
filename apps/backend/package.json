@@ -2,6 +2,7 @@
   "name": "backend",
   "scripts": {
     "dev": "NODE_OPTIONS='--dns-result-order=ipv4first' wrangler dev",
+    "dev:cron": "NODE_ENV=development tsx src/cron/notifVerifyAndCleanup.ts",
     "deploy": "wrangler deploy --minify",
     "build": "echo 'No build step needed' && exit 0"
   },
@@ -11,6 +12,7 @@
     "@vanshkathpalia/sportstolt-common": "^1.0.0",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
+    "dotenv": "^16.5.0",
     "hono": "^4.6.5",
     "nodemailer": "^7.0.3",
     "sharp": "^0.33.5",
@@ -25,6 +27,7 @@
     "mock-aws-s3": "^4.0.2",
     "nock": "^13.5.6",
     "prisma": "^6.5.0",
+    "tsx": "^4.19.4",
     "wrangler": "^4.16.1"
   },
   "build": {

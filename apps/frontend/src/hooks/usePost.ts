@@ -10,9 +10,10 @@ export interface Post {
     title: string;
     createdAt: string;
     author: {
+        id: number;
         username: string;
         name: string;
-        image: string;
+        image?: string;
     };
     tags?: { name: string }[];
     expanded: boolean;

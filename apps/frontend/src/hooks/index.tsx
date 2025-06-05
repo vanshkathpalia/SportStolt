@@ -9,6 +9,7 @@ export interface Post {
     "title": string;
     "id": number;
     "author": {
+        "id": number
         "username": string
         "name": string
         "image": string

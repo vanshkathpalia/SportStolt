@@ -14,7 +14,6 @@ DATABASE_URL="prisma://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsI
 
 JWT_SECRET="mymymysecret"
 
-
 RESEND_API_KEY = "re_Z6a5fdkG_KuPHLQ2cGuKD7Y7FsH9M1BpR"
 RESEND_SENDER_EMAIL = "onboarding@resend.dev"
 
@@ -23,20 +22,34 @@ GEOLOCATION_API_KEY = "1698e16e9d9731"
 
 FRONTEND_BASE_URL = "https://sport-stolt.vercel.app"
 
+
 # [env.production]
 # vars = { DATABASE_URL = "prisma://accelerate.prisma-data.net/?api_key=...", JWT_SECRET = "mymymysecret", YOUTUBE_API_KEY = "...", GEOLOCATION_API_KEY = "...", # # FRONTEND_BASE_URL = "https://sport-stolt.vercel.app" }
 # dns_resolvers = ["1.1.1.1", "8.8.8.8"]
 
-[triggers]
-crons = ["0 0 * * *"]
 
-[env.cleanup]
-name = "my-hono-cleanup"
-main = "src/cleanup.ts"
-compatibility_date = "2024-05-26"
-vars = { DATABASE_URL = "prisma://accelerate.prisma-data.net/?api_key=...", JWT_SECRET = "mymymysecret", YOUTUBE_API_KEY = "...", GEOLOCATION_API_KEY = "...", FRONTEND_BASE_URL = "https://sport-stolt.vercel.app" }
-[env.cleanup.triggers]
-crons = ["0 * * * *"]
+
+[triggers]
+crons = ["*/5 * * * *"] # every 15 mins or update as needed
+
+[env.verification]
+name = "verify-attendees"
+main = "src/cron/notifVerifyAndCleanup.ts"
+compatibility_date = "2025-05-31"
+vars = { DATABASE_URL = "prisma://accelerate.prisma-data.net/?api_key=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcGlfa2V5IjoiMDFKV1A3M000UEFRUzFOVkY3MDUyWjFOQzQiLCJ0ZW5hbnRfaWQiOiI0YzgwOTY0ZWFmYmE2YTA3MWExYTZkN2Y0NDYzZjVmZDY1M2QzOTcxOTk4ZWJmZmZmMTNiMDRhYWY0NWUzYmQ5IiwiaW50ZXJuYWxfc2VjcmV0IjoiZTUzZWUzM2ItODZiZi00MTI5LThhYzAtYWM5ZmEwZmNkMjUzIn0.brwgND4RYIIynTV2n3WtyC10UQqM-jBJYt6d_ym5CFc"}
+
+[env.verification.triggers]
+crons = ["*/5 * * * *"]
+
+
+
+# [env.cleanup]
+# name = "my-hono-cleanup"
+# main = "src/cleanup.ts"
+# compatibility_date = "2024-05-26"
+# vars = { DATABASE_URL = "prisma://accelerate.prisma-data.net/?api_key=...", JWT_SECRET = "mymymysecret", YOUTUBE_API_KEY = "..." GEOLOCATION_API_KEY = "...", FRONTEND_BASE_URL = "https://sport-stolt.vercel.app" }
+# [env.cleanup.triggers]
+# crons = ["0 * * * *"]
 
 
 # crons = ["*/10 * * * *"] would have been 10 mins

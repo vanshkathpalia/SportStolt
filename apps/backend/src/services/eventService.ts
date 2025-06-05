@@ -10,9 +10,9 @@
 //     data: {
 //       ...eventData,
 //       authorId,
-//       StartDate: new Date(eventData.StartDate),
-//       EndDate: new Date(eventData.EndDate),
-//       StartTime: new Date(eventData.StartTime),
+//       startDate: new Date(eventData.startDate),
+//       endDate: new Date(eventData.endDate),
+//       startTime: new Date(eventData.startTime),
 //     },
 //   });
 

@@ -14,7 +14,7 @@
 //     startDate,
 //     setStartDate,
 //     endDate,
-//     setEndDate,
+//     setendDate,
 //     startTime,
 //     setStartTime,
 //     stadium,
@@ -46,12 +46,12 @@
 
 //       <div>
 //         <Label className="block text-sm font-medium dark:text-white text-black mb-1">Start Date *</Label>
-//         <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} required />
+//         <Input type="date" value={startDate} onChange={(e) => setstartDate(e.target.value)} required />
 //       </div>
 
 //       <div>
 //         <Label className="block text-sm font-medium dark:text-white text-black mb-1">End Date *</Label>
-//         <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} required />
+//         <Input type="date" value={endDate} onChange={(e) => setendDate(e.target.value)} required />
 //       </div>
 
 //       <div>
