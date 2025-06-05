@@ -32,10 +32,10 @@ export default {
       const deletedEvents = await prisma.event.deleteMany({
         where: {
           OR: [
-            { EndDate: { lt: todayStr } },
+            { endDate: { lt: todayStr } },
             {
-              EndDate: todayStr,
-              StartTime: { lt: now.toISOString() },
+              endDate: todayStr,
+              startTime: { lt: now.toISOString() },
             },
           ],
         },

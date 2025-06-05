@@ -43,8 +43,12 @@ model User {
   comment               Comment[]
   event                 Event[]
 
+  
+
   sentNotifications     Notification[]    @relation("SentNotifications")
   receivedNotifications Notification[]    @relation("ReceivedNotifications")
+  targetNotifications   Notification[]    @relation("TargetNotifications")
+
   followers             Follow[]          @relation("Followers")
   following             Follow[]          @relation("Following")
   followedTags          Tag[]             @relation("TagFollowers")
@@ -113,7 +117,7 @@ model Comment {
 }
 
 model Like {
-  id     Int   @id @default(autoincrement())
+  id     String   @id @default(uuid())
   userId Int
   postId Int
 
@@ -154,7 +158,9 @@ model Story {
   rewardAmount       Float?
   swipeUpEnabled     Boolean           @default(false)
   authorId           Int
-  isViewed             Boolean           @default(false)
+  isViewed           Boolean           @default(false)
+  isArchived         Boolean  @default(false)
+  archivedAt         DateTime?
 
   author             User              @relation(fields: [authorId], references: [id], onDelete: Cascade)
   Storyimages        Storyimages[]
@@ -216,39 +222,99 @@ model Verification {
   storyImages    Storyimages @relation(fields: [verificationId], references: [id], onDelete: Cascade)
 }
 
+// model StoryAttendance {
+//   id           Int      @id @default(autoincrement())
+//   storyImageId Int
+//   userId       Int
+//   attendedAt   DateTime @default(now())
+//   storyId      Int?
+
+//   storyImage Storyimages @relation(fields: [storyImageId], references: [id], onDelete: Cascade)
+//   User       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   Story      Story?      @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+//   @@unique([storyImageId, userId])
+// }
+
 model StoryAttendance {
-  id           Int      @id @default(autoincrement())
-  storyImageId Int
-  userId       Int
-  attendedAt   DateTime @default(now())
-  storyId      Int?
+  id                 Int      @id @default(autoincrement())
+  userId             Int
+  storyId            Int
+  storyImageId       Int?
 
-  storyImage Storyimages @relation(fields: [storyImageId], references: [id], onDelete: Cascade)
-  User       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Story      Story?      @relation(fields: [storyId], references: [id], onDelete: Cascade)
+  attendanceConfirmed Boolean  @default(false)  // True if user pressed “Yes, will go”
+  storyImage   Storyimages? @relation(fields: [storyImageId], references: [id])
+  createdAt          DateTime @default(now())
 
-  @@unique([storyImageId, userId])
+  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  story              Story    @relation(fields: [storyId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, storyId])
 }
+
+model Notification {
+  id           Int              @id @default(autoincrement())
+  type         NotificationType
+  message      String
+  senderId     Int?
+  receiverId   Int
+  targetUserId Int?
+  createdAt    DateTime         @default(now())
+  seen         Boolean          @default(false)
+  isVerified   Boolean?
+
+  postId       Int?
+  commentId    String?
+  storyImageId Int?
+  followId     Int?
+  eventId      Int?
+  scheduledAt  DateTime?
+
+  sender       User?            @relation("SentNotifications", fields: [senderId], references: [id], onDelete: Cascade)
+  receiver     User             @relation("ReceivedNotifications", fields: [receiverId], references: [id], onDelete: Cascade)
+  targetUser   User?            @relation("TargetNotifications", fields: [targetUserId], references: [id], onDelete: Cascade)
+
+  post         Post?            @relation(fields: [postId], references: [id], onDelete: Cascade)
+  comment      Comment?         @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  storyImage   Storyimages?     @relation(fields: [storyImageId], references: [id], onDelete: Cascade)
+  follow       Follow?          @relation(fields: [followId], references: [id], onDelete: Cascade)
+  event        Event?           @relation(fields: [eventId], references: [id], onDelete: Cascade)
+}
+
+enum NotificationType {
+  LIKE
+  COMMENT
+  FOLLOW
+  STORY_ATTENDANCE
+  VERIFICATION
+  EVENT
+  INFO
+  SYSTEM
+}
+
 
 model Event {
   id          Int       @id @default(autoincrement())
-  image       String
-  likeCount   Int       @default(0)
+  image       String?
+  likeCount   Int?      @default(0)
   country     String    @default("")
   state       String    @default("")
   city        String    @default("")
   authorId    Int
   stadium     String    @default("")
-  StartDate   DateTime
-  EndDate     DateTime
-  StartTime   DateTime
+  startDate   DateTime
+  endDate     DateTime
+  startTime   DateTime
   OrganisedBy String
   name        String
   createdAt   DateTime  @default(now())
+  isArchived         Boolean  @default(false)
+  archivedAt         DateTime?
 
   Comment     Comment[]
   registration Registration[]
   author      User      @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  notificaitons  Notification[]
 }
 
 model Registration {
@@ -263,37 +329,6 @@ model Registration {
   @@unique([userId, eventId])
 }
 
-model Notification {
-  id           Int       @id @default(autoincrement())
-  type         String?
-  message      String
-  senderId     Int?
-  receiverId   Int
-  createdAt    DateTime  @default(now())
-  seen         Boolean   @default(false)
-  postId       Int?
-  commentId    String?
-  storyImageId Int?
-  followId     Int?
-  scheduledAt  DateTime?
-
-  sender     User?        @relation("SentNotifications", fields: [senderId], references: [id], onDelete: Cascade)
-  receiver   User         @relation("ReceivedNotifications", fields: [receiverId], references: [id], onDelete: Cascade)
-  post       Post?        @relation(fields: [postId], references: [id], onDelete: Cascade)
-  comment    Comment?     @relation(fields: [commentId], references: [id], onDelete: Cascade)
-  storyImage Storyimages? @relation(fields: [storyImageId], references: [id], onDelete: Cascade)
-  follow     Follow?      @relation(fields: [followId], references: [id], onDelete: Cascade)
-}
-
-enum NotificationType {
-  LIKE
-  COMMENT
-  FOLLOW
-  MENTION
-  STORY_ATTENDANCE
-  STORY_VERIFICATION
-  SYSTEM
-}
 
 model Tweet {
   id        String   @id @default(uuid())

@@ -341,7 +341,7 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose, onImageVie
               <div className="space-y-4 text-gray-800 dark:text-gray-200 text-base">
                 <div className="flex items-center space-x-3">
                   <MapPin className="h-5 w-5 text-blue-500 dark:text-blue-400" />
-                  <span>{story.location}</span>
+                  <span>{story.stadium}, {story.location}</span>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Clock className="h-5 w-5 text-blue-500 dark:text-blue-400" />

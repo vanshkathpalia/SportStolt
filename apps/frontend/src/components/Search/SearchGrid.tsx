@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { BACKEND_URL } from '../../config';
+import { sendFollowNotification } from '../../utils/sendNotification';
+// import { sendFollowNotification } from '../../utils/sendNotification';
 
 interface SearchGridProps {
   posts: string[];
@@ -51,38 +53,14 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
           },
         });
         setFollowedUsers(prev => [...prev, user]);
+
+        // sending notification here
+        await sendFollowNotification(user.id);
       }
     } catch (error) {
       console.error('Follow/unfollow user failed:', error);
     }
   };
-
-
-  // const toggleFollowTag = async (tag: Tag) => {
-  //   try {
-  //     const isFollowing = followedTags.some(t => t.id === tag.id);
-
-  //     if (isFollowing) {
-  //       await axios.delete(`${BACKEND_URL}/api/v1/search/follow/tag/${tag.id}`, {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         },
-  //       });
-
-  //       setFollowedTags(prev => prev.filter(t => t.id !== tag.id));
-  //     } else {
-  //       await axios.post(`${BACKEND_URL}/api/v1/search/follow/tag/${tag.id}`, {}, {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         },
-  //       });
-
-  //       setFollowedTags(prev => [...prev, tag]);
-  //     }
-  //   } catch (error) {
-  //     console.error('Follow/unfollow tag failed:', error);
-  //   }
-  // };
 
   const toggleFollowTag = async (tag: Tag) => {
     try {
@@ -109,49 +87,6 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
       console.error('Follow/unfollow tag failed:', error);
     }
   };
-
-  // const toggleFollowTag = async (tag: Tag) => {
-  //   try {
-  //     if (followedTags.includes(tag)) {
-  //       await axios.delete(`${BACKEND_URL}/api/v1/search/follow/tag/${tag}`, {
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         },
-  //       });
-  //     } else {
-  //       await axios.post(`${BACKEND_URL}/api/v1/search/follow/tag/${tag}`, {}, { 
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         }, 
-  //       });
-  //     }
-
-  //     setFollowedTags(prev =>
-  //       prev.includes(tag)
-  //         ? prev.filter((t) => t !== tag)
-  //         : [...prev, tag]
-  //     );
-  //   } catch (error) {
-  //     console.error('Follow/unfollow tag failed:', error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   const delayDebounceFn = setTimeout(() => {
-  //     if (query.trim().length > 0) {
-  //       axios.get(`${BACKEND_URL}/api/v1/search?q=${encodeURIComponent(query)}`, { 
-  //         headers: {
-  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
-  //         },
-  //       })
-  //         .then(res => setResults(res.data))
-  //         .catch(err => console.error(err));
-  //     } else {
-  //       setResults({ users: [], tags: [] });
-  //     }
-  //   }, 300);
-  //   return () => clearTimeout(delayDebounceFn);
-  // }, [query]);
 
   useEffect(() => {
     console.log("useEffect triggered with query:", query);
@@ -234,12 +169,6 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
                 placeholder="Search users or sports..."
                 required
               />
-              {/* <button
-                type="submit"
-                className="text-white absolute end-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-              >
-                Search
-              </button> */}
 
               {/* Dropdown */}
               {(results.users.length > 0 || results.tags.length > 0) ? (
@@ -248,7 +177,7 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
                   {results.users.map((user, idx) => (
                     <div
                       key={`user-${user.id}-${idx}`}
-                      className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                      className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center  dark:bg-background dark:text-white"
                       onClick={() => navigate(`/profile/${user.username}`)}
                     >
                       <span>👤 {user.username}</span>
@@ -258,33 +187,17 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
                           e.stopPropagation();
                           toggleFollowUser(user.username);
                         }}
-                        className="text-sm text-blue-500 hover:underline"
+                        className="text-sm text-blue-500 hover:text-blue-300 hover:underline"
                       >
                         {followedUsers.some(f => f.username === user.username) ? 'Unfollow' : 'Follow'}
                       </button>
                     </div>
                   ))}
 
-                  {/* {results.tags.map((tag, idx) => (
-                    <div key={`tag-${idx}`} className="...">
-                      <span>{tag.name}</span>
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleFollowTag(tag.name); // pass tag name only
-                        }}
-                        className="text-sm text-blue-500 hover:underline"
-                      >
-                        {followedTags.includes(tag.name) ? 'Unfollow' : 'Follow'}
-                      </button>
-                    </div>
-                  ))} */}
-
                   {results.tags.map((tag, idx) => (
                     <div
                       key={`tag-${idx}`}
-                      className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                      className="p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center  dark:bg-background dark:text-white"
                       onClick={() => toggleFollowTag(tag)}
                     >
                       <div key={tag.id}>
@@ -305,7 +218,7 @@ export const SearchGrid = ({ posts }: SearchGridProps) => {
                 </div>
               // ) : query.trim().length > 0 ? (
                 ) : showNoResults ? (
-                  <div className="absolute z-30 mt-2 w-full bg-white border rounded shadow-md p-2 text-center text-gray-500">
+                  <div className="absolute z-30 mt-2 w-full bg-white border rounded shadow-md p-2 text-center text-gray-500 dark:bg-background dark:text-white">
                     No user or tag found.
                   </div>
                 ) : null}

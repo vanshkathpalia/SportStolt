@@ -48,7 +48,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
   const [image, setImage] = useState("")
   const [participants, setParticipants] = useState<number | undefined>(undefined);
   const [locationImage, setLocationImage] = useState("")  
-  const [isStartTimeInPast, setIsStartTimeInPast] = useState(false);
+  const [isstartTimeInPast, setIsstartTimeInPast] = useState(false);
   // const [selectedFile, setSelectedFile] = useState<File | null>(null)
   // const [previewUrl, setPreviewUrl] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -95,7 +95,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
 
     const selectedDateTime = new Date();
     selectedDateTime.setHours(hours, minutes, 0, 0);
-    setIsStartTimeInPast(selectedDateTime.getTime() < Date.now());
+    setIsstartTimeInPast(selectedDateTime.getTime() < Date.now());
 
   }, [activityStarted]);
 
@@ -331,7 +331,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                   required
                 />
               </div>
-              {isStartTimeInPast && (
+              {isstartTimeInPast && (
                 <p className="text-xs text-red-500 mt-1">Start time is in the past</p>
               )}
             </div>

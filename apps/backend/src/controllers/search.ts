@@ -208,8 +208,9 @@ searchRouter.get('/followed', authMiddleware, async (c) => {
 
 // to follow a user
 searchRouter.post('/follow/user/:id', authMiddleware, async (c) => {
-  console.log("HIT /follow/user/:id route");
-  console.log("DB URL:", c.env.DATABASE_URL);
+  // console.log("HIT /follow/user/:id route");
+  // console.log("DB URL:", c.env.DATABASE_URL);
+  
   const followingId = parseInt(c.req.param('id'));
   const followerId = (c.get('userId'));
 

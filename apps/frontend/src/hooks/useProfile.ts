@@ -17,6 +17,7 @@ export interface ProfileData {
   achievements: string;
   location: string;
   university: string;
+  points: number;
   bio: string;
 }
 

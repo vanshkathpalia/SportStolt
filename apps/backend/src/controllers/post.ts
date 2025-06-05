@@ -224,6 +224,7 @@ postRouter.get('/bulk', authMiddleware, async (c) => {
         createdAt: true,
         author: {
           select: {
+            id: true,
             name: true,
             image: true,
             username: true
@@ -268,6 +269,7 @@ postRouter.get('/bulk', authMiddleware, async (c) => {
         createdAt: true,
         author: {
           select: {
+            id: true,
             name: true,
             image: true,
             username: true
@@ -291,6 +293,7 @@ postRouter.get('/bulk', authMiddleware, async (c) => {
         createdAt: true,
         author: {
           select: {
+            id: true,
             name: true,
             image: true,
             username: true
@@ -473,6 +476,7 @@ postRouter.get('/:id', async (c) => {
                 id: true,
                 author: {
                     select: {
+                        id: true,
                         username: true,
                         name: true,
                         image: true,

@@ -292,6 +292,7 @@ userRouter.get('/:id/profile', authMiddleware, async (c) => {
       ? Math.floor((user.verifiedStories.length / user.story.length) * 100)
       : 0}%`,
     badge: user.badgeLevel,
+    points: user.points,
     followingCount: user.following.length,
     // followedTagsCount: user.followedTags.length,
     achievements: user.achievements,
@@ -391,6 +392,7 @@ userRouter.get('/:id/events', authMiddleware, async (c) => {
 
   const events = await prisma.event.findMany({
     where: {
+      // isArchived: false,
       registration: {
         some: {
           userId: userId,
@@ -400,9 +402,9 @@ userRouter.get('/:id/events', authMiddleware, async (c) => {
     select: {
       id: true,
       name: true,
-      StartDate: true,
-      EndDate: true,
-      StartTime: true,
+      startDate: true,
+      endDate: true,
+      startTime: true,
       stadium: true,
       OrganisedBy: true,
       // description: true,  // your schema doesn't have description in Event, so either add or remove
@@ -410,7 +412,7 @@ userRouter.get('/:id/events', authMiddleware, async (c) => {
       createdAt: true,
     },
     orderBy: {
-      StartDate: 'asc', // Order by start date ascending
+      startDate: 'asc', // Order by start date ascending
     },
   });
 
@@ -418,32 +420,32 @@ userRouter.get('/:id/events', authMiddleware, async (c) => {
 
   const enrichedEvents = events.map(event => {
     let status: "completed" | "ongoing" | "upcoming";
-    if (now > event.EndDate) {
+    if (now > event.endDate) {
       status = "completed";
-    } else if (now >= event.StartDate && now <= event.EndDate) {
+    } else if (now >= event.startDate && now <= event.endDate) {
       status = "ongoing";
     } else {
       status = "upcoming";
     }
     
-    const startDate = new Date(event.StartDate).toLocaleDateString('en-GB', {
+    const StartDate = new Date(event.startDate).toLocaleDateString('en-GB', {
       day: '2-digit', month: 'long', year: 'numeric',
     });
 
-    const endDate = new Date(event.EndDate).toLocaleDateString('en-GB', {
+    const EndDate = new Date(event.endDate).toLocaleDateString('en-GB', {
       day: '2-digit', month: 'long', year: 'numeric',
     });
 
-    const startTime = new Date(event.StartDate).toLocaleTimeString('en-GB', {
+    const StartTime = new Date(event.startDate).toLocaleTimeString('en-GB', {
       hour: '2-digit', minute: '2-digit', hour12: true,
     });
 
     return {
       organisedBy: event.OrganisedBy,
-      startDate,
-      startTime,
-      endDate,
-      timing: `Starts: ${startDate} at ${startTime}`,
+      StartDate,
+      EndDate,
+      StartTime,
+      timing: `Starts: ${StartDate} at ${StartTime}`,
       ...event,
       status,
     };

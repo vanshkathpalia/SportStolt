@@ -1,20 +1,93 @@
-import { PrismaClient } from '@prisma/client/edge';
+import { EventInterface, sendEventNotification } from "./notificationController";
 import { createEventInput } from '../schema/eventSchema';
 import { Context } from 'hono';
 import { formatDateToDDMMYYYY } from '../utils/eventTime';
-import { getPrisma } from '~/lib/prismaClient';
+import { getPrisma } from '../lib/prismaClient';
 
 // const getPrisma = (c: Context) =>
 //   new PrismaClient({ datasources: { db: { url: c.env.DATABASE_URL } } });
 
 // POST /api/v1/events/
+// export const createEventHandler = async (c: Context) => {
+//   try {
+    
+//     const body = await c.req.json();
+
+//     console.log(body); // here uncommnent
+
+//     const parseResult = createEventInput.safeParse(body);
+//     if (!parseResult.success) {
+//       c.status(400);
+//       return c.json({
+//         message: "Invalid input",
+//         errors: parseResult.error.errors.map(err => ({
+//           path: err.path.join('.'),
+//           message: err.message
+//         })),
+//       });
+//     }
+
+//     const now = new Date();
+
+//     const startDateTime = new Date(`${body.startDate}T${body.startTime}`);
+//     const endDate = new Date(body.endDate);
+
+//     if (startDateTime < now) {
+//     return c.json({ message: "Start time must be in the future" }, 400);
+//     }
+
+//     if (endDate < new Date(body.startDate)) {
+//     return c.json({ message: "End date must be after start date" }, 400);
+//     }
+
+//     const userId = c.get("userId");
+//     if (!userId) {
+//       c.status(403);
+//       return c.json({ message: "User not authenticated" });
+//     }
+
+//     // const prisma = new PrismaClient({
+//     //   datasources: {
+//     //     db: { url: c.env.DATABASE_URL },
+//     //   },
+//     // });
+
+//     // const prisma = getPrisma(c);
+
+//     const prisma = getPrisma(c.env.DATABASE_URL);
+
+//     // const event = await createEvent(c.env.DATABASE_URL, body, Number(userId)); 
+//     // if using services
+
+//     const event = await prisma.event.create({
+//       data: {
+//         ...body,
+//         authorId: Number(userId),
+//         startDate: new Date(body.startDate),
+//         endDate: new Date(body.endDate),
+//         startTime: new Date(body.startTime),
+//       },
+//     });
+
+//     // return c.json({
+//     //   id: event.id,
+//     //   authorId: event.authorId,
+//     //   startDate: formatDateToDDMMYYYY(new Date(event.startDate)),
+//     //   endDate: formatDateToDDMMYYYY(new Date(event.endDate)),
+//     //   startTime: event.startTime.toISOString(), // or formatted if needed
+//     // });
+
+//     return c.json({ id: event.id, authorId: event.authorId });
+//   } catch (error) {
+//     c.status(500);
+//     return c.json({ message: "Internal server error" });
+//   }
+// };
+
+
 export const createEventHandler = async (c: Context) => {
   try {
-    
     const body = await c.req.json();
-
-    console.log(body); // here uncommnent
-
     const parseResult = createEventInput.safeParse(body);
     if (!parseResult.success) {
       c.status(400);
@@ -28,16 +101,15 @@ export const createEventHandler = async (c: Context) => {
     }
 
     const now = new Date();
-
-    const startDateTime = new Date(`${body.StartDate}T${body.StartTime}`);
-    const endDate = new Date(body.EndDate);
+    const startDateTime = new Date(`${body.startDate}T${body.startTime}`);
+    const endDate = new Date(body.endDate);
 
     if (startDateTime < now) {
-    return c.json({ message: "Start time must be in the future" }, 400);
+      return c.json({ message: "Start time must be in the future" }, 400);
     }
 
-    if (endDate < new Date(body.StartDate)) {
-    return c.json({ message: "End date must be after start date" }, 400);
+    if (endDate < new Date(body.startDate)) {
+      return c.json({ message: "End date must be after start date" }, 400);
     }
 
     const userId = c.get("userId");
@@ -46,39 +118,24 @@ export const createEventHandler = async (c: Context) => {
       return c.json({ message: "User not authenticated" });
     }
 
-    // const prisma = new PrismaClient({
-    //   datasources: {
-    //     db: { url: c.env.DATABASE_URL },
-    //   },
-    // });
-
-    // const prisma = getPrisma(c);
-
     const prisma = getPrisma(c.env.DATABASE_URL);
-
-    // const event = await createEvent(c.env.DATABASE_URL, body, Number(userId)); 
-    // if using services
 
     const event = await prisma.event.create({
       data: {
         ...body,
         authorId: Number(userId),
-        StartDate: new Date(body.StartDate),
-        EndDate: new Date(body.EndDate),
-        StartTime: new Date(body.StartTime),
+        startDate: new Date(body.startDate),
+        endDate: new Date(body.endDate),
+        startTime: new Date(body.startTime),
       },
     });
 
-    // return c.json({
-    //   id: event.id,
-    //   authorId: event.authorId,
-    //   StartDate: formatDateToDDMMYYYY(new Date(event.StartDate)),
-    //   EndDate: formatDateToDDMMYYYY(new Date(event.EndDate)),
-    //   StartTime: event.StartTime.toISOString(), // or formatted if needed
-    // });
+    // use the notification helper
+    await sendEventNotification(prisma, event as EventInterface, Number(userId));
 
     return c.json({ id: event.id, authorId: event.authorId });
   } catch (error) {
+    console.error(error);
     c.status(500);
     return c.json({ message: "Internal server error" });
   }
@@ -90,6 +147,9 @@ export const getBulkEventsHandler = async (c: Context) => {
     const prisma = getPrisma(c.env.DATABASE_URL);
 
     const events = await prisma.event.findMany({
+      where: {
+        isArchived: false,
+      },
       select: {
         id: true,
         image: true,
@@ -99,21 +159,19 @@ export const getBulkEventsHandler = async (c: Context) => {
         city: true,
         authorId: true,
         stadium: true,
-        StartDate: true,
-        EndDate: true,
-        StartTime: true,
+        startDate: true,
+        endDate: true,
+        startTime: true,
         OrganisedBy: true,
         registration: true,
       },
-      orderBy: {
-        StartDate: 'asc',
-      },
+      orderBy: [ {startDate: 'asc'}, {endDate: 'asc'}, {startTime: 'asc'}], 
     });
 
     const transformedEvents = events.map((event) => {
-      const startDate = formatDateToDDMMYYYY(new Date(event.StartDate));
-      const endDate = formatDateToDDMMYYYY(new Date(event.EndDate));
-      const startTime = new Date(event.StartTime).toLocaleTimeString('en-GB', {
+      const startDate = formatDateToDDMMYYYY(new Date(event.startDate));
+      const endDate = formatDateToDDMMYYYY(new Date(event.endDate));
+      const startTime = new Date(event.startTime).toLocaleTimeString('en-GB', {
         hour: '2-digit', minute: '2-digit', hour12: true,
       });
 
@@ -210,7 +268,7 @@ export const deleteEventHandler = async (c: Context) => {
     const userId = c.get("userId");
     const prisma = getPrisma(c.env.DATABASE_URL);
 
-    const event = await prisma.event.findUnique({ where: { id: eventId } });
+    const event = await prisma.event.findUnique({ where: { id: eventId, isArchived: false }});
 
     if (!event) {
       c.status(404);
@@ -257,18 +315,18 @@ export const deleteEventHandler = async (c: Context) => {
 //     image: z.string().min(1, { message: 'Image URL is required' }), // Image URL must be non-empty
 //     city: z.string().min(1, { message: 'City is necessary field'}),
 //     stadium: z.string().min(1, { message: 'Stadium name is required' }), // Stadium name must be non-empty
-//     StartDate: z.string().refine(val => !isNaN(Date.parse(val)), {
-//       message: "StartDate must be a valid date string",
+//     startDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+//       message: "startDate must be a valid date string",
 //     }),
-//     EndDate: z.string().refine(val => !isNaN(Date.parse(val)), {
-//       message: "EndDate must be a valid date string",
+//     endDate: z.string().refine(val => !isNaN(Date.parse(val)), {
+//       message: "endDate must be a valid date string",
 //     }),
-//     StartTime: z.string().refine(val => !isNaN(Date.parse(val)), {
-//       message: "StartTime must be a valid datetime string",
+//     startTime: z.string().refine(val => !isNaN(Date.parse(val)), {
+//       message: "startTime must be a valid datetime string",
 //     }),
-//     // StartDate: z.string().datetime({ message: 'StartDate must be a valid ISO datetime' }), // ISO datetime string
-//     // EndDate: z.string().datetime({ message: 'EndDate must be a valid ISO datetime' }), // ISO datetime string
-//     // StartTime: z.string().datetime({ message: 'StartTime must be a valid ISO datetime' }), // ISO datetime string
+//     // startDate: z.string().datetime({ message: 'startDate must be a valid ISO datetime' }), // ISO datetime string
+//     // endDate: z.string().datetime({ message: 'endDate must be a valid ISO datetime' }), // ISO datetime string
+//     // startTime: z.string().datetime({ message: 'startTime must be a valid ISO datetime' }), // ISO datetime string
 //   });
 
 // function formatDateToDDMMYYYY(dateString: string): string {
@@ -324,9 +382,9 @@ export const deleteEventHandler = async (c: Context) => {
 //       ? new Date(body.publishedDate)
 //       : new Date();
 
-//     const startDate = new Date(body.StartDate);
-//     const endDate = new Date(body.EndDate);
-//     const startTime = new Date(body.StartTime);
+//     const startDate = new Date(body.startDate);
+//     const endDate = new Date(body.endDate);
+//     const startTime = new Date(body.startTime);
 
 //     console.log(`publishedDate: ${publishedDate.toISOString()}`);
 //     console.log(`startDate: ${startDate.toISOString()}`);
@@ -355,9 +413,9 @@ export const deleteEventHandler = async (c: Context) => {
 //         name: body.name,
 //         authorId: Number(userId),
 //         stadium: body.stadium,
-//         StartDate: startDate,
-//         EndDate: endDate,
-//         StartTime: startTime,
+//         startDate: startDate,
+//         endDate: endDate,
+//         startTime: startTime,
 //         OrganisedBy: body.OrganisedBy,
 //         likeCount: 0,
 //         country: body.country || "",
@@ -399,27 +457,27 @@ export const deleteEventHandler = async (c: Context) => {
 //         city: true,
 //         authorId: true,
 //         stadium: true,
-//         StartDate: true,
-//         EndDate: true,
-//         StartTime: true,
+//         startDate: true,
+//         endDate: true,
+//         startTime: true,
 //         OrganisedBy: true,
 //         registration: true,
 //       },
 //       orderBy: {
-//         StartDate: 'asc', // Order by start date ascending
+//         startDate: 'asc', // Order by start date ascending
 //       },
 //     });
 
 //     const transformedEvents = events.map((event) => {
-//       const startDate = new Date(event.StartDate).toLocaleDateString('en-GB', {
+//       const startDate = new Date(event.startDate).toLocaleDateString('en-GB', {
 //         day: '2-digit', month: 'long', year: 'numeric',
 //       });
 
-//       const endDate = new Date(event.EndDate).toLocaleDateString('en-GB', {
+//       const endDate = new Date(event.endDate).toLocaleDateString('en-GB', {
 //         day: '2-digit', month: 'long', year: 'numeric',
 //       });
 
-//       const startTime = new Date(event.StartDate).toLocaleTimeString('en-GB', {
+//       const startTime = new Date(event.startDate).toLocaleTimeString('en-GB', {
 //         hour: '2-digit', minute: '2-digit', hour12: true,
 //       });
 
@@ -436,7 +494,7 @@ export const deleteEventHandler = async (c: Context) => {
 //         startDate,
 //         startTime,
 //         endDate,
-//         // endDate: event.EndDate,
+//         // endDate: event.endDate,
 //         organisedBy: event.OrganisedBy,
 //         city: event.city,
 //         registrationCount: event.registration.length,
@@ -581,9 +639,9 @@ export const deleteEventHandler = async (c: Context) => {
 // //           city: true,
 // //           authorId: true,
 // //           stadium: true,
-// //           StartDate: true,
-// //           EndDate: true,
-// //           StartTime: true,
+// //           startDate: true,
+// //           endDate: true,
+// //           startTime: true,
 // //           OrganisedBy: true,
 // //         },
 // //       });

@@ -1,6 +1,3 @@
-"use client"
-// useEffect
-
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { Avatar, AvatarImage } from "../ui/avatar"
@@ -88,26 +85,71 @@ export const PostCard = ({
 
   const navigate = useNavigate()
 
-  // const handleLike = async () => {
-  //   setLiked(!liked)
+  const handleLike = async () => {
+    try {
+      const res = await axios.post(
+        `${BACKEND_URL}/api/v1/post/${id}/like`,
+        {},
+        { headers: { Authorization: `Bearer ${userToken}` } }
+      );
+      setLiked(res.data.liked);
+      setLikeCount(res.data.likeCount);
+
+      if (res.data.liked) {
+        await axios.post(
+          `${BACKEND_URL}/api/v1/notification/send-all`,
+          {
+            type: 'LIKE',
+            receiverId: author?.id, // Assuming author object has id
+            message: 'liked your post!',
+            postId: id, // Or postId if you want to relate to posts
+          },
+          // token coming from global call to localStorage
+          { headers: { Authorization: `Bearer ${userToken}` } }
+        );
+      }
+    } catch (error) {
+      console.error('Failed to like:', error);
+    }
+  };
+
+  // const handleComment = async (commentText: string) => {
   //   try {
-  //     await axios.post(`/api/posts/${id}/like`, {}, {
-  //       headers: {
-  //         Authorization: `Bearer ${localStorage.getItem("token")}`, || "", // Adjust token source
-  //       }
-  //     })
+  //     // 1. Post comment to backend
+  //     await axios.post(
+  //       `${BACKEND_URL}/api/v1/post/${id}/comment`,
+  //       { content: commentText },
+  //       { headers: { Authorization: `Bearer ${userToken}` } }
+  //     );
+
+  //     // 2. Notify the post author
+  //     await axios.post(
+  //       `${BACKEND_URL}/api/notification/send-all`,
+  //       {
+  //         type: 'COMMENT',
+  //         receiverId: author.id,
+  //         message: `commented on your post!`,
+  //         storyImageId: id, // or postId
+  //         commentText,
+  //       },
+  //       { headers: { Authorization: `Bearer ${userToken}` } }
+  //     );
+
+  //     // optionally update comments state here
+
   //   } catch (error) {
-  //     console.error("Failed to like:", error)
-  //     setLiked(!liked) // rollback
+  //     console.error('Failed to post comment:', error);
   //   }
-  // }
+  // };
+
+
 
   const handleSave = async () => {
     setSaved(!saved)
     try {
       await axios.post(`/api/post/${id}/save`, {}, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}, || ""`
+          Authorization: `Bearer ${userToken}, || ""`
         }
       })
     } catch (error) {
@@ -115,6 +157,22 @@ export const PostCard = ({
       setSaved(!saved) // rollback
     }
   }
+
+  // useEffect(() => {
+  //   const fetchStatus = async () => {
+  //     try {
+  //       const res = await axios.get(`${BACKEND_URL}/api/v1/post/${id}/status`, {
+  //         headers: { Authorization: `Bearer ${userToken}` }
+  //       });
+  //       setLiked(res.data.liked);
+  //       setLikeCount(res.data.likeCount);
+  //     } catch (err) {
+  //       console.error('Failed to fetch post status', err);
+  //     }
+  //   };
+  //   fetchStatus();
+  // }, [id, userToken]);
+
 
 //   Get initials for avatar fallback
 //   const authorInitials = post.author.name.charAt(0).toUpperCase()
@@ -133,10 +191,18 @@ export const PostCard = ({
     }
   }
 
+  if (!author?.id) {
+    console.warn("No author.id available", author);
+    return;
+  }
+
+
+  // console.log(author);
+
   return (
     <div
       className={cn(
-        "bg-background bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md max-w-xl mx-auto mb-5", 
+        "bg-background bg-white dark:bg-background border border-gray-200 dark:border-gray-700 rounded-md max-w-xl mx-auto mb-5", 
         // !expanded && "cursor-pointer"
       )} onClick={handlePostClick}
     >
@@ -144,7 +210,9 @@ export const PostCard = ({
       <div className="flex items-center justify-between p-3" onClick={handlePostClick}>
         <div className="flex dark:text-slate-200 items-center space-x-2">
           <Avatar className="w-10 h-10">
-            <AvatarImage src={author.image} alt={title} />
+            <AvatarImage src={author.image} onError={(e) => {
+            (e.target as HTMLImageElement).src = '/placeholder.svg?height=40&width=40';
+            }}/>
             {/* <AvatarFallback>{authorInitials}</AvatarFallback> */}
           </Avatar>
           <span className="font-medium dark:text-slate-200 text-sm">{author.username}</span>
@@ -176,21 +244,7 @@ export const PostCard = ({
           )}
           <div className="flex space-x-4">
             <button
-              onClick={(e) => {
-                e.stopPropagation();
-                fetch(`${BACKEND_URL}/api/v1/post/${id}/like`, {
-                  method: "POST",
-                  headers: { Authorization: `Bearer ${userToken}` },
-                })
-                  .then(res => res.json())
-                  .then(data => {
-                    setLiked(data.liked);
-                    setLikeCount(data.likeCount);
-                  })
-                  .catch(() => {
-                    setLiked(prev => !prev);
-                  });
-              }}
+              onClick={handleLike}
               className={cn(
                 "text-gray-600 dark:text-gray-400 hover:text-red-500 transition-colors",
                 liked && "text-red-500"

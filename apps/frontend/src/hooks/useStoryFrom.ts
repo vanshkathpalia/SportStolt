@@ -13,7 +13,7 @@
 //   const [image, setImage] = useState("")
 //   const [participants, setParticipants] = useState<number | undefined>(undefined)
 //   const [locationImage, setLocationImage] = useState("")
-//   const [isStartTimeInPast, setIsStartTimeInPast] = useState(false)
+//   const [isstartTimeInPast, setIsstartTimeInPast] = useState(false)
 //   const [isLoading, setIsLoading] = useState(false)
 
 //   const navigate = useNavigate()
@@ -25,7 +25,7 @@
 
 //     const selectedDateTime = new Date()
 //     selectedDateTime.setHours(hours, minutes, 0, 0)
-//     setIsStartTimeInPast(selectedDateTime.getTime() < Date.now())
+//     setIsstartTimeInPast(selectedDateTime.getTime() < Date.now())
 //   }, [activityStarted])
 
 //   const handleSubmit = async (e: React.FormEvent) => {
@@ -93,7 +93,7 @@
 //     setParticipants,
 //     locationImage,
 //     setLocationImage,
-//     isStartTimeInPast,
+//     isstartTimeInPast,
 //     isLoading,
 //     handleSubmit,
 //   }
