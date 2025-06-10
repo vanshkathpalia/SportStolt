@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import { ChevronUp, ChevronLeft, ChevronRight, X, Users, Clock, MapPin } from "lucide-react"
 import type { StoryType } from "./types"
 import { BACKEND_URL } from "../../config"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 
 interface StoryViewProps {
   story: StoryType
@@ -252,7 +253,7 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose, onImageVie
         </button>
 
         {/* Author */}
-        <div className="absolute top-4 left-4 z-40">
+        {/* <div className="absolute top-4 left-4 z-40">
           <div className="flex items-center space-x-2">
             <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-300">
               {story.author.image ? (
@@ -266,7 +267,28 @@ export const StoryView: React.FC<StoryViewProps> = ({ story, onClose, onImageVie
               <p className="text-sm opacity-80">{story.location}</p>
             </div>
           </div>
+        </div> */}
+        <div className="absolute top-4 left-4 z-40">
+          <div className="flex dark:text-slate-200 items-center space-x-2">
+            <Avatar className="w-10 h-10">
+              <AvatarImage
+                src={story.author.image}
+                alt={story.author.username}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/placeholder.svg?height=40&width=40';
+                }}
+              />
+              <AvatarFallback>
+                {story.author.username.charAt(0).toUpperCase()}
+              </AvatarFallback>
+            </Avatar>
+            <div className="text-white dark:text-slate-200">
+              <p className="font-medium text-sm">{story.author.username}</p>
+              <p className="text-xs opacity-80">{story.location}</p>
+            </div>
+          </div>
         </div>
+
 
         {/* Navigation */}
         {!showDetails && currentImageIndex > 0 && (

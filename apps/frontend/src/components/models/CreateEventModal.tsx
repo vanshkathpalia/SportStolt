@@ -5,6 +5,7 @@ import { Input } from "../ui/input"
 import { Label } from "../ui/label"
 import axios from "axios"
 import { BACKEND_URL } from "../../config"
+// import { Camera, X } from "lucide-react"
 
 interface CreateEventModalProps {
   isOpen: boolean
@@ -29,6 +30,45 @@ export function CreateEventModal({ isOpen, onClose }: CreateEventModalProps) {
     startTime?: string;
   }>({});
 
+  // const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  // const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  // const [error, setError] = useState<string | null>(null)
+
+
+  // const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0]
+  //   if (!file) return
+
+  //   if (!file.type.startsWith("image/")) {
+  //     setError("Please select a valid image file")
+  //     return
+  //   }
+
+  //   setSelectedFile(file)
+  //   setPreviewUrl(URL.createObjectURL(file))
+  //   setError(null)
+
+  //   // Cloudflare Upload
+  //   try {
+  //     const formData = new FormData()
+  //     formData.append("file", file)
+
+  //     const res = await axios.post(`${BACKEND_URL}/api/v1/upload`, formData, {
+  //       headers: {
+  //         Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         "Content-Type": "multipart/form-data",
+  //       },
+  //     })
+
+  //     const uploadedUrl = res.data?.url // Adjust based on your API response
+  //     if (uploadedUrl) {
+  //       setImage(uploadedUrl)
+  //     }
+  //   } catch (uploadErr) {
+  //     console.error("Upload error:", uploadErr)
+  //     setError("Failed to upload image. Try again.")
+  //   }
+  // }
 
 
   // const handleSubmit = async (e: React.FormEvent) => {
@@ -77,6 +117,7 @@ export function CreateEventModal({ isOpen, onClose }: CreateEventModalProps) {
   //     setIsLoading(false)
   //   }
   // }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -255,6 +296,69 @@ export function CreateEventModal({ isOpen, onClose }: CreateEventModalProps) {
               required
             />
           </div>
+
+          {/* Image Upload + Preview */}
+          {/* <div>
+            <Label className="block mb-2 dark:text-white">
+              <Camera className="w-4 h-4 inline mr-1" />
+              Upload an Image
+            </Label>
+
+            {previewUrl ? (
+              <div className="relative w-full border border-gray-600 rounded-lg p-4">
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="max-h-64 mx-auto object-contain rounded-lg"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  onClick={() => {
+                    setSelectedFile(null)
+                    setPreviewUrl(null)
+                    setImage("")
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center">
+                <Camera className="h-10 w-10 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground mb-2">
+                  Drag & drop image or click to upload
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="dark:text-white"
+                  onClick={() => document.getElementById("image-upload")?.click()}
+                >
+                  Select from computer
+                </Button>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+              </div>
+            )}
+
+            {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
+          </div> */}
+
+          {/* {selectedFile && (
+            <p className="text-sm text-muted-foreground mt-1">
+              Selected file: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
+            </p>
+          )} */}
+
 
           <div>
             <Label className="block text-sm font-medium dark:text-white text-black mb-2">Country</Label>

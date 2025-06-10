@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { Avatar, AvatarImage } from "../ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 import { Button } from "../ui/button"
 import { MessageCircle, Send, MoreHorizontal, Heart, Bookmark } from "lucide-react"
 import { cn } from "../../lib/utils"
@@ -142,8 +142,6 @@ export const PostCard = ({
   //   }
   // };
 
-
-
   const handleSave = async () => {
     setSaved(!saved)
     try {
@@ -210,10 +208,14 @@ export const PostCard = ({
       <div className="flex items-center justify-between p-3" onClick={handlePostClick}>
         <div className="flex dark:text-slate-200 items-center space-x-2">
           <Avatar className="w-10 h-10">
-            <AvatarImage src={author.image} onError={(e) => {
-            (e.target as HTMLImageElement).src = '/placeholder.svg?height=40&width=40';
+            <AvatarImage 
+              src={author.image} 
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/placeholder.svg?height=40&width=40';
             }}/>
-            {/* <AvatarFallback>{authorInitials}</AvatarFallback> */}
+            <AvatarFallback>
+              {author.username.charAt(0).toUpperCase()}
+            </AvatarFallback>
           </Avatar>
           <span className="font-medium dark:text-slate-200 text-sm">{author.username}</span>
         </div>
@@ -225,7 +227,7 @@ export const PostCard = ({
 
       {/* Post Image */}
       <div className="relative aspect-square" >
-        <img src={content || "/placeholder.svg"} alt={title} className="dark:text-slate-200 w-full h-full object-cover" />
+        <img src={content || "/placeholder.svg"} alt={title} className="dark:text-slate-200 w-full h-full object-contain bg-slate-800" />
       </div>
 
       {/* Post Actions */}

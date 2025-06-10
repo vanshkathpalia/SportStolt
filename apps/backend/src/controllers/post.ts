@@ -5,6 +5,9 @@ import { verify } from 'hono/jwt'
 import { createPostInput, updatePostInput } from '@vanshkathpalia/sportstolt-common'
 import { z } from "zod"
 import { authMiddleware } from '../middleware/authMiddleware' // adjust the path as needed
+import { HmacSHA1 } from 'crypto-js'; // use `crypto-js` for Hono-compatible hashing
+import Base64 from 'crypto-js/enc-base64';
+import { nanoid } from 'nanoid';
 
 
 const createPostsInput = z.object({
@@ -14,80 +17,55 @@ const createPostsInput = z.object({
 
 export const postRouter = new Hono<{
     Bindings: {
-        DATABASE_URL: string;
-        JWT_SECRET: string;
-      } 
+      DATABASE_URL: string;
+      JWT_SECRET: string;
+      IMAGEKIT_PRIVATE_KEY: string;
+      IMAGEKIT_PUBLIC_KEY: string;
+      IMAGEKIT_URL_ENDPOINT: string;
+  } 
     Variables: {
-        userId: number;
+      userId: number;
     }
 }>();
 
+
 postRouter.use('/*', authMiddleware);
 
- 
-// postRouter.post('/', async (c) => {
-//     // console.log('Incoming request:', c.req.method, c.req.url);
-//     try {
-//         const body = await c.req.json();
-//         console.log('Request body:', body);
-//         // console.log('createPostInput:', createPostsInput);
 
-//         const { success } = createPostsInput.safeParse(body);
-//         if (!success) {
-//             c.status(411);
-//             return c.json({ message: "invalid" });
-//         }
+postRouter.get('/upload-auth', async (c) => {
+  const userId = c.get('userId');
+  if (!userId) {
+    return c.json({ message: "Unauthorized" }, 403);
+  }
 
-//         // const result = createPostsInput.safeParse(body);
-//         // if (!result.success) {
-//         //     console.error("Validation error:", result.error);
-//         //     c.status(411);
-//         //     c.json({ message: "Invalid input" });
-//         //     return;
-//         // }
+  // Inside your /upload-auth endpoint
+  const privateKey = c.env.IMAGEKIT_PRIVATE_KEY;
+  const publicKey = c.env.IMAGEKIT_PUBLIC_KEY;
 
-//         const authorId = c.get("userId");
-//         if (!authorId) {
-//             c.status(403);
-//             c.json({ message: "User not authenticated" });
-//             return;
-//         }
+  const expire = Math.floor(Date.now() / 1000) + 60 * 30;
+  const token = nanoid();
 
-//         if (!c.env.DATABASE_URL) {
-//             c.status(500);
-//             c.json({ message: "DATABASE_URL is not set" });
-//             return;
-//         }
-//         // const prisma = new PrismaClient({
-//         //     datasourceUrl: c.env.DATABASE_URL,
-//         // }).$extends(withAccelerate());
-//         const prisma = new PrismaClient({
-//             datasources: {
-//                 db: { url: c.env.DATABASE_URL },
-//             },
-//         });
-//         prisma.$connect()
-//         .then(() => console.log('Prisma connected'))
-//         .catch((error: unknown) => console.error('Prisma connection error:', error));
+  const raw = token + expire;
+  const signatureBeforeCase = Base64.stringify(HmacSHA1(raw, privateKey));
+  const signature = signatureBeforeCase.toLowerCase();
+
+  console.log("Server-Side Signature Generation Details:");
+  console.log("Private Key (first 5 chars):", privateKey.substring(0, 5) + "..."); // Mask for safety
+  console.log("Token:", token);
+  console.log("Expire:", expire);
+  console.log("Raw String (token + expire):", raw);
+  console.log("Signature BEFORE toLowerCase():", signatureBeforeCase);
+  console.log("Signature AFTER toLowerCase():", signature);
+
+  return c.json({
+    signature,
+    token,
+    expire,
+    publicKey,
+  });
+});
 
 
-//         const post = await prisma.post.create({
-//             data: {
-//                 title: body.title,
-//                 content: body.content,
-//                 authorId: Number(authorId)
-//             }
-//         });
-
-//         return c.json({
-//             id: post.id
-//         });
-//     } catch(error) {
-//         console.error("Unhandled error:", error);
-//         c.status(500);
-//         c.json({ message: "Internal server error" });
-//     }
-// })
 postRouter.post('/', async (c) => {
     try {
         const body = await c.req.json();
@@ -209,7 +187,7 @@ postRouter.get('/bulk', authMiddleware, async (c) => {
       }
     });
 
-    const followedUserIds = followedUsers.map(f => f.followingId);
+    const followedUserIds = followedUsers.map((f: { followingId: number }) => f.followingId);
 
     posts = await prisma.post.findMany({
       where: {
@@ -249,7 +227,9 @@ postRouter.get('/bulk', authMiddleware, async (c) => {
       }
     });
 
-    const followedTagIds = followedTags.flatMap(t => t.followedTags.map(tag => tag.id));
+    const followedTagIds = followedTags.flatMap(
+      (t: { followedTags: { id: number }[] }) => t.followedTags.map((tag: { id: number }) => tag.id)
+    );
     // const followedTagIds = followedTags.map(t => t.followedTags.id);
 
     posts = await prisma.post.findMany({

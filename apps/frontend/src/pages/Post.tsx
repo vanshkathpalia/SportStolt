@@ -6,25 +6,8 @@ import { useMediaQuery } from "../hooks/useMediaQuery";
 import { MobileNav } from "../components/StickyBars/MobileNav";
 import { Sidebar } from "../components/StickyBars/Sidebar";
 import { Button } from "../components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Bookmark, Heart, MessageCircle, MoreHorizontal, Share2 } from "lucide-react";
 import { PostCard } from "../components/Post/PostCard";
-import { PostSkeleton } from "../components/Post/PostSkeleton";
-
-// // import { Sidebar } from "../components/StickyBars/Sidebar"
-// // import { MobileNav } from "../components/StickyBars/MobileNav"
-// // import { PostCard } from "../components/Post/PostCard"
-// // import { useMediaQuery } from "../hooks/useMediaQuery"
-// import { ArrowLeft } from "lucide-react"
-// import { usePosts } from "../../hooks"
-// import { useMediaQuery } from "../../hooks/useMediaQuery"
-// import { MobileNav } from "../StickyBars/MobileNav"
-// import { Sidebar } from "../StickyBars/Sidebar"
-// import { Button } from "../ui/button"
-// // import { Button } from "../components/ui/button"
-// // import { usePosts } from "../hooks"
-
-// Mock data
-// import { POSTS } from "../data/mockData"
 
 interface PostPageProps {
   openCreateModal: () => void
@@ -76,7 +59,51 @@ export const PostPage = ({ openCreateModal }: PostPageProps) => {
               //     <div className="h-4 bg-gray-200 dark:bg-gray-600 rounded w-full animate-pulse" />
               //   </div>
               // </div>
-              PostSkeleton()
+              // PostSkeleton()
+              <div className="flex justify-center">
+                <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg mb-4 animate-pulse w-full max-w-xl">
+                  {/* Header */}
+                  <div className="p-4 flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gray-200 dark:bg-gray-700 rounded-full" />
+                      <div className="h-4 w-36 bg-gray-200 dark:bg-gray-700 rounded" />
+                    </div>
+                    <button className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+                      <MoreHorizontal className="w-6 h-6" />
+                    </button>
+                  </div>
+
+                  {/* Image Placeholder */}
+                  <div className="h-[600px] bg-gray-200 dark:bg-gray-700 w-full" />
+
+                  {/* Bottom Content */}
+                  <div className="p-4 space-y-3">
+                    <div className="flex justify-between items-center">
+                      <div className="flex space-x-4">
+                        <button className="text-gray-600 dark:text-gray-400 hover:text-red-500 transition-colors">
+                          <Heart className="w-6 h-6" />
+                        </button>
+                        <button className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                          <MessageCircle className="w-6 h-6" />
+                        </button>
+                        <button className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                          <Share2 className="w-6 h-6" />
+                        </button>
+                      </div>
+                      <button className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
+                        <Bookmark className="w-6 h-6" />
+                      </button>
+                    </div>
+
+                    {/* Skeleton Texts */}
+                    <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded" />
+                    <div className="space-y-2">
+                      <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded" />
+                      <div className="h-4 w-1/2 bg-gray-200 dark:bg-gray-700 rounded" />
+                    </div>
+                  </div>
+                </div>
+              </div>
 
             ) : post ? (
               // Post detail view

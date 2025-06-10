@@ -8,11 +8,12 @@ import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Textarea } from "../ui/textarea"
 import { Label } from "../ui/label"
-import { Clock, Trophy, Camera, Users } from "lucide-react"
+import { Clock, Trophy, Camera, Users, X, Loader2 } from "lucide-react"
 // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { BACKEND_URL } from "../../config"
 import axios from "axios"
 import { useNavigate } from "react-router-dom"
+import { validateAndUploadImage } from "../../utils/validateAndUploadImage";
 // import e from "express"
 
 interface CreateStoryModalProps {
@@ -39,6 +40,12 @@ interface CreateStoryModalProps {
 
 export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
   // const [title, setTitle] = useState("")
+
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+
   const [description, setDescription] = useState("")
   const [location, setLocation] = useState("")
   const [activityStarted, setActivityStarted] = useState("")
@@ -149,6 +156,57 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
       setIsLoading(false);
     }
   };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) {
+      alert("Only JPEG, PNG, or WebP files are allowed.")
+      return
+    }
+
+    setIsUploadingImage(true)
+    setError(null)
+    setPreviewUrl(URL.createObjectURL(file))
+
+    try {
+      const uploadedUrl = await validateAndUploadImage(file)
+      setImage(uploadedUrl)
+      setSelectedFile(file)
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || "Image not accepted")
+      }
+      setImage("")
+      setPreviewUrl(null)
+    } finally {
+      setIsUploadingImage(false)
+    }
+  }
+
+  // const handleCreate = () => {
+  //   if (!image || !location || !sport) return
+  //   onCreate(image, location, sport)
+  //   onClose()
+  //   setSelectedFile(null)
+  //   setPreviewUrl(null)
+  //   setImageUrl("")
+  //   setLocation("")
+  //   setSport("")
+  //   setError(null)
+  // }
+
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedFile(null)
+      setPreviewUrl(null)
+      setImage("")
+      setLocation("")
+      setSport("")
+      setError(null)
+    }
+  }, [isOpen])
   
 
   return (
@@ -160,6 +218,67 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Story Image Upload */}
+          <div className="space-y-2">
+            <Label className="block mb-2 dark:text-white">
+              <Camera className="w-4 h-4 inline mr-1" />
+              Upload an Image
+            </Label>
+
+            {previewUrl ? (
+              <div className="relative w-full border border-gray-600 rounded-lg p-4">
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="max-h-64 mx-auto object-contain rounded-lg"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  onClick={() => {
+                    setSelectedFile(null)
+                    setPreviewUrl(null)
+                    setImage("")
+                  }}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed rounded-lg p-6 flex flex-col items-center justify-center text-center">
+                <Camera className="h-10 w-10 text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground mb-2">
+                  Drag & drop image or click to upload
+                </p>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="dark:text-white"
+                  onClick={() => document.getElementById("story-image-upload")?.click()}
+                >
+                  Select from computer
+                </Button>
+                <Input
+                  id="story-image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+              </div>
+            )}
+
+              {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
+            </div>
+
+            {selectedFile && (
+              <p className="text-sm text-muted-foreground mt-1">
+                Selected file: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
+              </p>
+            )}
+
           {/* <div className="space-y-2">
             <Label>Story Image</Label>
             {previewUrl ? (
@@ -207,7 +326,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
             )}
           </div> */}
 
-          <div>
+          {/* <div>
                 <label className="block text-sm font-medium dark:text-white text-black mb-2">
                     <Camera className="w-4 h-4 inline mr-1 " />
                     Story Image URL *
@@ -220,7 +339,7 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
                   className="w-full px-3 py-2 border dark:border-gray-700 dark:bg-background rounded-lg dark:text-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Enter image URL"
               />
-          </div>
+          </div> */}
           
           {/* Location image Input, rendered through api, seen the name of locaiton 
           can be used for maps later... */}
@@ -377,7 +496,8 @@ export function CreateStoryModal({ isOpen, onClose }: CreateStoryModalProps) {
             className="w-full bg-primary text-primary-foreground hover:bg-primary/90 dark:bg-gray-900 dark:hover:bg-gray-600 dark:text-white"
             disabled={ /*!isloading, was for when image was uploaded form device... */!image || !description || !location || !activityStarted || !activityEnded|| !sport }
           >
-            {isLoading ? "Creating story..." : "Share Story"}
+            {isUploadingImage ? "Uploading story..." : "Share Story"}
+            {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           </Button>
         </form>
       </DialogContent>

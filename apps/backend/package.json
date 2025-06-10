@@ -12,6 +12,7 @@
     "@vanshkathpalia/sportstolt-common": "^1.0.0",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
+    "crypto-js": "^4.2.0",
     "dotenv": "^16.5.0",
     "hono": "^4.6.5",
     "nodemailer": "^7.0.3",
@@ -22,6 +23,7 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250525.0",
     "@prisma/client": "^6.5.0",
+    "@types/crypto-js": "^4.2.2",
     "aws-sdk": "^2.1692.0",
     "dotenv-cli": "^8.0.0",
     "mock-aws-s3": "^4.0.2",
