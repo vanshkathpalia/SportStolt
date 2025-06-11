@@ -24,7 +24,7 @@ export const EarnPage = () => {
 
       const res = await axios.post(
         `${BACKEND_URL}/api/v1/earn/create-order`,
-        { amount: 100 },
+        { amount: 1 },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -95,7 +95,7 @@ export const EarnPage = () => {
             disabled={loading}
             className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition disabled:opacity-50"
           >
-            {loading ? "Processing..." : "Pay ₹100 to Join"}
+            {loading ? "Processing..." : "Pay ₹1 to Join"}
           </button>
         </section>
       </div>
