@@ -15,6 +15,7 @@ wrangler.toml
 # deps
 node_modules/
 .wrangler
+**/wrangler.toml
 
 # env
 .env
