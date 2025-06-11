@@ -45,7 +45,7 @@ model User {
   comment               Comment[]
   event                 Event[]
 
-  
+  withdrawals           Withdrawal[]
 
   sentNotifications     Notification[]    @relation("SentNotifications")
   receivedNotifications Notification[]    @relation("ReceivedNotifications")
@@ -57,6 +57,16 @@ model User {
 
   resetToken            String?
   resetTokenExpiry      DateTime?
+}
+
+model Withdrawal {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  amount      Float
+  upi         String
+  status      String
+  initiatedAt DateTime
 }
 
 model Tag {

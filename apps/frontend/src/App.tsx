@@ -33,6 +33,7 @@ import ShippingPolicy from "./pages/ShippingPolicy"
 import Contact from "./pages/Contact"
 import { EarnPage } from "./pages/Earn"
 import PaymentSuccessPage from "./pages/PaymentSuccess"
+import WithdrawPage from "./pages/Withdraw"
 
 const queryClient = new QueryClient()
 
@@ -73,6 +74,7 @@ function App() {
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/earn" element={<EarnPage/>} />
                 <Route path="/payment-success" element={<PaymentSuccessPage />} />
+                <Route path="/withdraw" element={<WithdrawPage />} />
                 <Route path="/logout" element={<Logout />} />
               </Routes>
 

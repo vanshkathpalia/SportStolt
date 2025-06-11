@@ -17,7 +17,7 @@ import { searchRouter } from '~/controllers/search';
 import { notificationRouter } from './routes/notificationRouter';
 import { trainingRouter } from './routes/trainingRouter';
 import { settingsRouter } from './routes/settingsRouter';
-import earnRouter from './controllers/earn';
+import { earnRouter } from './controllers/earn';
 
 const app = new Hono<{
   Bindings: {

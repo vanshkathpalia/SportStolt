@@ -3,6 +3,8 @@ import { BACKEND_URL } from "../config";
 // @ts-expect-error: cashfree-js library is not typed, but it's a required dependency
 import { load } from "@cashfreepayments/cashfree-js";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+
 
 export const EarnPage = () => {
   const [loading, setLoading] = useState(false);
@@ -24,7 +26,7 @@ export const EarnPage = () => {
 
       const res = await axios.post(
         `${BACKEND_URL}/api/v1/earn/create-order`,
-        { amount: 1 },
+        { amount: 5 },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -63,7 +65,7 @@ export const EarnPage = () => {
 
       <div className="bg-white dark:bg-slate-800 shadow-md rounded-xl p-6 space-y-5 border border-slate-200 dark:border-slate-700">
         <section>
-          <h2 className="text-2xl font-semibold mb-2">Why a ₹100 Fee?</h2>
+          <h2 className="text-2xl font-semibold mb-2">Why a ₹5 Fee?</h2>
           <p className="text-xl">
             This small fee helps us ensure that only genuine contributors are part of our community. It filters out spam
             and keeps the platform fair for everyone working hard to provide meaningful sports-related content.
@@ -73,7 +75,7 @@ export const EarnPage = () => {
         <section>
           <h2 className="text-2xl font-semibold mb-2">What is Proof of Work?</h2>
           <p className="text-xl">
-            Proof of Work (PoW) is our trust model. By paying ₹100, you’re signing up for a reward-based system where
+            Proof of Work (PoW) is our trust model. By paying ₹5, you're signing up for a reward-based system where
             you can earn points and recognition by uploading valid and verified local sports stories, events, or
             activities.
           </p>
@@ -95,8 +97,18 @@ export const EarnPage = () => {
             disabled={loading}
             className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition disabled:opacity-50"
           >
-            {loading ? "Processing..." : "Pay ₹1 to Join"}
+            {loading ? "Processing..." : "Pay ₹5 to Join"}
           </button>
+
+          <div className="mt-6">
+            <p className="text-lg mb-2">Already paid and earned points?</p>
+            <Link
+              to="/withdraw"
+              className="text-blue-500 underline hover:text-blue-800 transition"
+            >
+              Withdraw your earnings here →
+            </Link>
+          </div>
         </section>
       </div>
     </div>
