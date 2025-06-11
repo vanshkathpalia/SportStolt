@@ -4,6 +4,7 @@ import { BACKEND_URL } from '../config';
 import { Sidebar } from '../components/StickyBars/Sidebar';
 import { MobileNav } from '../components/StickyBars/MobileNav';
 import { useMediaQuery } from '../hooks/useMediaQuery';
+import { Link } from 'react-router-dom';
 
 export const SettingsPage = ({ openCreateModal }: { openCreateModal: () => void }) => {
   const [sports, setSports] = useState<string[]>([]);
@@ -14,25 +15,27 @@ export const SettingsPage = ({ openCreateModal }: { openCreateModal: () => void 
   const isMobile = useMediaQuery('(max-width: 768px)');
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    setTimeout(() => {
+      const token = localStorage.getItem('token');
 
-    if (!token) {
-      alert('No auth token found. Please log in.');
-      setLoading(false);
-      return;
-    }
+      if (!token) {
+        alert('No auth token found. Please log in.');
+        setLoading(false);
+        return;
+      }
 
-    axios
-      .get(`${BACKEND_URL}/api/v1/settings/preferences`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-      .then((res) => {
-        setSports(res.data.preferences?.preferredSports || []);
-        setLocations(res.data.preferences?.preferredLocations || []);
-      })
-      .catch((err) => console.error('Failed to load preferences:', err));
+      axios
+        .get(`${BACKEND_URL}/api/v1/settings/preferences`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          setSports(res.data.preferences?.preferredSports || []);
+          setLocations(res.data.preferences?.preferredLocations || []);
+        })
+        .catch((err) => console.error('Failed to load preferences:', err));
+      }, 1000);
   }, []);
 
   const addToList = (
@@ -216,8 +219,17 @@ export const SettingsPage = ({ openCreateModal }: { openCreateModal: () => void 
               </button>
             </div>
           </div>
+          <div className="mt-10 text-sm text-center text-gray-600 dark:text-gray-300 space-y-2">
+            <p>
+              <Link to="/privacy-policy" className="underline hover:text-blue-600">Privacy Policy</Link> |{" "}
+              <Link to="/refund-policy" className="underline hover:text-blue-600">Refund Policy</Link> |{" "}
+              <Link to="/shipping-policy" className="underline hover:text-blue-600">Shipping Info</Link> |{" "}
+              <Link to="/contact" className="underline hover:text-blue-600">Contact Us</Link>
+            </p>
+          </div>
         </main>
       </div>
+      
     </div>
   );
 };

@@ -55,6 +55,18 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
 
   const navigate = useNavigate();
 
+  // useEffect(() => {
+  //   const fetchFollowedUsers = async () => {
+  //     const token = localStorage.getItem("token");
+  //     const res = await axios.get(`${BACKEND_URL}/api/v1/search/followed`, {
+  //       headers: { Authorization: `Bearer ${token}` },
+  //     });
+  //     setFollowedUsers(res.data.users);
+  //   };
+
+  //   fetchFollowedUsers();
+  // }, []);
+
 
   useEffect(() => {
     const fetchNotifications = async () => {
@@ -179,9 +191,9 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
       } else if (notification.type === "COMMENT" && notification.postId) {
         navigate(`/post/${notification.postId}`);
       } 
-      else if (notification.type === "FOLLOW") {
-        navigate(`/profile/${notification.user.username}`);
-      }
+      // else if (notification.type === "FOLLOW") {
+      //   navigate(`/profile/${notification.user.username}`);
+      // }
       else if (notification.type === "INFO") {
         navigate(`/profile/${notification.user.username}`);
       }

@@ -27,6 +27,10 @@ import { SettingsPage } from "./pages/Settings"
 import { AuthProvider } from './context/AuthProvider'  // You need to create/export this if not already
 // import { useWatchedStories } from "./hooks/useWatchedStories"
 import { WatchedStoriesProvider } from "./context/WatchedStoriesProvider"
+import RefundPolicy from "./pages/RefundPolicy"
+import PrivacyPolicy from "./pages/PrivacyPolicy"
+import ShippingPolicy from "./pages/ShippingPolicy"
+import Contact from "./pages/Contact"
 
 const queryClient = new QueryClient()
 
@@ -61,6 +65,10 @@ function App() {
                 <Route path="/profile/:username" element={<Profile openCreateModal={() => setCreatePostModalOpen(true)} />} />
                 <Route path="/editprofile/:id" element={<EditProfile openCreateModal={() => setCreatePostModalOpen(true)} />} />
                 <Route path="/settings" element={<SettingsPage openCreateModal={() => setCreatePostModalOpen(true)} />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/refund-policy" element={<RefundPolicy />} />
+                <Route path="/shipping-policy" element={<ShippingPolicy />} />
+                <Route path="/contact" element={<Contact />} />
                 <Route path="/logout" element={<Logout />} />
               </Routes>
 
