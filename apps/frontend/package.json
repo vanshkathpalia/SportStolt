@@ -13,6 +13,7 @@
   },
   "homepage": "./",
   "dependencies": {
+    "@cashfreepayments/cashfree-js": "^1.0.5",
     "@tensorflow-models/mobilenet": "^2.1.1",
     "@tensorflow/tfjs": "^4.22.0",
     "@vanshkathpalia/sportstolt-common": "^1.0.0",

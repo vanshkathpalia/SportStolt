@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar"
 import { Button } from "../components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs"
 import { BACKEND_URL } from "../config"
-import { sendFollowNotification } from "../utils/sendNotification"
+// import { sendFollowNotification } from "../utils/sendNotification"
 import { useNavigate } from "react-router-dom";
 
 interface Notification {
@@ -34,10 +34,10 @@ export interface EventNotification extends Notification {
   eventId: number
 }
 
-interface User {
-  id: number;
-  username: string;
-}
+// interface User {
+//   id: number;
+//   username: string;
+// }
 
 interface NotificationsPageProps {
   openCreateModal: () => void
@@ -48,24 +48,12 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
   const [notifications, setNotifications] = useState<Notification[]>([])
   const isMobile = useMediaQuery("(max-width: 768px)")
 
-  const [followedUsers, setFollowedUsers] = useState<User[]>([]);
+  // const [followedUsers, setFollowedUsers] = useState<User[]>([]);
 
   const [eventNotifications, setEventNotifications] = useState<EventNotification[]>([]);
   const [eventTabLoaded, setEventTabLoaded] = useState(false);
 
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   const fetchFollowedUsers = async () => {
-  //     const token = localStorage.getItem("token");
-  //     const res = await axios.get(`${BACKEND_URL}/api/v1/search/followed`, {
-  //       headers: { Authorization: `Bearer ${token}` },
-  //     });
-  //     setFollowedUsers(res.data.users);
-  //   };
-
-  //   fetchFollowedUsers();
-  // }, []);
 
 
   useEffect(() => {
@@ -85,6 +73,20 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
 
     fetchNotifications()
   }, [])
+
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     const fetchFollowedUsers = async () => {
+  //       const token = localStorage.getItem("token");
+  //       const res = await axios.get(`${BACKEND_URL}/api/v1/search/followed`, {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       });
+  //       setFollowedUsers(res.data.users);
+  //     };
+  
+  //     fetchFollowedUsers();
+  //   }, 5000);
+  // }, []);
 
   const handleVerification = async (notificationId: number, isVerified: boolean) => {
     try {
@@ -150,38 +152,38 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
   });
 
 
-  const toggleFollowUser = async (username: string) => {
-    const notif = notifications.find(n => n.user.username === username);
-    if (!notif) return;
+  // const toggleFollowUser = async (username: string) => {
+  //   const notif = notifications.find(n => n.user.username === username);
+  //   if (!notif) return;
 
-    const user = notif.user;
-    if (!user) return;
+  //   const user = notif.user;
+  //   if (!user) return;
 
-    try {
-      const isFollowing = followedUsers.some(u => u.username === username);
+  //   try {
+  //     const isFollowing = followedUsers.some(u => u.username === username);
 
-      if (isFollowing) {
-        await axios.delete(`${BACKEND_URL}/api/v1/search/follow/user/${user.id}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        setFollowedUsers(prev => prev.filter(u => u.username !== username));
-      } else {
-        await axios.post(`${BACKEND_URL}/api/v1/search/follow/user/${user.id}`, {}, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        });
-        setFollowedUsers(prev => [...prev, user]);
+  //     if (isFollowing) {
+  //       await axios.delete(`${BACKEND_URL}/api/v1/search/follow/user/${user.id}`, {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         },
+  //       });
+  //       setFollowedUsers(prev => prev.filter(u => u.username !== username));
+  //     } else {
+  //       await axios.post(`${BACKEND_URL}/api/v1/search/follow/user/${user.id}`, {}, {
+  //         headers: {
+  //           Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //         },
+  //       });
+  //       setFollowedUsers(prev => [...prev, user]);
 
-        // sending notification here
-        await sendFollowNotification(user.id);
-      }
-    } catch (error) {
-      console.error('Follow/unfollow user failed:', error);
-    }
-  };
+  //       // sending notification here
+  //       await sendFollowNotification(user.id);
+  //     }
+  //   } catch (error) {
+  //     console.error('Follow/unfollow user failed:', error);
+  //   }
+  // };
 
   const renderNotification = (notification: Notification) => (
     <div key={notification.id} className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
@@ -191,12 +193,12 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
       } else if (notification.type === "COMMENT" && notification.postId) {
         navigate(`/post/${notification.postId}`);
       } 
-      // else if (notification.type === "FOLLOW") {
-      //   navigate(`/profile/${notification.user.username}`);
-      // }
-      else if (notification.type === "INFO") {
+      else if (notification.type === "FOLLOW") {
         navigate(`/profile/${notification.user.username}`);
       }
+      // else if (notification.type === "INFO") {
+      //   navigate(`/profile/${notification.user.username}`);
+      // }
       // was planning to go to the profile of story poster, but for verification no sender (himself actually)
       // else if (notification.type === "VERIFICATION") {
       //   navigate(`/profile/${notification.user.username}`);
@@ -229,7 +231,7 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
           </div>
         )}
 
-        {notification.type === "FOLLOW" && (
+        {/* {notification.type === "FOLLOW" && (
           <Button
             size="sm"
             variant="outline"
@@ -240,7 +242,7 @@ export default function NotificationsPage({ openCreateModal }: NotificationsPage
               ? 'Unfollow'
               : 'Follow'}
           </Button>
-        )}
+        )} */}
 
 
         {/* {notification.type === "EVENT" && (

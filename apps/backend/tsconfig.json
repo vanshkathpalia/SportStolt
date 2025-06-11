@@ -19,7 +19,7 @@
     "include": [
       "src/**/*.ts",
       "src/**/*.tsx"
-, "src/index.ts", "../frontend/src/utils/mailer.ts"    ],
+, "src/index.ts", "../frontend/src/utils/mailer.ts", "../frontend/src/pages/PaymentSuccess.tsx"    ],
     "exclude": [
       "node_modules"
     ]

@@ -24,6 +24,8 @@ model User {
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
   password              String
+  hasPaid               Boolean           @default(false)
+
 
   points                Int               @default(0)
   badgeLevel            String?

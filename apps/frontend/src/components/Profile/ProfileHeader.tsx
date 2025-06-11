@@ -118,10 +118,20 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ userId }) => {
             <span className="font-semibold">{profile.legitimacy}</span>
             <div className="text-gray-500 dark:text-gray-400 text-sm">Accuracy</div>
           </div>
-          <div>
-            <span className="font-semibold">{profile.points}</span>
-            <div className="text-gray-500 dark:text-gray-400 text-sm">Points</div>
-          </div>
+          {
+            !profile.hasPaid && (
+              <div>
+                <span className="font-semibold">{profile.verifiedStoriesCount}</span>
+                <div className="text-gray-500 dark:text-gray-400 text-sm">Verified</div>
+              </div>
+            )
+          }
+          {profile.hasPaid && (
+            <div>
+              <span className="font-semibold">{profile.points}</span>
+              <div className="text-gray-500 dark:text-gray-400 text-sm">Points</div>
+            </div>
+          )}
         </div>
 
         {/* Bio / Location / University */}
@@ -137,12 +147,12 @@ export const ProfileHeader: React.FC<ProfileHeaderProps> = ({ userId }) => {
           <span className="px-3 py-1 text-xs rounded-full bg-gray-400 text-white font-semibold">
             {profile.badge} Badge
           </span>
-          <Tooltip content={0}>
+          <Tooltip content={profile.followersCount-1}>
             <span className="text-gray-500 dark:text-gray-400 text-xs hover:underline cursor-pointer">
               Followers 
             </span>
           </Tooltip>
-          <Tooltip content={profile.followingCount}>
+          <Tooltip content={profile.followingCount-1}>
             <span className="text-gray-500 dark:text-gray-400 text-xs hover:underline cursor-pointer">
               Following
             </span>

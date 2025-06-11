@@ -17,6 +17,7 @@ import { searchRouter } from '~/controllers/search';
 import { notificationRouter } from './routes/notificationRouter';
 import { trainingRouter } from './routes/trainingRouter';
 import { settingsRouter } from './routes/settingsRouter';
+import earnRouter from './controllers/earn';
 
 const app = new Hono<{
   Bindings: {
@@ -46,6 +47,7 @@ app.route('/api/v1/search', searchRouter);
 app.route('/api/v1/notification', notificationRouter);
 app.route('/api/v1/training', trainingRouter);
 app.route('/api/v1/settings', settingsRouter);
+app.route('/api/v1/earn', earnRouter);
 
 // Dev-only cron simulation (no Cloudflare required)
 if (process.env.NODE_ENV === 'development') {

@@ -163,8 +163,11 @@ postRouter.put('/', async (c) => {
 
 
 postRouter.get('/bulk', authMiddleware, async (c) => {
+
   const prisma = new PrismaClient({
-    datasourceUrl: c.env.DATABASE_URL,
+    datasources: {
+        db: { url: c.env.DATABASE_URL },
+    },
   }).$extends(withAccelerate());
 
   const groupBy = c.req.query('groupBy') || 'default';

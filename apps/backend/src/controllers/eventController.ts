@@ -144,7 +144,7 @@ export const createEventHandler = async (c: Context) => {
 // GET api/v1/event/bulk 
 export const getBulkEventsHandler = async (c: Context) => {
   try {
-    const prisma = getPrisma(c.env.DATABASE_URL);
+  const prisma = getPrisma(c.env.DATABASE_URL);
 
     const events = await prisma.event.findMany({
       where: {

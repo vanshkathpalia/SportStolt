@@ -12,13 +12,14 @@ export interface ProfileData {
   verifiedStoriesCount: number;
   legitimacy: string;
   badge: string;
-  // followersCount: number;
+  followersCount: number;
   followingCount: number;
   achievements: string;
   location: string;
   university: string;
   points: number;
   bio: string;
+  hasPaid: boolean;
 }
 
 export const useProfile = (userId: number) => {

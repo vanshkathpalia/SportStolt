@@ -31,6 +31,8 @@ import RefundPolicy from "./pages/RefundPolicy"
 import PrivacyPolicy from "./pages/PrivacyPolicy"
 import ShippingPolicy from "./pages/ShippingPolicy"
 import Contact from "./pages/Contact"
+import { EarnPage } from "./pages/Earn"
+import PaymentSuccessPage from "./pages/PaymentSuccess"
 
 const queryClient = new QueryClient()
 
@@ -69,6 +71,8 @@ function App() {
                 <Route path="/refund-policy" element={<RefundPolicy />} />
                 <Route path="/shipping-policy" element={<ShippingPolicy />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/earn" element={<EarnPage/>} />
+                <Route path="/payment-success" element={<PaymentSuccessPage />} />
                 <Route path="/logout" element={<Logout />} />
               </Routes>
 

@@ -316,6 +316,7 @@ export async function verifyNotificationController(c: Context) {
           include: {
             Storyimages: true,
             attendees: true,
+            author: true,
           }
         }
       }

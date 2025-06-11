@@ -274,6 +274,7 @@ userRouter.get('/:id/profile', authMiddleware, async (c) => {
       post: true,
       story: true,
       following: true,
+      followers: true,
       // followedTags: true,
       verifiedStories: true,
     },
@@ -292,8 +293,10 @@ userRouter.get('/:id/profile', authMiddleware, async (c) => {
       ? Math.floor((user.verifiedStories.length / user.story.length) * 100)
       : 0}%`,
     badge: user.badgeLevel,
+    hasPaid: user.hasPaid,
     points: user.points,
     followingCount: user.following.length,
+    followersCount: user.followers.length,
     // followedTagsCount: user.followedTags.length,
     achievements: user.achievements,
     location: user.location,

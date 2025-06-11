@@ -12,6 +12,7 @@
     "@vanshkathpalia/sportstolt-common": "^1.0.0",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
+    "cashfree-pg": "^5.0.8",
     "crypto-js": "^4.2.0",
     "dotenv": "^16.5.0",
     "hono": "^4.6.5",
