@@ -9,7 +9,7 @@ import type { ScheduledEvent, ExecutionContext } from '@cloudflare/workers-types
 import { handleNotificationCron, startDevCleanupLoop } from './cron/notifVerifyAndCleanup';
 
 import { userRouter } from '~/controllers/user';
-import { postRouter } from '~/controllers/post';
+import { postRouter } from './controllers/post';
 import { storyRouter } from '~/controllers/story';
 import { apiPostRouter } from '~/controllers/apiPost';
 import { eventRouter } from './routes/eventRouter';

@@ -42,7 +42,7 @@ export const EarnPage = () => {
 
       const cashfree = await load({
           mode: "production", // use "sandbox" for testing
-        // mode: "sandbox",
+          // mode: "sandbox",
       });
 
       await cashfree.checkout({
@@ -75,7 +75,7 @@ export const EarnPage = () => {
         <section>
           <h2 className="text-2xl font-semibold mb-2">What is Proof of Work?</h2>
           <p className="text-xl">
-            Proof of Work (PoW) is our trust model. By paying ₹5, you're signing up for a reward-based system where
+            Proof of Work (PoW) isx our trust model. By paying ₹5, you're signing up for a reward-based system where
             you can earn points and recognition by uploading valid and verified local sports stories, events, or
             activities.
           </p>

@@ -90,29 +90,12 @@ userRouter.post('/signup', async (c) => {
           }
         });
         
-        // await prisma.follow.upsert({
-        //   where: {
-        //     followerId_followingId: {
-        //       followerId: user.id,
-        //       followingId: user.id
-        //     }
-        //   },
-        //   create: {
-        //     followerId: user.id,
-        //     followingId: user.id
-        //   },
-        //   update: {}
-        // });
 
         const jwt = await sign(
             { id: user.id, username: user.username, timestamp: Date.now() },
             c.env.JWT_SECRET
         );
 
-        // localStorage.setItem('token', jwt);
-        // localStorage.setItem('user', JSON.stringify(user));
-        // console.log('Setting token:', jwt);
-        // console.log('Setting user:', user);
         return c.json({
           token: jwt,
           user: {
@@ -121,10 +104,6 @@ userRouter.post('/signup', async (c) => {
             email: user.email,
           },
         });
-
-        // const { id, username, email } = user;
-        // return c.json({ token: jwt, user: { id, username, email } });
-        // return c.json({ token: jwt });
 
     } catch (e) {
         c.status(500);
@@ -159,10 +138,6 @@ userRouter.post('/signin', async (c) => {
 
         c.status(200);
         
-        // localStorage.setItem('token', jwt);
-        // localStorage.setItem('user', JSON.stringify(user));
-        // console.log('Setting token:', jwt);
-        // console.log('Setting user:', user);
         return c.json({
           token: jwt,
           user: {
@@ -171,10 +146,6 @@ userRouter.post('/signin', async (c) => {
             email: user.email,
           },
         });
-
-        // const { id, username, email } = user;
-        // return c.json({ token: jwt, user: { id, username, email } });
-        // return c.json({ token: jwt });
 
     } catch (e) {
         console.error(e);
@@ -208,21 +179,6 @@ userRouter.get('/users', async (c) => {
   }
 });
 
-// userRouter.get('/users', async (c) => {
-//   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-
-//   try {
-//     const users = await prisma.user.findMany({
-//       select: { id: true }, // only fetch user IDs
-//     });
-
-//     return c.json({ userIds: users.map(user => user.id) });
-//   } catch (e) {
-//     c.status(500);
-//     console.error(e);
-//     return c.json({ error: "Failed to fetch user IDs" });
-//   }
-// });
 
 // Get Current User
 userRouter.get('/me', authMiddleware, async (c) => {
@@ -232,7 +188,7 @@ userRouter.get('/me', authMiddleware, async (c) => {
   if (!userId) {
     return c.json({ error: 'Unauthorized' }, 401);
   }
-
+  
   try {
     // Fetch user from DB by id, exclude password
     const user = await prisma.user.findUnique({
@@ -249,11 +205,11 @@ userRouter.get('/me', authMiddleware, async (c) => {
         // any other public user fields
       },
     });
-
+    
     if (!user) {
       return c.json({ error: 'User not found' }, 404);
     }
-
+    
     return c.json(user);
   } catch (err) {
     console.error('Error fetching user:', err);
@@ -265,9 +221,9 @@ userRouter.get('/me', authMiddleware, async (c) => {
 userRouter.get('/:id/profile', authMiddleware, async (c) => {
   const userId = Number(c.req.param('id'));
   if (isNaN(userId)) return c.json({ error: 'Invalid user ID' }, 400);
-
+  
   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-
+  
   const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
@@ -279,9 +235,9 @@ userRouter.get('/:id/profile', authMiddleware, async (c) => {
       verifiedStories: true,
     },
   });
-
+  
   if (!user) return c.json({ error: 'User not found' }, 404);
-
+  
   const profileData = {
     name: user.name,
     username: user.username,
@@ -292,216 +248,234 @@ userRouter.get('/:id/profile', authMiddleware, async (c) => {
     legitimacy: `${user.verifiedStories.length && user.story.length
       ? Math.floor((user.verifiedStories.length / user.story.length) * 100)
       : 0}%`,
-    badge: user.badgeLevel,
-    hasPaid: user.hasPaid,
-    points: user.points,
-    followingCount: user.following.length,
-    followersCount: user.followers.length,
-    // followedTagsCount: user.followedTags.length,
-    achievements: user.achievements,
-    location: user.location,
-    university: user.university,
-    bio: user.bio,
-  };
-
-  return c.json(profileData);
-});
-
-// Editing bio achievement... patch request
-userRouter.patch('/:id/profile', authMiddleware, async (c) => {
-  const userId = Number(c.req.param('id'));
-  if (isNaN(userId)) return c.json({ error: 'Invalid user ID' }, 400);
-
-  // Parse and validate the input body
-  let updateData;
-  try {
-    updateData = UserEditInput.parse(await c.req.json());
-  } catch (e) {
-    if (e instanceof ZodError) {
-      return c.json({ error: 'Invalid input', details: e.errors }, 400);
+      badge: user.badgeLevel,
+      hasPaid: user.hasPaid,
+      points: user.points,
+      followingCount: user.following.length,
+      followersCount: user.followers.length,
+      // followedTagsCount: user.followedTags.length,
+      achievements: user.achievements,
+      location: user.location,
+      university: user.university,
+      bio: user.bio,
+    };
+    
+    return c.json(profileData);
+  });
+  
+  // Editing bio achievement... patch request
+  userRouter.patch('/:id/profile', authMiddleware, async (c) => {
+    const userId = Number(c.req.param('id'));
+    if (isNaN(userId)) return c.json({ error: 'Invalid user ID' }, 400);
+    
+    // Parse and validate the input body
+    let updateData;
+    try {
+      updateData = UserEditInput.parse(await c.req.json());
+    } catch (e) {
+      if (e instanceof ZodError) {
+        return c.json({ error: 'Invalid input', details: e.errors }, 400);
+      }
+      return c.json({ error: 'Unexpected error' }, 500);
     }
-    return c.json({ error: 'Unexpected error' }, 500);
-  }
-
-  const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-
-  // Optional: check if authenticated user matches the userId in URL or has permission
-  const authUserId = c.get('userId'); // assuming authMiddleware sets this
-  if (!authUserId || authUserId !== userId) {
-    return c.json({ error: 'Unauthorized' }, 401);
-  }
-
-  try {
-    const updatedUser = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        image: updateData.image, // Assuming you might want to update the profile image too
-        bio: updateData.bio,
-        location: updateData.location,
-        university: updateData.university,
-        achievements: updateData.achievements,
-        updatedAt: new Date(),
+    
+    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+    
+    // Optional: check if authenticated user matches the userId in URL or has permission
+    const authUserId = c.get('userId'); // assuming authMiddleware sets this
+    if (!authUserId || authUserId !== userId) {
+      return c.json({ error: 'Unauthorized' }, 401);
+    }
+    
+    try {
+      const updatedUser = await prisma.user.update({
+        where: { id: userId },
+        data: {
+          image: updateData.image, // Assuming you might want to update the profile image too
+          bio: updateData.bio,
+          location: updateData.location,
+          university: updateData.university,
+          achievements: updateData.achievements,
+          updatedAt: new Date(),
+        },
+        select: {
+          id: true,
+          image: true,  
+          bio: true,
+          location: true,
+          university: true,
+          achievements: true,
+          updatedAt: true,
+        },
+      });
+      
+      return c.json({ message: 'Profile updated', user: updatedUser });
+    } catch (error) {
+      return c.json({ error: 'Failed to update profile' }, 500);
+    }
+  });
+  
+  // Get User's Posts
+  userRouter.get('/:id/posts', authMiddleware, async (c) => {
+    const userId = Number(c.req.param('id'));
+    if (isNaN(userId)) return c.json({ error: 'Invalid user ID' }, 400);
+    
+    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+    
+    const posts = await prisma.post.findMany({
+      where: { authorId: userId }, // Note: You wrote userId in where but your model uses authorId
+      select: {
+        id: true,
+        content: true,   // Assuming you want content with image links here
+        title: true,
+        createdAt: true,
+        _count: {
+          select: {
+            likes: true,
+            Comment: true,
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    
+    return c.json(posts);
+  });
+  
+  // Get User's Participated Events
+  userRouter.get('/:id/events', authMiddleware, async (c) => {
+    const userId = Number(c.req.param('id'));
+    if (isNaN(userId)) return c.json({ error: 'Invalid user ID' }, 400);
+    
+    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+    
+    const events = await prisma.event.findMany({
+      where: {
+        // isArchived: false,
+        registration: {
+          some: {
+            userId: userId,
+          },
+        },
       },
       select: {
         id: true,
-        image: true,  
-        bio: true,
-        location: true,
-        university: true,
-        achievements: true,
-        updatedAt: true,
+        name: true,
+        startDate: true,
+        endDate: true,
+        startTime: true,
+        stadium: true,
+        OrganisedBy: true,
+        // description: true,  // your schema doesn't have description in Event, so either add or remove
+        city: true,
+        createdAt: true,
+      },
+      orderBy: {
+        startDate: 'asc', // Order by start date ascending
       },
     });
-
-    return c.json({ message: 'Profile updated', user: updatedUser });
-  } catch (error) {
-    return c.json({ error: 'Failed to update profile' }, 500);
-  }
-});
-
-// Get User's Posts
-userRouter.get('/:id/posts', authMiddleware, async (c) => {
-  const userId = Number(c.req.param('id'));
-  if (isNaN(userId)) return c.json({ error: 'Invalid user ID' }, 400);
-
-  const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-
-  const posts = await prisma.post.findMany({
-    where: { authorId: userId }, // Note: You wrote userId in where but your model uses authorId
-    select: {
-      id: true,
-      content: true,   // Assuming you want content with image links here
-      title: true,
-      createdAt: true,
-      _count: {
-        select: {
-          likes: true,
-          Comment: true,
-        }
+    
+    const now = new Date();
+    
+    const enrichedEvents = events.map(event => {
+      let status: "completed" | "ongoing" | "upcoming";
+      if (now > event.endDate) {
+        status = "completed";
+      } else if (now >= event.startDate && now <= event.endDate) {
+        status = "ongoing";
+      } else {
+        status = "upcoming";
       }
-    },
-    orderBy: { createdAt: 'desc' },
+      
+      const StartDate = new Date(event.startDate).toLocaleDateString('en-GB', {
+        day: '2-digit', month: 'long', year: 'numeric',
+      });
+      
+      const EndDate = new Date(event.endDate).toLocaleDateString('en-GB', {
+        day: '2-digit', month: 'long', year: 'numeric',
+      });
+      
+      const StartTime = new Date(event.startDate).toLocaleTimeString('en-GB', {
+        hour: '2-digit', minute: '2-digit', hour12: true,
+      });
+      
+      return {
+        organisedBy: event.OrganisedBy,
+        StartDate,
+        EndDate,
+        StartTime,
+        timing: `Starts: ${StartDate} at ${StartTime}`,
+        ...event,
+        status,
+      };
+      
+    });
+    
+    return c.json(enrichedEvents);
   });
-
-  return c.json(posts);
-});
-
-// Get User's Participated Events
-userRouter.get('/:id/events', authMiddleware, async (c) => {
-  const userId = Number(c.req.param('id'));
-  if (isNaN(userId)) return c.json({ error: 'Invalid user ID' }, 400);
-
-  const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-
-  const events = await prisma.event.findMany({
-    where: {
-      // isArchived: false,
-      registration: {
-        some: {
-          userId: userId,
-        },
-      },
-    },
-    select: {
-      id: true,
-      name: true,
-      startDate: true,
-      endDate: true,
-      startTime: true,
-      stadium: true,
-      OrganisedBy: true,
-      // description: true,  // your schema doesn't have description in Event, so either add or remove
-      city: true,
-      createdAt: true,
-    },
-    orderBy: {
-      startDate: 'asc', // Order by start date ascending
-    },
-  });
-
-  const now = new Date();
-
-  const enrichedEvents = events.map(event => {
-    let status: "completed" | "ongoing" | "upcoming";
-    if (now > event.endDate) {
-      status = "completed";
-    } else if (now >= event.startDate && now <= event.endDate) {
-      status = "ongoing";
-    } else {
-      status = "upcoming";
+  
+  // GET /api/user/id/:username
+  userRouter.get('/id/:username', async (c) => {
+    const { username } = c.req.param();
+    const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+    
+    const user = await prisma.user.findUnique({ where: { username } });
+    
+    if (!user) {
+      c.status(404);
+      return c.json({ error: "User not found" });
     }
     
-    const StartDate = new Date(event.startDate).toLocaleDateString('en-GB', {
-      day: '2-digit', month: 'long', year: 'numeric',
-    });
-
-    const EndDate = new Date(event.endDate).toLocaleDateString('en-GB', {
-      day: '2-digit', month: 'long', year: 'numeric',
-    });
-
-    const StartTime = new Date(event.startDate).toLocaleTimeString('en-GB', {
-      hour: '2-digit', minute: '2-digit', hour12: true,
-    });
-
-    return {
-      organisedBy: event.OrganisedBy,
-      StartDate,
-      EndDate,
-      StartTime,
-      timing: `Starts: ${StartDate} at ${StartTime}`,
-      ...event,
-      status,
-    };
-
+    return c.json({ id: user.id });
   });
-
-  return c.json(enrichedEvents);
-});
-
-// GET /api/user/id/:username
-userRouter.get('/id/:username', async (c) => {
-  const { username } = c.req.param();
-  const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-
-  const user = await prisma.user.findUnique({ where: { username } });
-
-  if (!user) {
-    c.status(404);
-    return c.json({ error: "User not found" });
-  }
-
-  return c.json({ id: user.id });
-});
+  
+  
 
 
-
-
-
-// // User Signup Route (Without Mailer Logic)
-// userRouter.post('/signup', async (c) => {
-//     const body = await c.req.json();
-//     const result = signupInput.safeParse(body);
-//     if (!result.success) {
-//         c.status(400);
-//         return c.json({ error: "Invalid input", details: result.error });
-//     }
-
-//     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
-
-//     try {
-//         const existingUser = await prisma.user.findUnique({ where: { email: body.email } });
-
-//         if (existingUser) {
-//             c.status(409); // Conflict
-//             return c.json({ error: "User already exists. Try signing in." });
-//         }
-
-//         const hashedPassword = await bcrypt.hash(body.password, 6);
-//         const user = await prisma.user.create({
-//             data: {
-//                 email: body.email,
-//                 password: hashedPassword,
-//                 username: body.username,
+  
+  // userRouter.get('/users', async (c) => {
+  //   const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+  
+  //   try {
+  //     const users = await prisma.user.findMany({
+  //       select: { id: true }, // only fetch user IDs
+  //     });
+  
+  //     return c.json({ userIds: users.map(user => user.id) });
+  //   } catch (e) {
+  //     c.status(500);
+  //     console.error(e);
+  //     return c.json({ error: "Failed to fetch user IDs" });
+  //   }
+  // });
+  
+  
+  
+  // // User Signup Route (Without Mailer Logic)
+  // userRouter.post('/signup', async (c) => {
+    //     const body = await c.req.json();
+    //     const result = signupInput.safeParse(body);
+    //     if (!result.success) {
+      //         c.status(400);
+      //         return c.json({ error: "Invalid input", details: result.error });
+      //     }
+      
+      //     const prisma = new PrismaClient({ datasourceUrl: c.env.DATABASE_URL }).$extends(withAccelerate());
+      
+      //     try {
+        //         const existingUser = await prisma.user.findUnique({ where: { email: body.email } });
+        
+        //         if (existingUser) {
+          //             c.status(409); // Conflict
+          //             return c.json({ error: "User already exists. Try signing in." });
+          //         }
+          
+          //         const hashedPassword = await bcrypt.hash(body.password, 6);
+          //         const user = await prisma.user.create({
+            //             data: {
+              //                 email: body.email,
+              //                 password: hashedPassword,
+              //                 username: body.username,
 //                 type: body.type,
 //             }
 //         });

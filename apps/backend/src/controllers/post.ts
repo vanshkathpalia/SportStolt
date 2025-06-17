@@ -32,38 +32,38 @@ export const postRouter = new Hono<{
 postRouter.use('/*', authMiddleware);
 
 
-postRouter.get('/upload-auth', async (c) => {
-  const userId = c.get('userId');
-  if (!userId) {
-    return c.json({ message: "Unauthorized" }, 403);
-  }
+// postRouter.get('/upload-auth', async (c) => {
+//   const userId = c.get('userId');
+//   if (!userId) {
+//     return c.json({ message: "Unauthorized" }, 403);
+//   }
 
-  // Inside your /upload-auth endpoint
-  const privateKey = c.env.IMAGEKIT_PRIVATE_KEY;
-  const publicKey = c.env.IMAGEKIT_PUBLIC_KEY;
+//   // Inside your /upload-auth endpoint
+//   const privateKey = c.env.IMAGEKIT_PRIVATE_KEY;
+//   const publicKey = c.env.IMAGEKIT_PUBLIC_KEY;
 
-  const expire = Math.floor(Date.now() / 1000) + 60 * 30;
-  const token = nanoid();
+//   const expire = Math.floor(Date.now() / 1000) + 60 * 30;
+//   const token = nanoid();
 
-  const raw = token + expire;
-  const signatureBeforeCase = Base64.stringify(HmacSHA1(raw, privateKey));
-  const signature = signatureBeforeCase.toLowerCase();
+//   const raw = token + expire;
+//   const signatureBeforeCase = Base64.stringify(HmacSHA1(raw, privateKey));
+//   const signature = signatureBeforeCase.toLowerCase();
 
-  console.log("Server-Side Signature Generation Details:");
-  console.log("Private Key (first 5 chars):", privateKey.substring(0, 5) + "..."); // Mask for safety
-  console.log("Token:", token);
-  console.log("Expire:", expire);
-  console.log("Raw String (token + expire):", raw);
-  console.log("Signature BEFORE toLowerCase():", signatureBeforeCase);
-  console.log("Signature AFTER toLowerCase():", signature);
+//   console.log("Server-Side Signature Generation Details:");
+//   console.log("Private Key (first 5 chars):", privateKey.substring(0, 5) + "..."); // Mask for safety
+//   console.log("Token:", token);
+//   console.log("Expire:", expire);
+//   console.log("Raw String (token + expire):", raw);
+//   console.log("Signature BEFORE toLowerCase():", signatureBeforeCase);
+//   console.log("Signature AFTER toLowerCase():", signature);
 
-  return c.json({
-    signature,
-    token,
-    expire,
-    publicKey,
-  });
-});
+//   return c.json({
+//     signature,
+//     token,
+//     expire,
+//     publicKey,
+//   });
+// });
 
 
 postRouter.post('/', async (c) => {
@@ -289,160 +289,6 @@ postRouter.get('/bulk', authMiddleware, async (c) => {
 
   return c.json({ posts });
 });
-
-
-// postRouter.get('/bulk', async (c) => {
-//     const prisma = new PrismaClient({
-//         datasourceUrl: c.env.DATABASE_URL,
-//     }).$extends(withAccelerate());
-
-//     const groupBy = c.req.query('groupBy') || 'default';
-
-//     let posts;
-
-//     if (groupBy === 'user') {
-//         posts = await prisma.post.findMany({
-//             select: {
-//                 id: true,
-//                 title: true,
-//                 content: true,
-//                 createdAt: true,
-//                 author: {
-//                     select: {
-//                         name: true,
-//                         image: true,
-//                         username: true
-//                     }
-//                 }
-//             },
-//             orderBy: { createdAt: 'desc' }
-//         });
-//     } else if (groupBy === 'tag') {
-//         posts = await prisma.post.findMany({
-//             select: {
-//                 id: true,
-//                 title: true,
-//                 content: true,
-//                 createdAt: true,
-//                 author: {
-//                     select: {
-//                         name: true,
-//                         image: true,
-//                         username: true
-//                     }
-//                 },
-//                 tags: {
-//                     select: {
-//                         name: true
-//                     }
-//                 }
-//             },
-//             orderBy: { createdAt: 'desc' }
-//         });
-//     } else {
-//         posts = await prisma.post.findMany({
-//             select: {
-//                 id: true,
-//                 title: true,
-//                 content: true,
-//                 createdAt: true,
-//                 author: {
-//                     select: {
-//                         name: true,
-//                         image: true,
-//                         username: true
-//                     }
-//                 }
-//             },
-//             orderBy: { createdAt: 'desc' }
-//         });
-//     }
-
-//     return c.json({ posts });
-// });
-
-// Showing all posts by all users with pagination
-// postRouter.get('/bulk', async (c) => {
-//     const prisma = new PrismaClient({
-//         datasourceUrl: c.env.DATABASE_URL,
-//     }).$extends(withAccelerate());
-
-//     const authorId = c.get("userId");
-//     const page = Number(c.req.query('page') || 1); // Default to page 1
-//     const limit = Number(c.req.query('limit') || 10); // Default to 10 posts per page
-//     const skip = (page - 1) * limit; // Calculate the number of posts to skip
-
-//     try {
-//         // Fetch paginated posts
-//         const posts = await prisma.post.findMany({
-//             select: {
-//                 content: true,
-//                 title: true,
-//                 id: true,
-//                 author: {
-//                     select: {
-//                         name: true
-//                     }
-//                 }
-//             },
-//             skip, // Skip posts for pagination
-//             take: limit, // Limit the number of posts
-//         });
-
-//         // Get total number of posts for pagination metadata
-//         const totalPosts = await prisma.post.count();
-
-//         return c.json({
-//             posts,
-//             pagination: {
-//                 totalPosts,
-//                 totalPages: Math.ceil(totalPosts / limit),
-//                 currentPage: page,
-//                 limit,
-//             },
-//         });
-//     } catch (error) {
-//         console.error("Error fetching posts:", error);
-//         return c.json({ message: "Error fetching posts" }, 500);
-//     }
-// });
-
-
-//add pagination at this 
-//showing all the posts by all the user 
-// postRouter.get('/bulk', async (c) => {
-//     const prisma = new PrismaClient({
-//         datasourceUrl: c.env.DATABASE_URL,
-//       }).$extends(withAccelerate())
-//     const authorId = c.get("userId")
-
-//     const posts = await prisma.post.findMany({
-//         select: {
-//             content: true,
-//             title: true,
-//             id: true,
-//             author: {
-//                 select: {
-//                     name: true,
-//                     image: true, 
-//                     username: true
-//                 }
-//             }
-//         },
-//         orderBy: { createdAt: 'desc' }, // because late time means it is the latest post
-//     });
-//     //for manipulating the size of the post image 
-//     // const posts = receivedposts.map(post => ({
-//     //     ...post,
-//     //     content: `${post.content}?w=600&h=600&fit=crop`,
-//     // }));
-//     return c.json({
-//         posts,
-//     })
-// })
-
-//to get into the depth of a particular post
-//this will handle the stories data too
 
 postRouter.get('/:id', async (c) => {
     const id = await c.req.param("id");

@@ -147,7 +147,7 @@ export const PostList: React.FC = () => {
             title={post.title}
             createdAt={post.createdAt}
             content={post.content}
-            expanded={false}
+            expanded={post.expanded ?? false}
           />
         ))}
       </div>

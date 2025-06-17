@@ -116,65 +116,9 @@ export const PostsPage = ({ openCreateModal }: PostsPageProps) => {
                   <StoryList />
                 </div>
 
-                {/* Post Sorting Options */}
-                {/* <div className="mt-4 mb-2">
-                  <div className="flex justify-between items-center">
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => setPostSortType("following")}
-                        className={`px-3 py-1 text-sm rounded-full transition ${
-                          postSortType === "following"
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
-                        }`}
-                      >
-                        Following
-                      </button>
-                      <button
-                        onClick={() => setPostSortType("sport")}
-                        className={`px-3 py-1 text-sm rounded-full transition ${
-                          postSortType === "sport"
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300"
-                        }`}
-                      >
-                        Sports
-                      </button>
-                    </div>
-                  </div>
-                </div> */}
-
-
                 {/* Posts Section */}
                 <PostList />
 
-
-                {/* <div className="mt-2 px-6 pt-6 space-y-4 md:px-4 pb-16 md:pb-8">
-                  {loading ? (
-                    Array(3)
-                      .fill(0)
-                      .map((_, index) => <PostSkeleton key={index} />)
-                  // ) : reversedPosts.length === 0 ? (
-                  ) : posts.length === 0 ? (
-                    <p className="text-center text-gray-500 dark:text-gray-400 py-10">
-                      No posts available right now
-                    </p>
-                  ) : (
-                    
-                    <PostList posts={posts} loading={loading} />
-                    reversedPosts.map((post) => (
-                    posts.map((post) => (
-                      <PostCard
-                        key={post.id}
-                        id={post.id}
-                        author={post.author}
-                        title={post.title}
-                        content={post.content}
-                        expanded={false}
-                      />
-                    ))
-                  )}
-                </div> */}
               </div>
 
               {/* Sidebar Events */}

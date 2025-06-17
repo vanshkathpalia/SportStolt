@@ -1,8 +1,6 @@
 import { 
     Calendar, 
     Camera, 
-    ShoppingBag, 
-    MessageSquareText, 
     MapPin, 
     Share2 
   } from 'lucide-react';
@@ -20,18 +18,18 @@ import {
       icon: Camera,
       color: "bg-purple-500"
     },
-    {
-      title: "Equipment Marketplace",
-      description: "Buy and sell sports equipment in our dedicated marketplace. Find the best deals on quality gear.",
-      icon: ShoppingBag,
-      color: "bg-green-500"
-    },
-    {
-      title: "AI Commentary",
-      description: "Get intelligent insights and analysis for your sports content using our advanced AI technology.",
-      icon: MessageSquareText,
-      color: "bg-orange-500"
-    },
+    // {
+    //   title: "Equipment Marketplace",
+    //   description: "Buy and sell sports equipment in our dedicated marketplace. Find the best deals on quality gear.",
+    //   icon: ShoppingBag,
+    //   color: "bg-green-500"
+    // },
+    // {
+    //   title: "AI Commentary",
+    //   description: "Get intelligent insights and analysis for your sports content using our advanced AI technology.",
+    //   icon: MessageSquareText,
+    //   color: "bg-orange-500"
+    // },
     {
       title: "Location-Based Discovery",
       description: "Find sports events and activities happening near you. Connect with your local sports community.",
